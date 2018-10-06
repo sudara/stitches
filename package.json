@@ -1,0 +1,26 @@
+{
+  "name": "stitches6",
+  "version": "1.0.0",
+  "description": "Stitching Together MP3 Playback in HTML5 Audio with ES6",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sudara/stitches6.git"
+  },
+  "keywords": [
+    "mp3",
+    "html5",
+    "audio",
+    "playback",
+    "es6"
+  ],
+  "author": "Sudara",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sudara/stitches6/issues"
+  },
+  "homepage": "https://github.com/sudara/stitches6#readme"
+}

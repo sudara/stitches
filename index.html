@@ -1,0 +1,162 @@
+<html>
+<body>
+<script>
+
+class Log {
+  static trigger(scope) {
+    console.log(scope)
+    document.body.insertAdjacentHTML("beforeend",`${scope}<br/>`)
+    const event = new CustomEvent(scope, { bubbles: true })
+    document.dispatchEvent(event)
+  }
+}
+
+class Playlist extends Array {
+  constructor(name, ...items) {
+    super(items)
+  }
+
+  add(track) {
+    this.push(track)
+  }
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio#Attributes
+class AudioNode {
+  constructor() {
+    Log.trigger('node:create')
+    this.preload = false
+    this.unlocked = false
+    this.node = new Audio()
+    this.node.preload = false
+
+    // https://developer.mozilla.org/en-US/docs/Web/Apps/Fundamentals/Audio_and_video_delivery/Cross-browser_audio_basics
+    this.node.onprogress = this.whileLoading.bind(this)
+    this.node.ontimeupdate = this.whilePlaying.bind(this)
+
+    // A mini BASE64 encoded silent mp3 allows us to .play() to activate
+    // nodes without https requests or excess file sizes
+    // https://gist.github.com/wittnl/8a1a0168b94f3b6abfaa
+    this.node.src = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU2LjM2LjEwMAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAEAAABIADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV6urq6urq6urq6urq6urq6urq6urq6urq6v////////////////////////////////8AAAAATGF2YzU2LjQxAAAAAAAAAAAAAAAAJAAAAAAAAAAAASDs90hvAAAAAAAAAAAAAAAAAAAA//MUZAAAAAGkAAAAAAAAA0gAAAAATEFN//MUZAMAAAGkAAAAAAAAA0gAAAAARTMu//MUZAYAAAGkAAAAAAAAA0gAAAAAOTku//MUZAkAAAGkAAAAAAAAA0gAAAAANVVV'
+  }
+
+  async unlock() {
+    console.log(typeof this.node)
+    // https://developers.google.com/web/updates/2016/03/play-returns-promise
+    try {
+      await this.node.play()
+      Log.trigger('node:unlocked')
+      this.unlocked = true
+    } catch (err) {
+      Log.trigger('node:unlockfailed')
+    }
+  }
+  // https://dev.w3.org/html5/spec-author-view/spec.html#mediaerror
+
+  whileLoading() {
+    if(this.node.b)
+    Log.trigger(`loading: ${this.node.buffered.end(0)}`)
+  }
+
+  whilePlaying() {
+    Log.trigger(`playing: ${this.node.currentTime}`)
+  }
+
+  ready() {
+    return this.node.readyState >= 3
+  }
+}
+
+// auto play restrictions are per-element
+// https://webkit.org/blog/7734/auto-play-policy-changes-for-macos/
+//
+// Unlock a few elements, inspired by https://github.com/goldfire/howler.js/pull/1008/files
+class NodePool extends Array {
+  constructor(size) {
+    Log.trigger('nodepool:create')
+    let nodes = Array.from({length: size}, () => new AudioNode())
+    super(...nodes)
+  }
+
+  async nextAvailableNode() {
+    const nodesAvailable = this.filter(node => node.unlocked)
+    if(!nodesAvailable.length) {
+      Log.trigger('nodepool:unlockingnode')
+      await this[0].unlock()
+      return this[0].node
+    }
+    else {
+      Log.trigger('nodepool:availablenode')
+      return this.filter(node => node.unlocked)[0].node
+    }
+  }
+
+  unlockAllNodes() {
+    Log.trigger('nodepool:unlockall')
+    for(let node of this) {
+      node.unlock()
+    }
+  }
+}
+
+class Track{
+  constructor(src, preload) {
+    this.src = src
+    this.preload = preload || false
+    Log.trigger('track:create')
+    this.node = null
+    if(this.preload) this.preload()
+  }
+
+  preload() {
+    // grab node from list
+    // make sure this one is last to be unloeckd
+  }
+
+  async grabNode () {
+    Log.trigger('track:grabNodeAndSetSrc')
+    this.node = await pool.nextAvailableNode()
+  }
+
+  // https://developers.google.com/web/updates/2016/03/play-returns-promise
+  async play() {
+    Log.trigger('track:play')
+    try {
+      await this.grabNode()
+      this.node.src = this.src
+      await this.node.play()
+      Log.trigger('track:playing')
+      this.unlocked = false
+    } catch (err) {
+      Log.trigger('track:notplaying')
+      Log.trigger(err)
+    }
+  }
+}
+
+const pool = new NodePool(5)
+
+function play() {
+  var track1 = new Track('/continuous-play-1.mp3')
+  track1.play()
+}
+
+window.addEventListener("load", function (event) {
+  document.addEventListener('touchstart', pool.unlockAllNodes.bind(pool), {once: true, capture: true});
+  document.addEventListener('touchend', pool.unlockAllNodes.bind(pool), { once: true, capture: true});
+  document.addEventListener('click', pool.unlockAllNodes.bind(pool), { once: true, capture: true});
+})
+
+</script>
+<progress></progress>
+<a href="javascript:play()">Play Track 1</a><br />
+
+<progress></progress>
+<a href="javascript:play()">Play Track 2</a><br />
+
+<progress></progress>
+<a href="javascript:play()">Play Track 3</a><br />
+
+</body>
+
+</html>
