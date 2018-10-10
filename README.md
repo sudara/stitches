@@ -1,4 +1,5 @@
 ![stitches6](logo.svg)
+
 Stitching Together MP3 Playback in HTML5 Audio with ES6
 
 ## What's the goal?
