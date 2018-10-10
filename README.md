@@ -67,6 +67,7 @@ However, as time wore on, I found myself constantly having to keep up with the c
 
 ## Acknowledgements
 
+* Thanks to [@smoofles](https://twitter.com/smoofles) for the name and logo!
 * Thanks to [@scottschiller](https://github.com/scottshiller) for creating [soundmanager](http://www.schillmania.com/projects/soundmanager2/), which had alonetone's back for many many years
 * Thanks to [@blackslate](https://github.com/blackslate) for [an example of, and detailed instructions to render](https://gist.github.com/wittnl/8a1a0168b94f3b6abfaa) a small base64 encoded mp3.
 * Thanks to [@scottanderson42](https://github.com/scottanderson42) for [the idea of creating a pool of unlocked nodes.](https://github.com/goldfire/howler.js/pull/1008)
