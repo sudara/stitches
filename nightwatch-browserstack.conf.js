@@ -10,7 +10,7 @@ let nightwatch_config = {
   test_settings: {
     default: {
       desiredCapabilities: {
-        'browserstack.user': 'sudarawilliams1',
+        'browserstack.user': '***REMOVED***',
         'browserstack.key': 'BROWSERSTACK_ACCESS_KEY',
         'browserstack.local': 'true',
         'browserstack.debug': 'true',
