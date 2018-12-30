@@ -1,4 +1,4 @@
-import Log from './log'
+import Log from './log.js'
 
 // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio#Attributes
 export default class AudioNode {
@@ -16,7 +16,7 @@ export default class AudioNode {
     this.node.oncanplaythrough = this.loaded.bind(this)
 
     // A mini BASE64 encoded silent mp3 allows us to .play() to activate
-    // nodes without https requests or excess file sizes
+    // nodes without requests or excess file sizes
     // https://gist.github.com/wittnl/8a1a0168b94f3b6abfaa
     this.blankMP3 = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU2LjM2LjEwMAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAEAAABIADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV6urq6urq6urq6urq6urq6urq6urq6urq6v////////////////////////////////8AAAAATGF2YzU2LjQxAAAAAAAAAAAAAAAAJAAAAAAAAAAAASDs90hvAAAAAAAAAAAAAAAAAAAA//MUZAAAAAGkAAAAAAAAA0gAAAAATEFN//MUZAMAAAGkAAAAAAAAA0gAAAAARTMu//MUZAYAAAGkAAAAAAAAA0gAAAAAOTku//MUZAkAAAGkAAAAAAAAA0gAAAAANVVV'
     this.node.src = preloadSrc || this.blankMP3

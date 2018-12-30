@@ -1,0 +1,14 @@
+# Install guide here: https://github.com/travis-ci/travis-ci/issues/7650#issuecomment-302467188
+addons:
+  browserstack:
+    forcelocal: true
+    # Placeholders
+    username: ${BROWSERSTACK_USERNAME}
+    access_key: ${BROWSERSTACK_ACCESS_KEY}
+
+language: node_js
+node_js:
+- "node"
+
+script:
+- npm test

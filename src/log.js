@@ -4,8 +4,13 @@ export default class Log {
     /* eslint-disable no-console */
     console.log(message)
     /* eslint-disable */
-    document.body.insertAdjacentHTML("beforeend", `${message}<br/>`)
+    this.appendToElement(message)
     const event = new CustomEvent(scope, { bubbles: true })
     document.dispatchEvent(event)
+  }
+
+  static appendToElement(message){
+    const el = document.querySelector('#debug')
+    el.insertAdjacentHTML("beforeend", `${message}<br/>`)
   }
 }

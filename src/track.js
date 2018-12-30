@@ -1,5 +1,5 @@
-import Log from './log'
-import NodePool from './node_pool'
+import Log from './log.js'
+import NodePool from './node_pool.js'
 
 const pool = new NodePool(2)
 

@@ -1,5 +1,5 @@
-import Log from './log'
-import AudioNode from './audio_node'
+import Log from './log.js'
+import AudioNode from './audio_node.js'
 
 // auto play restrictions are per-element
 // https://webkit.org/blog/7734/auto-play-policy-changes-for-macos/

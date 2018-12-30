@@ -1,4 +1,4 @@
-import Log from './log'
+import Log from './log.js'
 import Track from './track.js'
 
 export default class Playlist extends Array {
