@@ -3,7 +3,8 @@
   <title>StitchES6</title>
   <script type='module'>
     import Playlist from '/src/playlist.js'
-    const playlist = Playlist.newFromSelector('a',{ preloadIndex: 0 }).listen()
+    window.playlist = Playlist.newFromSelector('a',{ preloadIndex: 0 })
+
   </script>
 </head>
 <body>
@@ -11,13 +12,13 @@
   <img src="logo.svg" id="logo"/>
 </header>
 <progress></progress>
-<a href="/continuous-play-1.mp3">Play Track 1</a><br />
+<a href="/continuous-play-1.mp3" class="track">Play Track 1</a><br />
 
 <progress></progress>
-<a href="/continuous-play-2.mp3">Play Track 2</a><br />
+<a href="/continuous-play-2.mp3" class="track">Play Track 2</a><br />
 
 <progress></progress>
-<a href="/continuous-play-3.mp3">Play Track 3</a><br />
+<a href="/continuous-play-3.mp3" class="track">Play Track 3</a><br />
 
 <div id="debug">
 </div>

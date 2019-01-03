@@ -4,14 +4,14 @@ module.exports = {
       .url(browser.launchUrl)
       .waitForElementVisible('body', 500)
       .assert.title('StitchES6')
-      .end();
+      .end()
   },
   'StichES6 logs properly': (browser) => {
     browser
       .url(browser.launchUrl)
       .waitForElementVisible('#debug', 500)
       .assert.containsText('#debug','nodepool:create')
-      .end();
+      .end()
   },
   'Clicking Anywhere unlocks audio': (browser) => {
     browser
@@ -21,4 +21,4 @@ module.exports = {
       .assert.containsText('#debug', 'node:unlocked')
       .end()
   }
-};
+}
