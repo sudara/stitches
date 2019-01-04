@@ -11,6 +11,7 @@ let nightwatch_config = {
   common_capabilities: {
     'browserstack.user': 'sudarawilliams1' || 'BROWSERSTACK_USERNAME',
     'browserstack.key': process.env.BROWSERSTACK_ACCESS_KEY || 'BROWSERSTACK_ACCESS_KEY',
+    'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
     'browserstack.debug': true,
     'browserstack.local': true,
     'browserstack.console': 'errors'
