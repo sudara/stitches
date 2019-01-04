@@ -17,7 +17,7 @@ let nightwatch_config = {
 
   test_settings: {
     default: {
-      "launch_url": "http://bs-local.com:8080"
+      "launch_url": "http://localhost:8080"
     },
     chrome: {
       desiredCapabilities: {
@@ -29,7 +29,8 @@ let nightwatch_config = {
     },
     firefox: {
       desiredCapabilities: {
-        'os_version': 'High Sierra',
+        'os': 'Windows',
+        'os_version': '10',
         'browser': 'Firefox',
         'browser_version': '64.0'
       }
@@ -51,9 +52,9 @@ let nightwatch_config = {
     },
     iphone: {
       desiredCapabilities: {
-        'device': 'iPhone 8 Plus',
+        'device': 'iPhone 8',
         'realMobile': 'true',
-        'os_version': '11.0'
+        'os_version': '12.1'
       }
     },
     galaxy: {
