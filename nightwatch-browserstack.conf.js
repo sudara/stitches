@@ -12,12 +12,13 @@ let nightwatch_config = {
     'browserstack.user': 'sudarawilliams1' || 'BROWSERSTACK_USERNAME',
     'browserstack.key': process.env.BROWSERSTACK_ACCESS_KEY || 'BROWSERSTACK_ACCESS_KEY',
     'browserstack.debug': true,
-    'browserstack.local': true
+    'browserstack.local': true,
+    'browserstack.console': 'errors'
   },
 
   test_settings: {
     default: {
-      "launch_url": "http://localhost:8080"
+      "launch_url": "http://bs-local.com:8080"
     },
     chrome: {
       desiredCapabilities: {
