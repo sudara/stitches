@@ -17,16 +17,21 @@ let nightwatch_config = {
 
   test_settings: {
     default: {
-      "launch_url": "http://localhost:8080"
+      "launch_url": "http://bs-local.com:8080"
     },
     chrome: {
       desiredCapabilities: {
-        browser: "chrome"
+        'os': 'Windows',
+        'os_version': '10',
+        'browser': 'Chrome',
+        'browser_version': '71.0'
       }
     },
     firefox: {
       desiredCapabilities: {
-        browser: "firefox"
+        'os_version': 'High Sierra',
+        'browser': 'Firefox',
+        'browser_version': '64.0'
       }
     },
     safari: {
