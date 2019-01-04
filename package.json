@@ -4,9 +4,10 @@
   "description": "Stitching Together MP3 Playback in HTML5 Audio with ES6",
   "main": "index.js",
   "scripts": {
-    "pretest": "http-server -s c-1 . & ",
-    "test": "nightwatch -c nightwatch-local.conf.json",
-    "posttest": "pkill -f http-server"
+    "start": "http-server -s c-1 . & ",
+    "test": "npm start && nightwatch -c nightwatch-local.conf.json && npm stop  ",
+    "stop": "pkill -f http-server",
+    "browserstack": "npm start && node browserstack.runner.js -c nightwatch-browserstack.conf.js -e chrome,firefox,safari,edge,iphone,galaxy,pixel && npm stop"
   },
   "repository": "git+https://github.com/sudara/stitches6.git",
   "keywords": [

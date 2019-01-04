@@ -2,9 +2,9 @@
 addons:
   browserstack:
     forcelocal: true
-    # Placeholders
-    username: ${BROWSERSTACK_USERNAME}
-    access_key: ${BROWSERSTACK_ACCESS_KEY}
+    username: sudarawilliams1
+    access_key:
+      secure: "OKHSWqNvbBnq461vYx8L+zZBeErCiY1bIbnz25RqtBXFjbExbR3b2TV0YSGx9Hx/DSQFXXgiBfLUq3mov+AMg/8Y7kId/77BXGaJudFyPs6zrQ3zULT1g2yFnlwMK3GxAOqAKJRJSjD/acCwqpT3ExOabjoBbLpVEvzTSPWwn46QtSBVme38hfViDqOmJ64xLrn6u0EqDccwEx+rDPGdQU/B2gTIl5588pUt2ePXoFURn6AJm4zInJ0j3kJ1/8Y4WJLeSz03beX0nnKdHi6ZZGEcLNi7H9toz4U+ApE29cgVDFS+cdkpqUFntpnz3+P7vL2OCHu+fS4nFuWtK3/k5HJd8MyeS6DWMMMW7Obr/ga9pAfHIGhAViJPlhls1sI8g7V82ATOzks4CSdpRukkPyuiIsrWzeLYZuzFvivRi7SDbnDEtr85uufrN8kvLYeFoXq1TU6zaMUGfxtEiaOeDVlajduBwE7LJQfn/uDSuCzdEPLjpaSFTu0c9Hh4ShiknwOOVPocSTql5I25jJRuwTfI5W7YxmYtRwN/UGw2VVdf8FC0PqUlStf/jZIhXGsPYOgDvCoFodMljf263BOo1PON8Mko2wxPfncQK9or/pI+qwdiLOWddpqCPTEozjXlrQJtLi9ZodExuy68pxcva/LsEIbG+tGP7IC8VVdY56A="
 
 language: node_js
 node_js:
