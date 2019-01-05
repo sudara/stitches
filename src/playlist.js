@@ -4,7 +4,6 @@ import Track from './track.js'
 export default class Playlist extends Array {
   constructor(items) {
     document.addEventListener('click', e => this.click(e))
-    document.addEventListener('touchstart', e => this.click(e))
     super(...items)
   }
 
