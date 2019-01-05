@@ -26,7 +26,6 @@ let nightwatch_config = {
         'os': 'Windows',
         'os_version': '10',
         'browser': 'Chrome',
-        'browser_version': '71.0'
       }
     },
     firefox: {
@@ -42,7 +41,6 @@ let nightwatch_config = {
         'os': 'OS X',
         'os_version': 'Mojave',
         'browser': 'Safari',
-        'browser_version': '12.0',
         'resolution': '1024x768'
       }
     },
@@ -62,13 +60,21 @@ let nightwatch_config = {
         'nativeWebTap': 'true'
       }
     },
-    galaxy: {
+    galaxys9: {
       desiredCapabilities: {
         'device': 'Samsung Galaxy S9',
         'realMobile': 'true',
         'os_version': '8.0'
       }
     },
+    ucbrowser: {
+      desiredCapabilities: {
+        'device': 'Samsung Galaxy S9',
+        'realMobile': 'true',
+        'os_version': '8.0',
+        'browser': 'ucbrowser'
+      }
+    }
     pixel: {
       desiredCapabilities: {
         'device': 'Google Pixel 3',
