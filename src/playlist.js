@@ -4,6 +4,7 @@ import Track from './track.js'
 export default class Playlist extends Array {
   constructor(items) {
     document.addEventListener('click', e => this.click(e))
+    document.addEventListener('touchstart', e => this.click(e))
     super(...items)
   }
 
@@ -21,8 +22,7 @@ export default class Playlist extends Array {
   listen() {
   }
 
-  async click(e) {
-    let event = e
+  async click(event) {
     event.preventDefault()
     if(!this.elements.includes(event.target)) return
     console.log(event)
