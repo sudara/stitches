@@ -56,7 +56,8 @@ let nightwatch_config = {
       desiredCapabilities: {
         'device': 'iPhone 8',
         'realMobile': 'true',
-        'os_version': '12.1'
+        'os_version': '12.1',
+        'nativeWebTap': 'true'
       }
     },
     galaxy: {
