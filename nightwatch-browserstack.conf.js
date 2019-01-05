@@ -12,6 +12,7 @@ let nightwatch_config = {
     'browserstack.user': 'sudarawilliams1' || 'BROWSERSTACK_USERNAME',
     'browserstack.key': process.env.BROWSERSTACK_ACCESS_KEY || 'BROWSERSTACK_ACCESS_KEY',
     'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
+    'build': process.env.TRAVIS_BUILD_NUMBER || 'local',
     'browserstack.debug': true,
     'browserstack.local': true,
     'browserstack.console': 'errors'
@@ -28,6 +29,13 @@ let nightwatch_config = {
         'browser': 'Chrome',
       }
     },
+    chromeMac: {
+      desiredCapabilities: {
+        'os': 'OS X',
+        'os_version': 'Mojave',
+        'browser': 'Chrome',
+      }
+    },
     firefox: {
       desiredCapabilities: {
         'os': 'Windows',
@@ -39,9 +47,8 @@ let nightwatch_config = {
     safari: {
       desiredCapabilities: {
         'os': 'OS X',
-        'os_version': 'Mojave',
+        'os_version': 'High Sierra',
         'browser': 'Safari',
-        'resolution': '1024x768'
       }
     },
     edge: {
