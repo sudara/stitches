@@ -74,7 +74,7 @@ let nightwatch_config = {
         'os_version': '8.0',
         'browser': 'ucbrowser'
       }
-    }
+    },
     pixel: {
       desiredCapabilities: {
         'device': 'Google Pixel 3',
