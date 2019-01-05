@@ -39,9 +39,11 @@ let nightwatch_config = {
     },
     safari: {
       desiredCapabilities: {
+        'os': 'OS X',
         'os_version': 'Mojave',
         'browser': 'Safari',
         'browser_version': '12.0',
+        'resolution': '1024x768'
       }
     },
     edge: {
