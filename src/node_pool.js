@@ -43,8 +43,6 @@ export default class NodePool extends Array {
 
   setupEventListeners() {
     window.addEventListener("load", (event) => {
-      document.addEventListener('touchstart', this.unlockAllNodes.bind(this), { once: true, capture: true })
-      document.addEventListener('touchend', this.unlockAllNodes.bind(this), { once: true, capture: true })
       document.addEventListener('click', this.unlockAllNodes.bind(this), { once: true, capture: true })
     })
   }
