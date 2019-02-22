@@ -54,6 +54,19 @@ To mitigate the fact that browsers sabotage this ability, we create a `NodePool`
 
 For continuous/gapless playback we really only need two `<audio>` elements: One to handle a currently playing track and another to preload the next audio track in. When a file is done playing, the node is released back to the pool.
 
+## Visualizing the object relationships
+
+```
+                   |-----------|
+                   | Node Pool |
+                   |-----------|
+                    /    |    \
+                   /     |     \
+            |------|  |------|  |------| 
+            | Node |  | Node |  | Node |
+            |------|  |------|  |------|
+```
+
 ## Why?
 
 10 years ago, I launched alonetone.com. Since then, I've written several wrappers around audio libraries such as SoundManager2 and Howler.js, both which are fantastic projects and very much enabled me to launch and maintain the site.
