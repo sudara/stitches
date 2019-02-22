@@ -3,21 +3,30 @@
   <title>StitchES6</title>
   <script type='module'>
     import Playlist from '/src/playlist.js'
-    window.playlist = Playlist.newFromSelector('a',{ preloadIndex: 0 })
+    window.playlist = Playlist.newFromSelector('#playlist li a',{ preloadIndex: 0 })
   </script>
 </head>
 <body>
 <header>
   <img src="logo.svg" id="logo"/>
 </header>
-<progress></progress>
-<a href="mp3/continuous-play-1.mp3" id="track1" class="track">Play Track 1</a><br />
 
-<progress></progress>
-<a href="mp3/continuous-play-2.mp3" class="track">Play Track 2</a><br />
+<ul id="playlist">
+  <li>
+    <a href="mp3/continuous-play-1.mp3" id="track1" class="track">&#9658; Play Track 1</a><br />
+    <progress value='0'></progress>
+  </li>
 
-<progress></progress>
-<a href="mp3/continuous-play-3.mp3" class="track">Play Track 3</a><br />
+  <li>
+    <a href="mp3/continuous-play-2.mp3" class="track">&#9658; Play Track 2</a><br />
+    <progress value='0'></progress>
+  </li>
+
+  <li>
+    <a href="mp3/continuous-play-3.mp3" class="track">&#9658; Play Track 3</a><br />
+    <progress value='0'></progress>
+  </li>
+</ul>
 
 <div id="debug">
 </div>
