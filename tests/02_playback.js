@@ -5,7 +5,7 @@ module.exports = {
       .waitForElementPresent('body')
       .click('#track1')
       .assert.containsText('#debug', 'nodepool:create')
-      .pause(2000)
+      .pause(3000)
       .assert.containsText('#debug', 'playing: 2')
       .end()
   },
@@ -17,7 +17,7 @@ module.exports = {
       .waitForElementPresent('#debug', 1000)
       .click('a.track:nth-of-type(1)')
       .assert.containsText('#debug', 'nodepool:create')
-      .pause(2000)
+      .pause(3000)
       .assert.containsText('#debug', 'playing: 2')
       .end()
   }
