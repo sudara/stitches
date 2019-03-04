@@ -40,23 +40,21 @@ let nightwatch_config = {
       desiredCapabilities: {
         'os': 'Windows',
         'os_version': '10',
-        'browser': 'Firefox',
-        'browser_version': '64.0'
+        'browser': 'Firefox'
       }
     },
     safari: {
       desiredCapabilities: {
         'os': 'OS X',
         'os_version': 'High Sierra',
-        'browser': 'Safari',
+        'browser': 'Safari'
       }
     },
     edge: {
       desiredCapabilities: {
         'os': 'Windows',
         'os_version': '10',
-        'browser': 'Edge',
-        'resolution': '1024x768'
+        'browser': 'Edge'
       }
     },
     iphone: {
