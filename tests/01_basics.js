@@ -16,8 +16,9 @@ module.exports = {
   'Clicking Anywhere unlocks audio': (browser) => {
     browser
       .url(browser.launchUrl)
-      .waitForElementPresent('#logo', 1000)
+      .waitForElementPresent('body', 1000)
       .click('#logo')
+      .pause(500)
       .assert.containsText('#debug', 'node:unlocked')
       .end()
   }
