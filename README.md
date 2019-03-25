@@ -59,6 +59,17 @@ For continuous/gapless playback we really only need two `<audio>` elements: One 
 
 ```
                    ┌-----------┐
+                   | Playlist  |
+                   └-----------┘
+                    /    |    \
+                   /     |     \
+          ┌-------┐  ┌-------┐  ┌-------┐
+          | Track |  | Track |  | Track |
+          └-------┘  └-------┘  └-------┘
+                         ↓
+          hi, can i have an unlocked node plz?
+                         ↓
+                   ┌-----------┐
                    | Node Pool |
                    └-----------┘
                     /    |    \
@@ -66,6 +77,8 @@ For continuous/gapless playback we really only need two `<audio>` elements: One 
             ┌------┐  ┌------┐  ┌------┐
             | Node |  | Node |  | Node |
             └------┘  └------┘  └------┘
+                |         |         |
+             <Audio>   <Audio>   <Audio>
 ```
 
 ## Why?
