@@ -57,14 +57,14 @@ For continuous/gapless playback we really only need two `<audio>` elements: One 
 ## Visualizing the object relationships
 
 ```
-                   |-----------|
+                   ┌-----------┐
                    | Node Pool |
-                   |-----------|
+                   └-----------|
                     /    |    \
                    /     |     \
-            |------|  |------|  |------| 
+            ┌------┐  ┌------┐  ┌------┐
             | Node |  | Node |  | Node |
-            |------|  |------|  |------|
+            └------┘  └------┘  └------┘
 ```
 
 ## Why?
