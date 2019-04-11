@@ -52,11 +52,11 @@ export default class AudioNode {
   // https://dev.w3.org/html5/spec-author-view/spec.html#mediaerror
   whileLoading() {
     if (this.node.b)
-      Log.trigger(`loading: ${this.node.buffered.end(0)}`)
+      Log.trigger(`node:whileLoading: ${this.node.buffered.end(0)}`)
   }
 
   whilePlaying() {
-    Log.trigger(`playing: ${this.node.currentTime}`)
+    Log.trigger(`node:whilePlaying: ${this.node.currentTime}`)
   }
 
   ready() {
