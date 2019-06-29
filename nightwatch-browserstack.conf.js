@@ -29,13 +29,16 @@ let nightwatch_config = {
       // to actually identify a failed test. Instead, we have to
       // issue an API request from a nightwatch callback to mark the test as failed
       // which will in turn mark it as failed on browserstack and eventually travis.
+      // Note that here we are just defining the function.
+      // We still need to call it from an afterEach hook in each "suite" (js file)
       "globals": {
-        afterEach: function (client, done) {
+        updateStatus: function(browser) {
           console.log('afterEach called...')
-          if (client.currentTest.results.failed > 0) {
+          if (browser.currentTest.results.failed > 0) {
+            console.log('test failed')
             request({
               method: 'PUT',
-              uri: `https://api.browserstack.com/automate/sessions/${client.sessionId}.json`,
+              uri: `https://api.browserstack.com/automate/sessions/${browser.sessionId}.json`,
               auth: {
                 user: process.env.BROWSERSTACK_USERNAME,
                 pass: process.env.BROWSERSTACK_ACCESS_KEY,
@@ -46,7 +49,6 @@ let nightwatch_config = {
               },
             })
           }
-          done()
         }
       },
     },
