@@ -1,9 +1,9 @@
 module.exports = {
   // this is so ugly, but the only way we can get failures to report properly
   afterEach: function (browser, done) {
-    console.warn(`This is the host: ${browser.selenium_host}`)
-    console.warn(`This is globals: ${browser.globals}`)
-    require('../nightwatch-browserstack').updateStatus(browser)
+    if (browser.launchUrl.includes('bc-local')) {
+      require('../nightwatch-browserstack').updateStatus(browser)
+    }
     done()
   },
 
