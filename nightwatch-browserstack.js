@@ -12,9 +12,6 @@ module.exports = {
   // Note that here we are just defining the function.
   // We still need to call it from an afterEach hook in each "suite" (js file)
   updateStatus: function (browser) {
-    console.warn('afterEach called...')
-    console.warn(browser.sessionId)
-
     if (browser.currentTest.results.failed > 0) {
       console.warn("FAILED")
       require('request')({
