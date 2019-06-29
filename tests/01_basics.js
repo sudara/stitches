@@ -1,7 +1,7 @@
 module.exports = {
   // this is so ugly, but the only way we can get failures to report properly
   afterEach: function (browser, done) {
-    if(browser.selenium_host === 'hub.browserstack.com') {
+    if(browser.selenium_host === 'hub-cloud.browserstack.com') {
       browser.updateStatus(browser)
     }
     done()
