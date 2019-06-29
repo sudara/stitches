@@ -15,7 +15,7 @@ let nightwatch_config = {
     'build': process.env.TRAVIS_BUILD_NUMBER || 'local',
     'browserstack.debug': true,
     'browserstack.local': true,
-    'browserstack.console': 'errors'
+    'browserstack.console': 'info'
   },
 
   test_settings: {
