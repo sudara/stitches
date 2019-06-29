@@ -1,7 +1,7 @@
 module.exports = {
   // this is so ugly, but the only way we can get failures to report properly
   afterEach: function (browser, done) {
-    if (browser.launchUrl.includes('bc-local')) {
+    if (browser.launchUrl.includes('bs-local')) {
       require('../nightwatch-browserstack').updateStatus(browser)
     }
     done()
