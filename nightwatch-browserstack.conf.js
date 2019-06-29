@@ -20,34 +20,35 @@ let nightwatch_config = {
 
   test_settings: {
     default: {
-      "launch_url": "http://bs-local.com:8080"
-    },
-    // This test harness is very fragile and obviously these
-    // pieces aren't really crafted to work well together.
-    // One obvious example of this is the following piece of code,
-    // needed because there's no way for selenium/browserstack
-    // to actually identify a failed test. Instead, we have to
-    // issue a request from a nightwatch callback to mark the test as failed
-    // which will in turn mark it as failed on browserstack and eventually travis.
-    globals: {
-      afterEach: function(client, done) {
-        console.log('afterEach called...')
-        if (client.currentTest.results.failed > 0 ) {
-          request({
-            method: 'PUT',
-            uri: `https://api.browserstack.com/automate/sessions/${client.sessionId}.json`,
-            auth: {
-              user: process.env.BROWSERSTACK_USERNAME,
-              pass: process.env.BROWSERSTACK_ACCESS_KEY,
-            },
-            form: {
-              status: 'error',
-              reason: 'failed'
-            },
-          })
+      "launch_url": "http://bs-local.com:8080",
+
+      // This test harness is very fragile and obviously these
+      // pieces aren't really crafted to work well together.
+      // One obvious example of this is the following piece of code,
+      // needed because there's no way for selenium/browserstack
+      // to actually identify a failed test. Instead, we have to
+      // issue an API request from a nightwatch callback to mark the test as failed
+      // which will in turn mark it as failed on browserstack and eventually travis.
+      globals: {
+        afterEach: function (client, done) {
+          console.log('afterEach called...')
+          if (client.currentTest.results.failed > 0) {
+            request({
+              method: 'PUT',
+              uri: `https://api.browserstack.com/automate/sessions/${client.sessionId}.json`,
+              auth: {
+                user: process.env.BROWSERSTACK_USERNAME,
+                pass: process.env.BROWSERSTACK_ACCESS_KEY,
+              },
+              form: {
+                status: 'error',
+                reason: 'failed'
+              },
+            })
+          }
+          done()
         }
-        done()
-      }
+      },
     },
     chrome: {
       desiredCapabilities: {
