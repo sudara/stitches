@@ -30,7 +30,8 @@ let nightwatch_config = {
     // issue a request from a nightwatch callback to mark the test as failed
     // which will in turn mark it as failed on browserstack and eventually travis.
     globals: {
-      afterEach(client, done) {
+      afterEach: function(client, done) {
+        console.log('afterEach called...')
         if (client.currentTest.results.failed > 0 ) {
           request({
             method: 'PUT',
