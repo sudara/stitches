@@ -11,4 +11,5 @@ node_js:
 - "node"
 
 script:
-- yarn browserstack
+- npm start
+- node browserstack.runner.js -c nightwatch-browserstack.conf.js -e safari,chrome,chromeMac,firefox,iphone,pixel,galaxys9,ucbrowser

@@ -1,12 +1,20 @@
 module.exports = {
+  // this is so ugly, but the only way we can get failures to report properly
+  afterEach: function (browser, done) {
+    if (browser.launchUrl.includes('bs-local')) {
+      require('../nightwatch-browserstack').updateStatus(browser)
+    }
+    done()
+  },
+
   'Clicking play on a track starts audio': (browser) => {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent('body')
       .click('#track1')
       .assert.containsText('#debug', 'nodepool:create')
-      .pause(3000)
-      .assert.containsText('#debug', 'playing: 2')
+      .pause(1500)
+      .assert.containsText('#debug', 'whilePlaying: 1')
       .end()
   },
   'Clicking play on a track after clicking anywhere starts audio': (browser) => {
@@ -17,8 +25,8 @@ module.exports = {
       .waitForElementPresent('#debug', 1000)
       .click('a.track:nth-of-type(1)')
       .assert.containsText('#debug', 'nodepool:create')
-      .pause(3000)
-      .assert.containsText('#debug', 'playing: 2')
+      .pause(1500)
+      .assert.containsText('#debug', 'whilePlaying: 1')
       .end()
   }
 }

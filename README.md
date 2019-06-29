@@ -93,6 +93,18 @@ However, as time wore on, I found myself constantly having to keep up with the c
 * Are full of browser/feature detection code
 
 
+## Running tests
+
+For a project like this, given the somewhat sketchy state audio playback in browsers, it's absolutely critical to run tests against current browsers.
+
+Selenium tests are currently written in Nightwatch.
+
+You can run them locally with `yarn test` and it will run them in just against headless chrome as configured in `nightwatch-local.conf.json`.
+
+We are using browserstack to actually run the tests against multiple browsers. This is configured in `nightwatch-browserstack.conf.js` and uses a runner defined in `browserstack.runner.js`. Travis is setup to run browserstack, but you can also run browserstack locally (assuming you have credentials) with `yarn browserstack`
+
+Note that test failures on selenium (and therefore browserstack) are manually registered via browserstack's API.
+
 ## Acknowledgements
 
 * Thanks to [@smoofles](https://twitter.com/smoofles) for the name and logo!

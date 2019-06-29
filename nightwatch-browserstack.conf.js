@@ -9,18 +9,18 @@ let nightwatch_config = {
     "port": 80
   },
   common_capabilities: {
-    'browserstack.user': 'sudarawilliams1' || 'BROWSERSTACK_USERNAME',
-    'browserstack.key': process.env.BROWSERSTACK_ACCESS_KEY || 'BROWSERSTACK_ACCESS_KEY',
+    'browserstack.user': process.env.BROWSERSTACK_USERNAME,
+    'browserstack.key': process.env.BROWSERSTACK_ACCESS_KEY,
     'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
     'build': process.env.TRAVIS_BUILD_NUMBER || 'local',
     'browserstack.debug': true,
     'browserstack.local': true,
-    'browserstack.console': 'errors'
+    'browserstack.console': 'info'
   },
 
   test_settings: {
     default: {
-      "launch_url": "http://bs-local.com:8080"
+      "launch_url": "http://bs-local.com:8080",
     },
     chrome: {
       desiredCapabilities: {
