@@ -45,6 +45,7 @@ let nightwatch_config = {
             },
           })
         }
+        done()
       }
     },
     chrome: {
