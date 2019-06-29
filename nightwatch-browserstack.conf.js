@@ -29,7 +29,7 @@ let nightwatch_config = {
       // to actually identify a failed test. Instead, we have to
       // issue an API request from a nightwatch callback to mark the test as failed
       // which will in turn mark it as failed on browserstack and eventually travis.
-      globals: {
+      "globals": {
         afterEach: function (client, done) {
           console.log('afterEach called...')
           if (client.currentTest.results.failed > 0) {
