@@ -13,8 +13,8 @@ module.exports = {
       .waitForElementPresent('body')
       .click('#track1')
       .assert.containsText('#debug', 'nodepool:create')
-      .pause(3000)
-      .assert.containsText('#debug', 'playing: 2')
+      .pause(1500)
+      .assert.containsText('#debug', 'whilePlaying: 1')
       .end()
   },
   'Clicking play on a track after clicking anywhere starts audio': (browser) => {
@@ -25,8 +25,8 @@ module.exports = {
       .waitForElementPresent('#debug', 1000)
       .click('a.track:nth-of-type(1)')
       .assert.containsText('#debug', 'nodepool:create')
-      .pause(3000)
-      .assert.containsText('#debug', 'playing: 2')
+      .pause(1500)
+      .assert.containsText('#debug', 'whilePlaying: 1')
       .end()
   }
 }
