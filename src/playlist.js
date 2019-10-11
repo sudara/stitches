@@ -33,6 +33,7 @@ export default class Playlist extends Array {
     let nextTrack = this.nextTrack()
     if (nextTrack) {
       nextTrack.play()
+      this.currentTrack = nextTrack;
     }
   }
 
