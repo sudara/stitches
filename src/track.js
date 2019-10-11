@@ -1,10 +1,12 @@
 import Log from './log.js'
 import NodePool from './node_pool.js'
+import uniqueId from './unique_id.js'
 
 const pool = new NodePool(2)
 
 export default class Track {
   constructor(src) {
+    this.id = uniqueId();
     this.src = src
     Log.trigger('track:create')
     this.node = null

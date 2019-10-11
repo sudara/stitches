@@ -3,8 +3,10 @@ import Track from './track.js'
 
 export default class Playlist extends Array {
   constructor(items) {
-    document.addEventListener('click', e => this.click(e))
     super(...items)
+    document.addEventListener('click', e => this.click(e))
+    document.addEventListener('audioNode:ended', this.playNextTrack)
+    this.currentTrack = null;
   }
 
   static newFromSelector(selector, { preloadIndex = -1 } = {}) {
@@ -18,7 +20,20 @@ export default class Playlist extends Array {
     return playlist
   }
 
-  listen() {
+  nextTrack() {
+    let currentTrackIndex = this.findIndex(track =>
+      this.currentTrack &&
+      track.id === this.currentTrack.id
+    )
+    return this[currentTrackIndex + 1] ? this[currentTrackIndex + 1] : undefined
+  }
+
+  playNextTrack = () => {
+    let track = this.find(track => track.src === event.target.href)
+    let nextTrack = this.nextTrack()
+    if (nextTrack) {
+      nextTrack.play()
+    }
   }
 
   async click(event) {
@@ -26,6 +41,7 @@ export default class Playlist extends Array {
     if(!this.elements.includes(event.target)) return
     console.log(event)
     let track = this.find(track => track.src === event.target.href)
+    this.currentTrack = track;
     await track.play()
   }
 }

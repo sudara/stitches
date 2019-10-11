@@ -41,9 +41,14 @@ export default class NodePool extends Array {
     }
   }
 
+  nodeReleased() {
+    console.log('TODO please release node')
+  }
+
   setupEventListeners() {
-    window.addEventListener("load", (event) => {
+    window.addEventListener("DOMContentLoaded", (event) => {
       document.addEventListener('click', this.unlockAllNodes.bind(this), { once: true, capture: true })
     })
+    document.addEventListener('audioNode:ended', this.nodeReleased)
   }
 }
