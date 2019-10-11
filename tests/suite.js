@@ -27,7 +27,29 @@ module.exports = {
       .waitForElementPresent('body', 1000)
       .click('#logo')
       .pause(500)
-      .assert.containsText('#debug', 'node:unlocked')
+      .assert.containsText('#debug', 'audioNode:unlocked')
+      .end()
+  }
+  'Clicking play on a track starts audio': (browser) => {
+    browser
+      .url(browser.launchUrl)
+      .waitForElementPresent('body')
+      .click('#track1')
+      .assert.containsText('#debug', 'nodepool:create')
+      .pause(1500)
+      .assert.containsText('#debug', 'whilePlaying: 1')
+      .end()
+  },
+  'Clicking play on a track after clicking anywhere starts audio': (browser) => {
+    browser
+      .url(browser.launchUrl)
+      .waitForElementPresent('body')
+      .click('#logo')
+      .waitForElementPresent('#debug', 1000)
+      .click('a.track:nth-of-type(1)')
+      .assert.containsText('#debug', 'nodepool:create')
+      .pause(1500)
+      .assert.containsText('#debug', 'whilePlaying: 1')
       .end()
   }
 }
