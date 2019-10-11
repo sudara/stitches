@@ -3,7 +3,10 @@
   <title>StitchES6</title>
   <script type='module'>
     import Playlist from '/src/playlist.js'
-    window.playlist = Playlist.newFromSelector('#playlist li a',{ preloadIndex: 0 })
+    window.playlist = new Playlist({
+      selector: '#playlist li a',
+      preloadIndex: 0
+    })
   </script>
 </head>
 <body>

@@ -8,8 +8,8 @@ import AudioNode from './audio_node.js'
 export default class NodePool extends Array {
   constructor(size) {
     Log.trigger('nodepool:create')
-    let nodes = Array.from({ length: size }, () => new AudioNode())
-    super(...nodes)
+    let audioNodes = Array.from({ length: size }, () => new AudioNode())
+    super(...audioNodes)
     this.setupEventListeners()
   }
 
@@ -20,9 +20,9 @@ export default class NodePool extends Array {
   }
 
   async nextAvailableNode() {
-    const nodesAvailable = this.filter(node => node.available)
+    const audioNodesAvailable = this.filter(node => node.available)
     // if someone clicks play before interacting with document
-    if (!nodesAvailable.length) {
+    if (!audioNodesAvailable.length) {
       Log.trigger('nodepool:unlockingnode')
       await this[0].unlock()
       return this[0]
@@ -30,25 +30,20 @@ export default class NodePool extends Array {
     // fires on documunt interaction
     else {
       Log.trigger('nodepool:availablenode')
-      return nodesAvailable[0]
+      return audioNodesAvailable[0]
     }
   }
 
-  unlockAllNodes() {
+  unlockAllAudioNodes() {
     Log.trigger('nodepool:unlockall')
-    for (let node of this) {
-      node.unlock()
+    for (let audioNode of this) {
+      audioNode.unlock()
     }
-  }
-
-  nodeReleased() {
-    console.log('TODO please release node')
   }
 
   setupEventListeners() {
     window.addEventListener("DOMContentLoaded", (event) => {
-      document.addEventListener('click', this.unlockAllNodes.bind(this), { once: true, capture: true })
+      document.addEventListener('click', this.unlockAllAudioNodes.bind(this), { once: true, capture: true })
     })
-    document.addEventListener('audioNode:ended', this.nodeReleased)
   }
 }

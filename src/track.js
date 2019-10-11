@@ -5,18 +5,24 @@ import uniqueId from './unique_id.js'
 const pool = new NodePool(2)
 
 export default class Track {
-  constructor(src) {
+  constructor(element, setCurrentTrack) {
     this.id = uniqueId();
-    this.src = src
+    this.url = element.href
+    this.element = element
+    this.playlistSetCurrentTrack = setCurrentTrack
     Log.trigger('track:create')
     this.audioNode = null
+    element.addEventListener('click', (evt) => {
+      evt.preventDefault()
+      this.togglePlay()
+    })
   }
 
   async preload() {
     // grab node from list
     // make sure this one is last to be unlocked
     Log.trigger('track:preload')
-    this.audioNode = pool.makePreloadingNode(this.src)
+    this.audioNode = pool.makePreloadingNode(this.url)
   }
 
   async grabNode() {
@@ -32,7 +38,7 @@ export default class Track {
         await this.audioNode.play()
       } else {
         await this.grabNode()
-        this.audioNode.src = this.src
+        this.audioNode.src = this.url
         await this.audioNode.play()
       }
       Log.trigger('track:playing')
@@ -41,4 +47,21 @@ export default class Track {
       Log.trigger(err)
     }
   }
+
+  pause() {
+    this.audioNode.pause()
+    Log.trigger('track:pause')
+  }
+
+  togglePlay = () => {
+    if (
+      this.audioNode &&
+      !this.audioNode.paused
+    ) {
+      this.pause()
+    } else {
+      this.playlistSetCurrentTrack(this)
+    }
+  }
+
 }

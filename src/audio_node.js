@@ -20,6 +20,7 @@ export default class AudioNode {
     this.audio.onended = this.onended.bind(this)
     this.audio.oncanplaythrough = this.loaded.bind(this)
     this.src = preloadSrc || blankMP3
+    this.paused = true
   }
 
   get available() {
@@ -73,6 +74,12 @@ export default class AudioNode {
 
   play() {
     this.audio.play()
+    this.paused = false;
+  }
+
+  pause() {
+    this.audio.pause()
+    this.paused = true;
   }
 
   ready() {
