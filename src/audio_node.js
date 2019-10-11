@@ -1,9 +1,14 @@
 import Log from './log.js'
 
+// A mini BASE64 encoded silent mp3 allows us to .play() to activate
+// nodes without requests or excess file sizes
+// https://gist.github.com/wittnl/8a1a0168b94f3b6abfaa
+const blankMP3 = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU2LjM2LjEwMAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAEAAABIADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV6urq6urq6urq6urq6urq6urq6urq6urq6v////////////////////////////////8AAAAATGF2YzU2LjQxAAAAAAAAAAAAAAAAJAAAAAAAAAAAASDs90hvAAAAAAAAAAAAAAAAAAAA//MUZAAAAAGkAAAAAAAAA0gAAAAATEFN//MUZAMAAAGkAAAAAAAAA0gAAAAARTMu//MUZAYAAAGkAAAAAAAAA0gAAAAAOTku//MUZAkAAAGkAAAAAAAAA0gAAAAANVVV'
+
 // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio#Attributes
 export default class AudioNode {
   constructor(preloadSrc=null) {
-    Log.trigger('node:create')
+    Log.trigger('audioNode:create')
     this.unlocked = false
     this.loadNext = null
     this.node = new Audio()
@@ -14,12 +19,7 @@ export default class AudioNode {
     this.node.ontimeupdate = this.whilePlaying.bind(this)
     this.node.onended = this.onended.bind(this)
     this.node.oncanplaythrough = this.loaded.bind(this)
-
-    // A mini BASE64 encoded silent mp3 allows us to .play() to activate
-    // nodes without requests or excess file sizes
-    // https://gist.github.com/wittnl/8a1a0168b94f3b6abfaa
-    this.blankMP3 = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU2LjM2LjEwMAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAEAAABIADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV6urq6urq6urq6urq6urq6urq6urq6urq6v////////////////////////////////8AAAAATGF2YzU2LjQxAAAAAAAAAAAAAAAAJAAAAAAAAAAAASDs90hvAAAAAAAAAAAAAAAAAAAA//MUZAAAAAGkAAAAAAAAA0gAAAAATEFN//MUZAMAAAGkAAAAAAAAA0gAAAAARTMu//MUZAYAAAGkAAAAAAAAA0gAAAAAOTku//MUZAkAAAGkAAAAAAAAA0gAAAAANVVV'
-    this.node.src = preloadSrc || this.blankMP3
+    this.node.src = preloadSrc || blankMP3
   }
 
   get available() {
@@ -27,7 +27,7 @@ export default class AudioNode {
   }
 
   get blank() {
-    return this.node.src === this.blankMP3
+    return this.node.src === blankMP3
   }
 
   // this can only be called on an interaction event like a click/touch
@@ -36,27 +36,27 @@ export default class AudioNode {
     try {
       // if we've preloaded another src, switch src to unlock w/ blank
       if(!this.blank && !this.unlocked) {
-        Log.trigger('node:unlockingpreloaded')
+        Log.trigger('audioNode:unlockingpreloaded')
         await this.node.play()
         this.node.pause()
       } else {
         await this.node.play()
       }
-      Log.trigger('node:unlocked')
+      Log.trigger('audioNode:unlocked')
       this.unlocked = true
     } catch (err) {
-      Log.trigger('node:unlockfailed')
+      Log.trigger('audioNode:unlockfailed')
     }
   }
 
   // https://dev.w3.org/html5/spec-author-view/spec.html#mediaerror
   whileLoading() {
     if (this.node.b)
-      Log.trigger(`node:whileLoading: ${this.node.buffered.end(0)}`)
+      Log.trigger(`audioNode:whileLoading: ${this.node.buffered.end(0)}`)
   }
 
   whilePlaying() {
-    Log.trigger(`node:whilePlaying: ${this.node.currentTime}`)
+    Log.trigger(`audioNode:whilePlaying: ${this.node.currentTime}`)
   }
 
   ready() {
@@ -65,16 +65,15 @@ export default class AudioNode {
 
   loaded() {
     // don't care about notifying on the blank mp3 loading since it's local
-    if(this.node.src !== this.blankMP3) {
-      Log.trigger('node:loaded')
+    if(this.node.src !== blankMP3) {
+      Log.trigger('audioNode:loaded')
     }
   }
 
   onended() {
-    this.unload() // "release" the node back to the pool
-  }
-
-  unload() {
-    this.node.src = this.blankMP3
+    if (this.node.src !== blankMP3) {
+      Log.trigger('audioNode:ended')
+    }
+    this.node.src = blankMP3
   }
 }
