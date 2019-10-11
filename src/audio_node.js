@@ -11,15 +11,15 @@ export default class AudioNode {
     Log.trigger('audioNode:create')
     this.unlocked = false
     this.loadNext = null
-    this.node = new Audio()
-    this.node.preload = preloadSrc ? 'auto': 'none'
-    this.node.autoplay = false
+    this.audio = new Audio()
+    this.audio.preload = preloadSrc ? 'auto': 'none'
+    this.audio.autoplay = false
     // https://developer.mozilla.org/en-US/docs/Web/Apps/Fundamentals/Audio_and_video_delivery/Cross-browser_audio_basics
-    this.node.onprogress = this.whileLoading.bind(this)
-    this.node.ontimeupdate = this.whilePlaying.bind(this)
-    this.node.onended = this.onended.bind(this)
-    this.node.oncanplaythrough = this.loaded.bind(this)
-    this.node.src = preloadSrc || blankMP3
+    this.audio.onprogress = this.whileLoading.bind(this)
+    this.audio.ontimeupdate = this.whilePlaying.bind(this)
+    this.audio.onended = this.onended.bind(this)
+    this.audio.oncanplaythrough = this.loaded.bind(this)
+    this.src = preloadSrc || blankMP3
   }
 
   get available() {
@@ -27,7 +27,16 @@ export default class AudioNode {
   }
 
   get blank() {
-    return this.node.src === blankMP3
+    return this.src === blankMP3
+  }
+
+  set src(url) {
+    this.audio.src = url;
+    this.fileName = url.startsWith('data:audio') ? 'data' : url.split('/').pop()
+  }
+
+  get src() {
+    return this.audio.src;
   }
 
   // this can only be called on an interaction event like a click/touch
@@ -37,10 +46,10 @@ export default class AudioNode {
       // if we've preloaded another src, switch src to unlock w/ blank
       if(!this.blank && !this.unlocked) {
         Log.trigger('audioNode:unlockingpreloaded')
-        await this.node.play()
-        this.node.pause()
+        await this.audio.play()
+        this.audio.pause()
       } else {
-        await this.node.play()
+        await this.audio.play()
       }
       Log.trigger('audioNode:unlocked')
       this.unlocked = true
@@ -51,29 +60,36 @@ export default class AudioNode {
 
   // https://dev.w3.org/html5/spec-author-view/spec.html#mediaerror
   whileLoading() {
-    if (this.node.b)
-      Log.trigger(`audioNode:whileLoading: ${this.node.buffered.end(0)}`)
+    if (this.audio.b)
+      Log.trigger(`audioNode:whileLoading: ${this.audio.buffered.end(0)}`)
   }
 
   whilePlaying() {
-    Log.trigger(`audioNode:whilePlaying: ${this.node.currentTime}`)
+    Log.trigger('audioNode:whilePlaying', {
+      currentTime: this.audio.currentTime,
+      fileName: this.fileName
+    })
+  }
+
+  play() {
+    this.audio.play()
   }
 
   ready() {
-    return this.node.readyState >= 3
+    return this.audio.readyState >= 3
   }
 
   loaded() {
     // don't care about notifying on the blank mp3 loading since it's local
-    if(this.node.src !== blankMP3) {
+    if(!this.blank) {
       Log.trigger('audioNode:loaded')
     }
   }
 
   onended() {
-    if (this.node.src !== blankMP3) {
+    if (!this.blank) {
       Log.trigger('audioNode:ended')
     }
-    this.node.src = blankMP3
+    this.src = blankMP3
   }
 }

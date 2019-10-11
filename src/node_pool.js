@@ -25,12 +25,12 @@ export default class NodePool extends Array {
     if (!nodesAvailable.length) {
       Log.trigger('nodepool:unlockingnode')
       await this[0].unlock()
-      return this[0].node
+      return this[0]
     }
     // fires on documunt interaction
     else {
       Log.trigger('nodepool:availablenode')
-      return nodesAvailable[0].node
+      return nodesAvailable[0]
     }
   }
 
