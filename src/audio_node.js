@@ -110,6 +110,7 @@ export default class AudioNode {
   }
 
   onended() {
+    this.paused = true
     if (!this.blank) {
       Log.trigger("audioNode:ended")
     }
