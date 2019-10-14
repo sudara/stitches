@@ -34,10 +34,19 @@ module.exports = {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent("#debug")
-      .click("li:nth-of-type(1) > a")
-      .assert.containsText("#debug", "nodepool:create")
+      .click("li:nth-of-type(2) > a")
+      .pause(500)
+      .assert.containsText("#debug", "whilePlaying - 0")
+      .click("li:nth-of-type(2) > a")
+      .assert.containsText("#debug", "track:pause")
+      .execute(function cleanDebug() {
+        document.getElementById("debug").innerHTML = ""
+      })
+    browser.expect.element("#debug").text.to.not.contain("whilePlaying - 1")
+    browser
+      .click("li:nth-of-type(2) > a")
       .pause(1500)
-      .assert.containsText("#debug", "whilePlaying - 1")
+      .assert.containsText("#debug", "whilePlaying - 2")
       .end()
   }
 }
