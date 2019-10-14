@@ -12,11 +12,7 @@ export default class Track {
     this.playlistSetCurrentTrack = setCurrentTrack
     Log.trigger("track:create")
     this.audioNode = null
-    this.togglePlay = this.togglePlay.bind(this)
-    element.addEventListener("click", evt => {
-      evt.preventDefault()
-      this.togglePlay()
-    })
+    element.addEventListener("click", this.togglePlay.bind(this))
   }
 
   async preload() {
@@ -54,7 +50,8 @@ export default class Track {
     Log.trigger("track:pause")
   }
 
-  togglePlay() {
+  togglePlay(evt) {
+    evt.preventDefault()
     if (this.audioNode && !this.audioNode.paused) {
       this.pause()
     } else {

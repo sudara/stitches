@@ -6,11 +6,11 @@ export default class Playlist {
     const { preloadIndex = -1, selector } = options
     this.currentTrack = null
     const elements = document.querySelectorAll(selector)
-    this.tracks = [...elements].map(el => new Track(el, this.setCurrentTrack))
+    this.tracks = [...elements].map(
+      el => new Track(el, this.setCurrentTrack.bind(this))
+    )
     if (preloadIndex >= 0) this.tracks[preloadIndex].preload()
-    this.setCurrentTrack = this.setCurrentTrack.bind(this)
-    this.playNextTrack = this.playNextTrack.bind(this)
-    document.addEventListener("audioNode:ended", this.playNextTrack)
+    document.addEventListener("audioNode:ended", this.playNextTrack.bind(this))
   }
 
   nextTrack() {
