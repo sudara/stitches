@@ -12,6 +12,7 @@ export default class Track {
     this.playlistSetCurrentTrack = setCurrentTrack
     Log.trigger("track:create")
     this.audioNode = null
+    this.togglePlay = this.togglePlay.bind(this)
     element.addEventListener("click", evt => {
       evt.preventDefault()
       this.togglePlay()
@@ -53,7 +54,7 @@ export default class Track {
     Log.trigger("track:pause")
   }
 
-  togglePlay = () => {
+  togglePlay() {
     if (this.audioNode && !this.audioNode.paused) {
       this.pause()
     } else {

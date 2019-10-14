@@ -8,7 +8,7 @@ const blankMP3 =
 
 // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio#Attributes
 export default class AudioNode {
-  constructor(preloadSrc = null) {
+  constructor(preloadSrc) {
     Log.trigger("audioNode:create")
     this.unlocked = false
     this.loadNext = null

@@ -8,6 +8,8 @@ export default class Playlist {
     const elements = document.querySelectorAll(selector)
     this.tracks = [...elements].map(el => new Track(el, this.setCurrentTrack))
     if (preloadIndex >= 0) this.tracks[preloadIndex].preload()
+    this.setCurrentTrack = this.setCurrentTrack.bind(this)
+    this.playNextTrack = this.playNextTrack.bind(this)
     document.addEventListener("audioNode:ended", this.playNextTrack)
   }
 
@@ -20,7 +22,7 @@ export default class Playlist {
       : undefined
   }
 
-  setCurrentTrack = track => {
+  setCurrentTrack(track) {
     if (this.currentTrack) {
       this.currentTrack.pause()
     }
@@ -28,7 +30,7 @@ export default class Playlist {
     this.currentTrack.play()
   }
 
-  playNextTrack = async () => {
+  async playNextTrack() {
     const nextTrack = this.nextTrack()
     if (nextTrack) {
       await nextTrack.play()
