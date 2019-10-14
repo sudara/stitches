@@ -1,6 +1,6 @@
 export default class Log {
   static trigger(scope, detail) {
-    const message = `${ performance.now().toFixed(1) } ms: ${ scope }`
+    const message = `${performance.now().toFixed(1)} ms: ${scope}`
     /* eslint-disable no-console */
     console.log(message)
     /* eslint-disable */
@@ -9,16 +9,15 @@ export default class Log {
     document.dispatchEvent(event)
   }
 
-  static appendToElement(message, detail){
-    let detailString = '';
+  static appendToElement(message, detail) {
+    let detailString = ""
     if (detail) {
-      Object.values(detail).map((value) => {
+      Object.values(detail).map(value => {
         detailString = `${detailString} ${value}`
       })
     }
 
-
-    const el = document.querySelector('#debug')
+    const el = document.querySelector("#debug")
     el.insertAdjacentHTML("beforeend", `${message} - ${detailString}<br/>`)
   }
 }

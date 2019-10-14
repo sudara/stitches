@@ -1,5 +1,6 @@
-let idCounter = 0;
+let idCounter = 0
 
 export default function uniqueId() {
-  return ++idCounter + ''
+  idCounter += 1
+  return `${idCounter}`
 }
