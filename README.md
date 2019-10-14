@@ -3,24 +3,34 @@
 
 Stitching Together MP3 Playback in HTML5 Audio with ES6
 
-## What's the goal?
+## Our goal
 
-To provide the best user experience of playling playlists of mp3s on a website.
+To distill and codify 10+ years experience of building dozens of web music players into a tight, usable library with 0 dependencies.
 
 ## Features
 
 Stitches6...
 
-* Is written in ES6/ES2017
+* Is written in ES6+
 * Completely ignores the Web Audio API (which doesn't allow buffering, therefore useless for music playback)
 * Only handles the MP3 format (pragmatically, the only format that matters)
 * Lets you decide if you want to babel things or just include in a `<script type=module>`
 * Is defensive, but doesn't test for browsers or feature detect
 * Assumes you have a playlist
 * Assumes you want to preload one of the tracks
-* Assumes you want to have continuous playback of a playlist (preloads next track)
+* Assumes you want to have continuous playback of a playlist (preloads next tracks)
 * Assumes you care as much about mobile as you do desktop
 * Deals with "unlocking" audio elements from their auto-play restrictions
+
+## We worked hard so you don't have to
+
+Unfortunately the state of HTML5 Audio support on browsers has not evolved much in the last decade, leaving the API incomplete and unreliable across platforms. Stitches has your back by:
+
+* Unlocking multiple audio nodes on an interaction so you can play through multiple tracks
+
+* Abstracts out and normalizes HTML5 audio events so that they actually work cross-browser (For example, [onended in iOS has been broken for years](https://bugs.webkit.org/show_bug.cgi?id=173332)).
+
+* Comes with defaults that enable gapless playback, with an ability to tune.
 
 ## Installation
 
