@@ -16,6 +16,9 @@ module.exports = {
       .assert.containsText("#debug", "nodepool:create")
       .pause(1500)
       .assert.containsText("#debug", "whilePlaying - 1")
+      .getAttribute("li:nth-of-type(1) > progress", "value", result => {
+        browser.assert.ok(parseFloat(result.value) > 0.2)
+      })
       .end()
   },
   "Clicking play on a track after clicking to unlock starts audio": browser => {
