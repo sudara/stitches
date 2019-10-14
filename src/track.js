@@ -21,19 +21,28 @@ export default class Track {
     // grab node from list
     // make sure this one is last to be unlocked
     Log.trigger("track:preload")
-    this.audioNode = pool.makePreloadingNode(this.url)
+    this.audioNode = pool.makePreloadingNode(
+      this.url,
+      this.cleanupAudioNode.bind(this)
+    )
   }
 
   async grabNode() {
     Log.trigger("track:grabNodeAndSetSrc")
-    this.audioNode = await pool.nextAvailableNode()
+    this.audioNode = await pool.nextAvailableNode(
+      this.cleanupAudioNode.bind(this)
+    )
+  }
+
+  cleanupAudioNode() {
+    this.audioNode = null
   }
 
   // https://developers.google.com/web/updates/2016/03/play-returns-promise
   async play() {
     Log.trigger("track:play")
     try {
-      if (this.preload === true) {
+      if (this.audioNode) {
         await this.audioNode.play(this.whilePlaying.bind(this))
       } else {
         await this.grabNode()

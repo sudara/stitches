@@ -24,10 +24,6 @@ export default class AudioNode {
     this.paused = true
   }
 
-  get available() {
-    return this.unlocked && this.blank
-  }
-
   get blank() {
     return this.src === blankMP3
   }
