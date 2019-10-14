@@ -10,14 +10,17 @@ export default class Log {
   }
 
   static appendToElement(message, detail) {
-    let detailString = ""
-    if (detail) {
-      Object.values(detail).map(value => {
-        detailString = `${detailString} ${value}`
-      })
-    }
-
     const el = document.querySelector("#debug")
-    el.insertAdjacentHTML("beforeend", `${message} - ${detailString}<br/>`)
+
+    if (el) {
+      let detailString = ""
+      if (detail) {
+        Object.values(detail).map(value => {
+          detailString = `${detailString} ${value}`
+        })
+      }
+
+      el.insertAdjacentHTML("beforeend", `${message} - ${detailString}<br/>`)
+    }
   }
 }
