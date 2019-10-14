@@ -83,15 +83,19 @@ export default class AudioNode {
     }
   }
 
-  play(whilePlayingCallback) {
+  async play(whilePlayingCallback) {
+    while (this.unlocked === false) {
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise(resolve => setTimeout(resolve, 0))
+    }
     this.whilePlayingCallback = whilePlayingCallback
-    this.audio.play()
     this.paused = false
+    return this.audio.play()
   }
 
   pause() {
-    this.audio.pause()
     this.paused = true
+    this.audio.pause()
   }
 
   ready() {
