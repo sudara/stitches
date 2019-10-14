@@ -32,6 +32,10 @@ export default class AudioNode {
     return this.src === blankMP3
   }
 
+  get duration() {
+    return this.audio.duration
+  }
+
   set src(url) {
     this.audio.src = url
     this.fileName = url.startsWith("data:audio") ? "data" : url.split("/").pop()
@@ -39,6 +43,10 @@ export default class AudioNode {
 
   get src() {
     return this.audio.src
+  }
+
+  seek(position) {
+    this.audio.currentTime = this.audio.duration * position
   }
 
   // this can only be called on an interaction event like a click/touch
@@ -71,9 +79,16 @@ export default class AudioNode {
       currentTime: this.audio.currentTime,
       fileName: this.fileName
     })
+    if (this.whilePlayingCallback) {
+      this.whilePlayingCallback({
+        currentTime: this.audio.currentTime,
+        fileName: this.fileName
+      })
+    }
   }
 
-  play() {
+  play(whilePlayingCallback) {
+    this.whilePlayingCallback = whilePlayingCallback
     this.audio.play()
     this.paused = false
   }

@@ -7,12 +7,14 @@ const pool = new NodePool(2)
 export default class Track {
   constructor(element, setCurrentTrack) {
     this.id = uniqueId()
-    this.url = element.href
     this.element = element
+    this.triggerElement = element.querySelector("a")
+    this.url = this.triggerElement.href
+    this.progressElement = element.querySelector(".stitches-progress")
     this.playlistSetCurrentTrack = setCurrentTrack
     Log.trigger("track:create")
     this.audioNode = null
-    element.addEventListener("click", this.togglePlay.bind(this))
+    this.triggerElement.addEventListener("click", this.togglePlay.bind(this))
   }
 
   async preload() {
@@ -32,17 +34,28 @@ export default class Track {
     Log.trigger("track:play")
     try {
       if (this.preload === true) {
-        await this.audioNode.play()
+        await this.audioNode.play(this.whilePlaying.bind(this))
       } else {
         await this.grabNode()
         this.audioNode.src = this.url
-        await this.audioNode.play()
+        await this.audioNode.play(this.whilePlaying.bind(this))
       }
       Log.trigger("track:playing")
     } catch (err) {
       Log.trigger("track:notplaying")
       Log.trigger(err)
     }
+  }
+
+  whilePlaying(data) {
+    const position = data.currentTime / this.audioNode.duration
+    if (this.progressElement && !Number.isNaN(position)) {
+      this.progressElement.value = position
+    }
+  }
+
+  seek(position) {
+    this.audioNode.seek(position)
   }
 
   pause() {
