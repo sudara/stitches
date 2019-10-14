@@ -11,9 +11,7 @@ module.exports = {
   "Next track starts once one has ended": browser => {
     browser
       .url(browser.launchUrl)
-      .waitForElementPresent("body")
-      .click("#logo")
-      .waitForElementPresent("#debug", 1000)
+      .waitForElementPresent("#debug")
       .click("a.track:nth-of-type(1)")
       .assert.containsText("#debug", "nodepool:create")
       .pause(1500)
@@ -25,8 +23,7 @@ module.exports = {
   "Playlist ends automatically after the last track": browser => {
     browser
       .url(browser.launchUrl)
-      .waitForElementPresent("body")
-      .waitForElementPresent("#debug", 1000)
+      .waitForElementPresent("#debug")
       .click("li:nth-of-type(4) > a")
       .pause(1500)
       .assert.containsText("#debug", "short-continuous-4.mp3")

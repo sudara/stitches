@@ -18,13 +18,23 @@ module.exports = {
       .assert.containsText("#debug", "whilePlaying - 1")
       .end()
   },
-  "Clicking play on a track after clicking anywhere starts audio": browser => {
+  "Clicking play on a track after clicking to unlock starts audio": browser => {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent("body")
-      .click("#logo")
-      .waitForElementPresent("#debug", 1000)
-      .click("a.track:nth-of-type(1)")
+      .click("#logo") // unlock audio
+      .waitForElementPresent("#debug")
+      .click("li:nth-of-type(1) > a")
+      .assert.containsText("#debug", "nodepool:create")
+      .pause(1500)
+      .assert.containsText("#debug", "whilePlaying - 1")
+      .end()
+  },
+  "Clicking play, pause and play on a track resumes playback": browser => {
+    browser
+      .url(browser.launchUrl)
+      .waitForElementPresent("#debug")
+      .click("li:nth-of-type(1) > a")
       .assert.containsText("#debug", "nodepool:create")
       .pause(1500)
       .assert.containsText("#debug", "whilePlaying - 1")
