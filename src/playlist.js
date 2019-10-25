@@ -1,31 +1,40 @@
-import Log from './log.js'
-import Track from './track.js'
+// import Log from './log'
+import Track from "./track.js"
 
-export default class Playlist extends Array {
-  constructor(items) {
-    document.addEventListener('click', e => this.click(e))
-    super(...items)
-  }
-
-  static newFromSelector(selector, { preloadIndex = -1 } = {}) {
-    this.selector = selector
-    Log.trigger('playlist:newfromselector')
+export default class Playlist {
+  constructor(options) {
+    const { preloadIndex = -1, selector } = options
+    this.currentTrack = null
     const elements = document.querySelectorAll(selector)
-    const tracks = [...elements].map((el, index) => new Track(el.href))
-    if (preloadIndex >= 0) tracks[preloadIndex].preload()
-    const playlist = new this(tracks)
-    playlist.elements = [...elements]
-    return playlist
+    this.tracks = [...elements].map(
+      el => new Track(el, this.setCurrentTrack.bind(this))
+    )
+    if (preloadIndex >= 0) this.tracks[preloadIndex].preload()
+    document.addEventListener("audioNode:ended", this.playNextTrack.bind(this))
   }
 
-  listen() {
+  nextTrack() {
+    const currentTrackIndex = this.tracks.findIndex(
+      track => this.currentTrack && track.id === this.currentTrack.id
+    )
+    return this.tracks[currentTrackIndex + 1]
+      ? this.tracks[currentTrackIndex + 1]
+      : undefined
   }
 
-  async click(event) {
-    event.preventDefault()
-    if(!this.elements.includes(event.target)) return
-    console.log(event)
-    let track = this.find(track => track.src === event.target.href)
-    await track.play()
+  setCurrentTrack(track) {
+    if (this.currentTrack) {
+      this.currentTrack.pause()
+    }
+    this.currentTrack = track
+    this.currentTrack.play()
+  }
+
+  async playNextTrack() {
+    const nextTrack = this.nextTrack()
+    if (nextTrack) {
+      await nextTrack.play()
+      this.currentTrack = nextTrack
+    }
   }
 }

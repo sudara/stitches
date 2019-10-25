@@ -1,16 +1,26 @@
 export default class Log {
-  static trigger(scope) {
-    const message = `${ performance.now().toFixed(1) } ms: ${ scope }`
+  static trigger(scope, detail) {
+    const message = `${performance.now().toFixed(1)} ms: ${scope}`
     /* eslint-disable no-console */
     console.log(message)
     /* eslint-disable */
-    this.appendToElement(message)
-    const event = new CustomEvent(scope, { bubbles: true })
+    this.appendToElement(message, detail)
+    const event = new CustomEvent(scope, { bubbles: true, detail })
     document.dispatchEvent(event)
   }
 
-  static appendToElement(message){
-    const el = document.querySelector('#debug')
-    el.insertAdjacentHTML("beforeend", `${message}<br/>`)
+  static appendToElement(message, detail) {
+    const el = document.querySelector("#debug")
+
+    if (el) {
+      let detailString = ""
+      if (detail) {
+        Object.values(detail).map(value => {
+          detailString = `${detailString} ${value}`
+        })
+      }
+
+      el.insertAdjacentHTML("beforeend", `${message} - ${detailString}<br/>`)
+    }
   }
 }

@@ -1,49 +1,60 @@
-import Log from './log.js'
-import AudioNode from './audio_node.js'
+import Log from "./log.js"
+import AudioNode from "./audio_node.js"
 
 // auto play restrictions are per-element
 // https://webkit.org/blog/7734/auto-play-policy-changes-for-macos/
 //
 // Unlock a few elements, inspired by https://github.com/goldfire/howler.js/pull/1008/files
-export default class NodePool extends Array {
+export default class NodePool {
   constructor(size) {
-    Log.trigger('nodepool:create')
-    let nodes = Array.from({ length: size }, () => new AudioNode())
-    super(...nodes)
+    Log.trigger("nodepool:create")
+    this.audioNodes = Array.from({ length: size }, () => new AudioNode())
+    this.audioNodes.forEach(audioNode => {
+      audioNode.cleanupCallback = () => {}
+    })
     this.setupEventListeners()
   }
 
-  makePreloadingNode(src) {
+  makePreloadingNode(src, cleanupCallback) {
     const preloader = new AudioNode(src)
-    this.push(preloader)
+    preloader.cleanupCallback = cleanupCallback
+    // we want to grab the preloaded one last
+    this.audioNodes.push(preloader)
     return preloader
   }
 
-  async nextAvailableNode() {
-    const nodesAvailable = this.filter(node => node.available)
-    // if someone clicks play before interacting with document
-    if (!nodesAvailable.length) {
-      Log.trigger('nodepool:unlockingnode')
-      await this[0].unlock()
-      return this[0].node
+  // has Last in Last out behaviour e.g. [a, b, c] -> [b, c, a]
+  async nextAvailableNode(cleanupCallback) {
+    const audioNode = this.audioNodes.shift()
+    // run the cleanup callback to cleanup the previous track
+    audioNode.cleanupCallback()
+    // attach the cleanup callback for the new track
+    audioNode.cleanupCallback = cleanupCallback
+    this.audioNodes.push(audioNode)
+    // if the node is not unlocked (edge case) then unlock it
+    // this happens if someone clicks play before interacting with document
+    if (!audioNode.unlocked) {
+      Log.trigger("nodepool:unlockingnode")
+      await audioNode.unlock()
     }
     // fires on documunt interaction
-    else {
-      Log.trigger('nodepool:availablenode')
-      return nodesAvailable[0].node
-    }
+    Log.trigger("nodepool:availablenode")
+    return audioNode
   }
 
-  unlockAllNodes() {
-    Log.trigger('nodepool:unlockall')
-    for (let node of this) {
-      node.unlock()
+  unlockAllAudioNodes() {
+    Log.trigger("nodepool:unlockall")
+    for (const audioNode of this.audioNodes) {
+      audioNode.unlock()
     }
   }
 
   setupEventListeners() {
-    window.addEventListener("load", (event) => {
-      document.addEventListener('click', this.unlockAllNodes.bind(this), { once: true, capture: true })
+    window.addEventListener("DOMContentLoaded", () => {
+      document.addEventListener("click", this.unlockAllAudioNodes.bind(this), {
+        once: true,
+        capture: true
+      })
     })
   }
 }

@@ -1,35 +1,49 @@
 <html>
-<head>
-  <title>StitchES6</title>
-  <script type='module'>
-    import Playlist from '/src/playlist.js'
-    window.playlist = Playlist.newFromSelector('#playlist li a',{ preloadIndex: 0 })
-  </script>
-</head>
-<body>
-<header>
-  <img src="logo.svg" id="logo"/>
-</header>
+  <head>
+    <title>StitchES6</title>
+    <script type="module">
+      import Playlist from "/src/playlist.js"
+      window.playlist = new Playlist({
+        selector: "#playlist li",
+        preloadIndex: 0
+      })
+    </script>
+  </head>
+  <body>
+    <header>
+      <img src="logo.svg" id="logo" />
+    </header>
 
-<ul id="playlist">
-  <li>
-    <a href="mp3/continuous-play-1.mp3" id="track1" class="track">&#9658; Play Track 1</a><br />
-    <progress value='0'></progress>
-  </li>
+    <ul id="playlist">
+      <li>
+        <a href="mp3/short-continuous-1.mp3" id="track1" class="track"
+          >&#9658; Play Track 1</a
+        ><br />
+        <progress value="0" class="stitches-progress"></progress>
+      </li>
 
-  <li>
-    <a href="mp3/continuous-play-2.mp3" class="track">&#9658; Play Track 2</a><br />
-    <progress value='0'></progress>
-  </li>
+      <li>
+        <a href="mp3/short-continuous-2.mp3" class="track"
+          >&#9658; Play Track 2</a
+        ><br />
+        <progress value="0" class="stitches-progress"></progress>
+      </li>
 
-  <li>
-    <a href="mp3/continuous-play-3.mp3" class="track">&#9658; Play Track 3</a><br />
-    <progress value='0'></progress>
-  </li>
-</ul>
+      <li>
+        <a href="mp3/short-continuous-3.mp3" class="track"
+          >&#9658; Play Track 3</a
+        ><br />
+        <progress value="0" class="stitches-progress"></progress>
+      </li>
 
-<div id="debug">
-</div>
-</body>
+      <li>
+        <a href="mp3/short-continuous-4.mp3" class="track"
+          >&#9658; Play Track 4</a
+        ><br />
+        <progress value="0" class="stitches-progress"></progress>
+      </li>
+    </ul>
 
+    <div id="debug"></div>
+  </body>
 </html>
