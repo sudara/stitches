@@ -27,7 +27,7 @@
   "devDependencies": {
     "babel-eslint": "^10.0.3",
     "browserstack-local": "^1.4.2",
-    "chromedriver": "77.0.0",
+    "chromedriver": "78.0.1",
     "eslint": "^6.5.1",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.4.0",
