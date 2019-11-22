@@ -1,12 +1,10 @@
 import Log from "./log.js"
-import NodePool from "./node_pool.js"
 import uniqueId from "./unique_id.js"
 
-const pool = new NodePool(2)
-
 export default class Track {
-  constructor(element, setCurrentTrack) {
+  constructor(element, pool, setCurrentTrack) {
     this.id = uniqueId()
+    this.pool = pool
     this.element = element
     this.triggerElement = element.querySelector("a")
     this.url = this.triggerElement.href
@@ -26,7 +24,7 @@ export default class Track {
     // grab node from list
     // make sure this one is last to be unlocked
     Log.trigger("track:preload")
-    this.audioNode = pool.makePreloadingNode(
+    this.audioNode = this.pool.makePreloadingNode(
       this.url,
       this.cleanupAudioNode.bind(this)
     )
@@ -34,7 +32,7 @@ export default class Track {
 
   async grabNode() {
     Log.trigger("track:grabNodeAndSetSrc")
-    this.audioNode = await pool.nextAvailableNode(
+    this.audioNode = await this.pool.nextAvailableNode(
       this.cleanupAudioNode.bind(this)
     )
   }
@@ -74,11 +72,11 @@ export default class Track {
     if (!this.hasEnded && this.timeFromEnd < 0.2) {
       this.hasEnded = true
       this.paused = true
-      Log.trigger("track:ended", { fileName: this.url })
+      Log.trigger("track:ended", { fileName: this.url, id: this.id })
     }
     if (!this.preloadNextTrackDispatched && this.timeFromEnd < 10) {
       this.preloadNextTrackDispatched = true
-      Log.trigger("track:preloadNextTrack")
+      Log.trigger("track:preloadNextTrack", { id: this.id })
     }
     if (this.progressElement && !Number.isNaN(this.position)) {
       this.progressElement.value = this.position

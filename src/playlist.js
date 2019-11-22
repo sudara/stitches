@@ -1,13 +1,15 @@
 // import Log from './log'
 import Track from "./track.js"
+import NodePool from "./node_pool.js"
 
 export default class Playlist {
   constructor(options) {
     const { preloadIndex = -1, selector } = options
     this.currentTrack = null
     const elements = document.querySelectorAll(selector)
+    const pool = new NodePool(2)
     this.tracks = [...elements].map(
-      el => new Track(el, this.setCurrentTrack.bind(this))
+      el => new Track(el, pool, this.setCurrentTrack.bind(this))
     )
     if (preloadIndex >= 0) this.tracks[preloadIndex].preload()
     document.addEventListener("track:ended", this.playNextTrack.bind(this))
@@ -34,7 +36,12 @@ export default class Playlist {
     this.currentTrack.play()
   }
 
-  async playNextTrack() {
+  trackIsPartOfPlaylist(evt) {
+    return this.tracks.some(track => track.id === evt.detail.id)
+  }
+
+  async playNextTrack(evt) {
+    if (!this.trackIsPartOfPlaylist(evt)) return
     const nextTrack = this.nextTrack()
     if (nextTrack) {
       await nextTrack.play()
@@ -42,7 +49,8 @@ export default class Playlist {
     }
   }
 
-  preloadNextTrack() {
+  preloadNextTrack(evt) {
+    if (!this.trackIsPartOfPlaylist(evt)) return
     const nextTrack = this.nextTrack()
     if (nextTrack) {
       nextTrack.load()

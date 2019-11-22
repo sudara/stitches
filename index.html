@@ -7,6 +7,11 @@
         selector: "#playlist li",
         preloadIndex: 0
       })
+
+      window.playlist2 = new Playlist({
+        selector: "#playlist2 li",
+        preloadIndex: 0
+      })
     </script>
   </head>
   <body>
@@ -39,6 +44,22 @@
       <li>
         <a href="mp3/short-continuous-4.mp3" class="track"
           >&#9658; Play Track 4</a
+        ><br />
+        <progress value="0" class="stitches-progress"></progress>
+      </li>
+    </ul>
+
+    <ul id="playlist2">
+      <li>
+        <a href="mp3/short-continuous-1.mp3" id="playlist2-track1" class="track"
+          >&#9658; Play Track 1</a
+        ><br />
+        <progress value="0" class="stitches-progress"></progress>
+      </li>
+
+      <li>
+        <a href="mp3/short-continuous-1.mp3" class="track"
+          >&#9658; Play Track 1 again</a
         ><br />
         <progress value="0" class="stitches-progress"></progress>
       </li>

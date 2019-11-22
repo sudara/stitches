@@ -43,5 +43,22 @@ module.exports = {
       .pause(3000)
       .assert.containsText("#debug", "track:ended")
       .end()
+  },
+  "Playlist can contain the same track multiple times": browser => {
+    browser
+      .url(browser.launchUrl)
+      .waitForElementPresent("#debug")
+      .click("#playlist2 li:nth-of-type(1) > a")
+      .pause(1500)
+    browser.expect
+      .element("#debug")
+      .text.to.match(/whilePlaying - \d\.\d+ short-continuous-1\.mp3/)
+    browser.pause(3000).execute(function cleanDebug() {
+      document.getElementById("debug").innerHTML = ""
+    })
+    browser.expect
+      .element("#debug")
+      .text.to.match(/whilePlaying - 1\.\d+ short-continuous-1\.mp3/)
+    browser.end()
   }
 }
