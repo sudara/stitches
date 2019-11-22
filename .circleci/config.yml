@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  saucelabs: saucelabs/connect@volatile
+  saucelabs: saucelabs/sauce-connect@volatile
 workflows:
   basic_workflow:
     jobs:
