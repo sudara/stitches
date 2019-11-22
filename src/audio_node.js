@@ -17,13 +17,11 @@ export default class AudioNode {
     // https://developer.mozilla.org/en-US/docs/Web/Apps/Fundamentals/Audio_and_video_delivery/Cross-browser_audio_basics
     this.audio.onprogress = this.whileLoading.bind(this)
     this.audio.ontimeupdate = this.whilePlaying.bind(this)
-    this.audio.onended = this.onended.bind(this)
     this.audio.oncanplaythrough = this.loaded.bind(this)
     this.audio.onloadeddata = this.onloading.bind(this)
     this.audio.preload = preloadSrc ? "auto" : "none"
     this.src = preloadSrc || blankMP3
     this.isLoading = Boolean(preloadSrc)
-    this.paused = true
   }
 
   get blank() {
@@ -45,6 +43,10 @@ export default class AudioNode {
   }
 
   seek(position) {
+    Log.trigger("audioNode:seek", {
+      position,
+      fileName: this.fileName
+    })
     this.audio.currentTime = this.audio.duration * position
   }
 
@@ -96,16 +98,17 @@ export default class AudioNode {
 
   async play(whilePlayingCallback) {
     while (this.unlocked === false) {
+      // Waiting for audio element to be unlocked, because we decided to not
+      // go further with playing it until it's available.
+      // This is done by leveraging the non-blocking nature of Promises.
       // eslint-disable-next-line no-await-in-loop
       await new Promise(resolve => setTimeout(resolve, 0))
     }
     this.whilePlayingCallback = whilePlayingCallback
-    this.paused = false
     return this.audio.play()
   }
 
   pause() {
-    this.paused = true
     this.audio.pause()
   }
 
@@ -124,13 +127,5 @@ export default class AudioNode {
         fileName: this.fileName
       })
     }
-  }
-
-  onended() {
-    this.paused = true
-    if (!this.blank) {
-      Log.trigger("audioNode:ended")
-    }
-    this.src = blankMP3
   }
 }

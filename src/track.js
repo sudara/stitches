@@ -16,8 +16,9 @@ export default class Track {
     this.audioNode = null
     this.position = 0
     this.timeFromEnd = NaN
-    this.endingDispatched = false
+    this.hasEnded = false
     this.preloadNextTrackDispatched = false
+    this.paused = true
     this.triggerElement.addEventListener("click", this.togglePlay.bind(this))
   }
 
@@ -47,12 +48,19 @@ export default class Track {
     Log.trigger("track:play")
     try {
       if (this.audioNode) {
-        await this.audioNode.play(this.whilePlaying.bind(this))
+        // No need to check for unlocked audio nodes, since hasEnded means the audio node have been unlocked before
+        if (this.hasEnded) {
+          this.seek(0)
+        }
       } else {
+        // grabbing a new node automatically results in position 0 for it and no seek(0) is needed
+        // TODO we should set the old position if it was partially played
         await this.grabNode()
         this.audioNode.src = this.url
-        await this.audioNode.play(this.whilePlaying.bind(this))
       }
+      await this.audioNode.play(this.whilePlaying.bind(this))
+      this.hasEnded = false
+      this.paused = false
       Log.trigger("track:playing")
     } catch (err) {
       Log.trigger("track:notplaying")
@@ -63,9 +71,10 @@ export default class Track {
   whilePlaying(data) {
     this.position = data.currentTime / this.audioNode.duration
     this.timeFromEnd = this.audioNode.duration - data.currentTime
-    if (!this.endingDispatched && this.timeFromEnd < 0.2) {
-      this.endingDispatched = true
-      Log.trigger("track:ending")
+    if (!this.hasEnded && this.timeFromEnd < 0.2) {
+      this.hasEnded = true
+      this.paused = true
+      Log.trigger("track:ended", { fileName: this.url })
     }
     if (!this.preloadNextTrackDispatched && this.timeFromEnd < 10) {
       this.preloadNextTrackDispatched = true
@@ -77,7 +86,10 @@ export default class Track {
   }
 
   seek(position) {
-    // TODO check if positionFromEnd needs be reset
+    if (this.hasEnded) {
+      this.hasEnded = false
+      this.preloadNextTrackDispatched = false
+    }
     this.audioNode.seek(position)
   }
 
@@ -93,12 +105,13 @@ export default class Track {
 
   pause() {
     this.audioNode.pause()
+    this.paused = true
     Log.trigger("track:pause")
   }
 
   togglePlay(evt) {
     evt.preventDefault()
-    if (this.audioNode && !this.audioNode.paused) {
+    if (this.audioNode && !this.paused) {
       this.pause()
     } else {
       this.playlistSetCurrentTrack(this)

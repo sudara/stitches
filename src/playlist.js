@@ -10,7 +10,7 @@ export default class Playlist {
       el => new Track(el, this.setCurrentTrack.bind(this))
     )
     if (preloadIndex >= 0) this.tracks[preloadIndex].preload()
-    document.addEventListener("track:ending", this.playNextTrack.bind(this))
+    document.addEventListener("track:ended", this.playNextTrack.bind(this))
     document.addEventListener(
       "track:preloadNextTrack",
       this.preloadNextTrack.bind(this)
