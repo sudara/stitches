@@ -10,9 +10,9 @@ workflows:
           name: node/default
           tag: '10.4'
         steps:
-          - checkout
           - node/with-cache:
             steps:
+              - checkout
               - run: npm install
           - saucelabs/with_proxy:
             version: 4.5.4
