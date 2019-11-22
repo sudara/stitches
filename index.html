@@ -7,7 +7,10 @@
         tracksSelector: "#playlist li",
         playButtonSelector: "a",
         progressSelector: "progress",
-        preloadIndex: 0
+        preloadIndex: 0,
+        whilePlaying: data => {
+          // console.log(data)
+        }
       })
 
       window.playlist2 = new Playlist({

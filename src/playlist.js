@@ -8,7 +8,8 @@ export default class Playlist {
       preloadIndex = -1,
       tracksSelector,
       playButtonSelector = ".stiches-play",
-      progressSelector = ".stiches-progress"
+      progressSelector = ".stiches-progress",
+      whilePlaying
     } = options
     this.currentTrack = null
     const elements = document.querySelectorAll(tracksSelector)
@@ -20,7 +21,8 @@ export default class Playlist {
           pool,
           setCurrentTrack: this.setCurrentTrack.bind(this),
           playButtonSelector,
-          progressSelector
+          progressSelector,
+          whilePlaying
         })
     )
     if (preloadIndex >= 0) this.tracks[preloadIndex].preload()
@@ -40,12 +42,12 @@ export default class Playlist {
       : undefined
   }
 
-  setCurrentTrack(track) {
+  async setCurrentTrack(track) {
     if (this.currentTrack) {
       this.currentTrack.pause()
     }
     this.currentTrack = track
-    this.currentTrack.play()
+    await this.currentTrack.play()
   }
 
   trackIsPartOfPlaylist(evt) {

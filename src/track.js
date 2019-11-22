@@ -7,7 +7,8 @@ export default class Track {
     pool,
     setCurrentTrack,
     playButtonSelector,
-    progressSelector
+    progressSelector,
+    whilePlaying
   }) {
     this.id = uniqueId()
     this.pool = pool
@@ -23,7 +24,13 @@ export default class Track {
     this.hasEnded = false
     this.preloadNextTrackDispatched = false
     this.paused = true
+    this.displayPauseButton = false
+    this.whilePlayingCallback = whilePlaying
     this.playButtonElement.addEventListener("click", this.togglePlay.bind(this))
+    this.progressElement.addEventListener(
+      "click",
+      this.updatePosition.bind(this)
+    )
   }
 
   async preload() {
@@ -95,11 +102,31 @@ export default class Track {
       this.preloadNextTrackDispatched = true
       Log.trigger("track:preloadNextTrack", { id: this.id })
     }
+
     if (this.progressElement && !Number.isNaN(this.position)) {
       this.progressElement.value = this.position
     }
-    this.playButtonElement.classList.remove("stitches-loading")
-    this.playButtonElement.classList.add("stitches-playing")
+
+    if (!this.displayPauseButton) {
+      this.playButtonElement.classList.remove("stitches-loading")
+      this.playButtonElement.classList.add("stitches-playing")
+      this.displayPauseButton = true
+    }
+
+    if (typeof this.whilePlayingCallback === "function") {
+      this.whilePlayingCallback({
+        timeFromEnd: this.timeFromEnd,
+        fileName: this.url
+      })
+    }
+  }
+
+  async updatePosition(evt) {
+    const offset =
+      evt.clientX - this.progressElement.getBoundingClientRect().left
+    const newPosition = offset / this.progressElement.offsetWidth
+    await this.playlistSetCurrentTrack(this)
+    this.seek(newPosition)
   }
 
   seek(position) {
@@ -123,6 +150,7 @@ export default class Track {
   pause() {
     this.audioNode.pause()
     this.paused = true
+    this.displayPauseButton = false
     Log.trigger("track:pause")
   }
 
