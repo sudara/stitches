@@ -4,12 +4,24 @@ import NodePool from "./node_pool.js"
 
 export default class Playlist {
   constructor(options) {
-    const { preloadIndex = -1, selector } = options
+    const {
+      preloadIndex = -1,
+      tracksSelector,
+      playButtonSelector = ".stiches-play",
+      progressSelector = ".stiches-progress"
+    } = options
     this.currentTrack = null
-    const elements = document.querySelectorAll(selector)
+    const elements = document.querySelectorAll(tracksSelector)
     const pool = new NodePool(2)
     this.tracks = [...elements].map(
-      el => new Track(el, pool, this.setCurrentTrack.bind(this))
+      el =>
+        new Track({
+          element: el,
+          pool,
+          setCurrentTrack: this.setCurrentTrack.bind(this),
+          playButtonSelector,
+          progressSelector
+        })
     )
     if (preloadIndex >= 0) this.tracks[preloadIndex].preload()
     document.addEventListener("track:ended", this.playNextTrack.bind(this))

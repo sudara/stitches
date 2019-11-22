@@ -2,13 +2,19 @@ import Log from "./log.js"
 import uniqueId from "./unique_id.js"
 
 export default class Track {
-  constructor(element, pool, setCurrentTrack) {
+  constructor({
+    element,
+    pool,
+    setCurrentTrack,
+    playButtonSelector,
+    progressSelector
+  }) {
     this.id = uniqueId()
     this.pool = pool
     this.element = element
-    this.triggerElement = element.querySelector("a")
-    this.url = this.triggerElement.href
-    this.progressElement = element.querySelector(".stitches-progress")
+    this.playButtonElement = element.querySelector(playButtonSelector)
+    this.url = this.playButtonElement.href
+    this.progressElement = element.querySelector(progressSelector)
     this.playlistSetCurrentTrack = setCurrentTrack
     Log.trigger("track:create")
     this.audioNode = null
@@ -17,7 +23,7 @@ export default class Track {
     this.hasEnded = false
     this.preloadNextTrackDispatched = false
     this.paused = true
-    this.triggerElement.addEventListener("click", this.togglePlay.bind(this))
+    this.playButtonElement.addEventListener("click", this.togglePlay.bind(this))
   }
 
   async preload() {
@@ -56,7 +62,18 @@ export default class Track {
         await this.grabNode()
         this.audioNode.src = this.url
       }
+
       await this.audioNode.play(this.whilePlaying.bind(this))
+
+      if (this.audioNode.isLoaded) {
+        this.playButtonElement.classList.add("stitches-playing")
+        this.playButtonElement.classList.remove("stitches-paused")
+      } else {
+        this.playButtonElement.classList.add("stitches-loading")
+        this.playButtonElement.classList.remove("stitches-playing")
+        this.playButtonElement.classList.remove("stitches-paused")
+      }
+
       this.hasEnded = false
       this.paused = false
       Log.trigger("track:playing")
@@ -81,6 +98,8 @@ export default class Track {
     if (this.progressElement && !Number.isNaN(this.position)) {
       this.progressElement.value = this.position
     }
+    this.playButtonElement.classList.remove("stitches-loading")
+    this.playButtonElement.classList.add("stitches-playing")
   }
 
   seek(position) {
@@ -111,6 +130,9 @@ export default class Track {
     evt.preventDefault()
     if (this.audioNode && !this.paused) {
       this.pause()
+      this.playButtonElement.classList.remove("stitches-loading")
+      this.playButtonElement.classList.remove("stitches-playing")
+      this.playButtonElement.classList.add("stitches-paused")
     } else {
       this.playlistSetCurrentTrack(this)
     }

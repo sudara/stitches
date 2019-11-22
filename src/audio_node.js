@@ -21,6 +21,7 @@ export default class AudioNode {
     this.audio.onloadeddata = this.onloading.bind(this)
     this.audio.preload = preloadSrc ? "auto" : "none"
     this.src = preloadSrc || blankMP3
+    this.isLoaded = false
     this.isLoading = Boolean(preloadSrc)
   }
 
@@ -33,6 +34,7 @@ export default class AudioNode {
   }
 
   set src(url) {
+    this.isLoaded = false
     this.isLoading = false
     this.audio.src = url
     this.fileName = url.startsWith("data:audio") ? "data" : url.split("/").pop()
@@ -121,6 +123,7 @@ export default class AudioNode {
   }
 
   loaded() {
+    this.isLoaded = true
     // don't care about notifying on the blank mp3 loading since it's local
     if (!this.blank) {
       Log.trigger("audioNode:loaded", {

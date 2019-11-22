@@ -4,15 +4,30 @@
     <script type="module">
       import Playlist from "/src/playlist.js"
       window.playlist = new Playlist({
-        selector: "#playlist li",
+        tracksSelector: "#playlist li",
+        playButtonSelector: "a",
+        progressSelector: "progress",
         preloadIndex: 0
       })
 
       window.playlist2 = new Playlist({
-        selector: "#playlist2 li",
+        tracksSelector: "#playlist2 li",
+        playButtonSelector: "a",
+        progressSelector: "progress",
         preloadIndex: 0
       })
     </script>
+    <style>
+      .stitches-loading {
+        border: 3px solid red;
+      }
+      .stitches-playing {
+        border: 3px solid green;
+      }
+      .stitches-paused {
+        border: 3px solid blue;
+      }
+    </style>
   </head>
   <body>
     <header>
