@@ -5,6 +5,9 @@ orbs:
 workflows:
   basic_workflow:
     jobs:
+      - node/with-cache:
+        steps:
+          - run: npm install
       - saucelabs/with_proxy:
           version: 4.5.4
           steps:
