@@ -1,32 +1,28 @@
-var browserstack = require('browserstack-local');
-
 let nightwatch_config = {
   src_folders: ["tests"],
 
   selenium : {
     "start_process": false,
-    "host": "hub-cloud.browserstack.com",
-    "port": 80
+    "host": "127.0.0.1",
+    "port": 4445
   },
   common_capabilities: {
-    'browserstack.user': process.env.BROWSERSTACK_USERNAME,
-    'browserstack.key': process.env.BROWSERSTACK_ACCESS_KEY,
-    'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
-    'build': process.env.TRAVIS_BUILD_NUMBER || 'local',
-    'browserstack.debug': true,
-    'browserstack.local': true,
-    'browserstack.console': 'info'
+    'javascriptEnabled': true,
+    "acceptSslCerts": true,
   },
 
   test_settings: {
     default: {
-      "launch_url": "http://bs-local.com:8080",
+      "launch_url": "http://localhost",
+      "selenium_port": process.env.SELENIUM_PORT || 80,
+      "selenium_host": process.env.SELENIUM_HOST || 'ondemand.saucelabs.com',
+      "skip_testcases_on_fail": false,
     },
     chrome: {
       desiredCapabilities: {
-        'os': 'Windows',
-        'os_version': '10',
-        'browser': 'Chrome',
+        'platform': 'Windows 10',
+        'browserName': 'Chrome',
+        'version': 'latest'
       }
     },
     chromeMac: {
@@ -93,8 +89,6 @@ let nightwatch_config = {
 // Code to support common capabilites
 for (var i in nightwatch_config.test_settings) {
   var config = nightwatch_config.test_settings[i];
-  config['selenium_host'] = nightwatch_config.selenium.host;
-  config['selenium_port'] = nightwatch_config.selenium.port;
   config['desiredCapabilities'] = config['desiredCapabilities'] || {};
   for (var j in nightwatch_config.common_capabilities) {
     config['desiredCapabilities'][j] = config['desiredCapabilities'][j] || nightwatch_config.common_capabilities[j];
