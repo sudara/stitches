@@ -1,0 +1,3 @@
+version: 2.1
+orbs:
+  sauce-connect: saucelabs/sauce-connect@1.0.1
