@@ -14,6 +14,10 @@ export default class Track {
     this.playlistSetCurrentTrack = setCurrentTrack
     Log.trigger("track:create")
     this.audioNode = null
+    this.position = 0
+    this.timeFromEnd = NaN
+    this.endingDispatched = false
+    this.preloadNextTrackDispatched = false
     this.triggerElement.addEventListener("click", this.togglePlay.bind(this))
   }
 
@@ -57,13 +61,23 @@ export default class Track {
   }
 
   whilePlaying(data) {
-    const position = data.currentTime / this.audioNode.duration
-    if (this.progressElement && !Number.isNaN(position)) {
-      this.progressElement.value = position
+    this.position = data.currentTime / this.audioNode.duration
+    this.timeFromEnd = this.audioNode.duration - data.currentTime
+    if (!this.endingDispatched && this.timeFromEnd < 0.25) {
+      this.endingDispatched = true
+      Log.trigger("track:ending")
+    }
+    if (!this.preloadNextTrackDispatched && this.timeFromEnd < 10) {
+      this.preloadNextTrackDispatched = true
+      Log.trigger("track:preloadNextTrack")
+    }
+    if (this.progressElement && !Number.isNaN(this.position)) {
+      this.progressElement.value = this.position
     }
   }
 
   seek(position) {
+    // TODO check if positionFromEnd needs be reset
     this.audioNode.seek(position)
   }
 
