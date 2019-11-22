@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   saucelabs: saucelabs/sauce-connect@volatile
+  node: circleci/node@volatile
 workflows:
   basic_workflow:
     jobs:
