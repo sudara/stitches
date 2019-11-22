@@ -13,14 +13,16 @@ export default class AudioNode {
     this.unlocked = false
     this.loadNext = null
     this.audio = new Audio()
-    this.audio.preload = preloadSrc ? "auto" : "none"
     this.audio.autoplay = false
     // https://developer.mozilla.org/en-US/docs/Web/Apps/Fundamentals/Audio_and_video_delivery/Cross-browser_audio_basics
     this.audio.onprogress = this.whileLoading.bind(this)
     this.audio.ontimeupdate = this.whilePlaying.bind(this)
     this.audio.onended = this.onended.bind(this)
     this.audio.oncanplaythrough = this.loaded.bind(this)
+    this.audio.onloadeddata = this.onloading.bind(this)
+    this.audio.preload = preloadSrc ? "auto" : "none"
     this.src = preloadSrc || blankMP3
+    this.isLoading = Boolean(preloadSrc)
     this.paused = true
   }
 
@@ -33,6 +35,7 @@ export default class AudioNode {
   }
 
   set src(url) {
+    this.isLoading = false
     this.audio.src = url
     this.fileName = url.startsWith("data:audio") ? "data" : url.split("/").pop()
   }
@@ -43,6 +46,10 @@ export default class AudioNode {
 
   seek(position) {
     this.audio.currentTime = this.audio.duration * position
+  }
+
+  load() {
+    this.audio.load()
   }
 
   // this can only be called on an interaction event like a click/touch
@@ -71,6 +78,10 @@ export default class AudioNode {
   }
 
   whilePlaying() {
+    // Updating the src seems to fire ontimeupdate and we ignore it to avoid
+    // triggering the event for tracks that actually aren't playing
+    if (this.audio.currentTime === 0) return
+
     Log.trigger("audioNode:whilePlaying", {
       currentTime: this.audio.currentTime,
       fileName: this.fileName
@@ -102,10 +113,16 @@ export default class AudioNode {
     return this.audio.readyState >= 3
   }
 
+  onloading() {
+    this.isLoading = true
+  }
+
   loaded() {
     // don't care about notifying on the blank mp3 loading since it's local
     if (!this.blank) {
-      Log.trigger("audioNode:loaded")
+      Log.trigger("audioNode:loaded", {
+        fileName: this.fileName
+      })
     }
   }
 

@@ -11,6 +11,10 @@ export default class Playlist {
     )
     if (preloadIndex >= 0) this.tracks[preloadIndex].preload()
     document.addEventListener("track:ending", this.playNextTrack.bind(this))
+    document.addEventListener(
+      "track:preloadNextTrack",
+      this.preloadNextTrack.bind(this)
+    )
   }
 
   nextTrack() {
@@ -35,6 +39,13 @@ export default class Playlist {
     if (nextTrack) {
       await nextTrack.play()
       this.currentTrack = nextTrack
+    }
+  }
+
+  preloadNextTrack() {
+    const nextTrack = this.nextTrack()
+    if (nextTrack) {
+      nextTrack.load()
     }
   }
 }

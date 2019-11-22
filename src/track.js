@@ -63,7 +63,7 @@ export default class Track {
   whilePlaying(data) {
     this.position = data.currentTime / this.audioNode.duration
     this.timeFromEnd = this.audioNode.duration - data.currentTime
-    if (!this.endingDispatched && this.timeFromEnd < 0.25) {
+    if (!this.endingDispatched && this.timeFromEnd < 0.2) {
       this.endingDispatched = true
       Log.trigger("track:ending")
     }
@@ -79,6 +79,16 @@ export default class Track {
   seek(position) {
     // TODO check if positionFromEnd needs be reset
     this.audioNode.seek(position)
+  }
+
+  async load() {
+    if (!this.audioNode) {
+      await this.grabNode()
+      this.audioNode.src = this.url
+      await this.audioNode.load()
+    } else if (this.audioNode && !this.audioNode.isLoading) {
+      await this.audioNode.load()
+    }
   }
 
   pause() {
