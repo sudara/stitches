@@ -1,3 +1,9 @@
 version: 2.1
 orbs:
   sauce-connect: saucelabs/sauce-connect@1.0.1
+workflows:
+  basic_workflow:
+    jobs:
+      - saucelabs/with_proxy:
+          steps:
+            - run: mvn verify -B
