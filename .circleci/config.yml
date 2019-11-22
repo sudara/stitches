@@ -11,11 +11,11 @@ workflows:
       steps:
         - checkout
         - node/with-cache:
-            steps:
-              - run: npm install
+          steps:
+            - run: npm install
         - saucelabs/with_proxy:
-            version: 4.5.4
-            steps:
-              - run: npm start
-              - run: node browserstack.runner.js -c nightwatch-browserstack.conf.js -e safari,chrome,chromeMac,firefox,iphone,pixel,galaxys9,ucbrowser
+          version: 4.5.4
+          steps:
+            - run: npm start
+            - run: node browserstack.runner.js -c nightwatch-browserstack.conf.js -e safari,chrome,chromeMac,firefox,iphone,pixel,galaxys9,ucbrowser
 
