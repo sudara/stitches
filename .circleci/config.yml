@@ -9,13 +9,13 @@ jobs:
       name: node/default
       tag: '10.4'
     steps:
+      - checkout
       - node/with-cache:
         steps:
-          - checkout
           - run: npm install
-      - saucelabs/with_proxy:
-        version: 4.5.4
-        steps:
-          - run: npm start
-          - run: node ./node_modules/.bin/nightwatch -c nightwatch-sauce.conf.js -e safari,chrome,chromeMac,firefox,iphone,pixel,galaxys9,ucbrowser
+#  - saucelabs/with_proxy:
+#    version: 4.5.4
+#    steps:
+#      - run: npm start
+#      - run: node ./node_modules/.bin/nightwatch -c nightwatch-sauce.conf.js -e safari,chrome,chromeMac,firefox,iphone,pixel,galaxys9,ucbrowser
 
