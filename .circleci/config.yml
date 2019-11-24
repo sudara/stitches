@@ -2,21 +2,20 @@ version: 2.1
 orbs:
   saucelabs: saucelabs/sauce-connect@volatile
   node: circleci/node@volatile
-workflows:
-  basic_workflow:
-    jobs:
-      - build:
-        executor:
-          name: node/default
-          tag: '10.4'
+
+jobs:
+  build:
+    executor:
+      name: node/default
+      tag: '10.4'
+    steps:
+      - node/with-cache:
         steps:
-          - node/with-cache:
-            steps:
-              - checkout
-              - run: npm install
-          - saucelabs/with_proxy:
-            version: 4.5.4
-            steps:
-              - run: npm start
-              - run: node ./node_modules/.bin/nightwatch -c nightwatch-sauce.conf.js -e safari,chrome,chromeMac,firefox,iphone,pixel,galaxys9,ucbrowser
+          - checkout
+          - run: npm install
+      - saucelabs/with_proxy:
+        version: 4.5.4
+        steps:
+          - run: npm start
+          - run: node ./node_modules/.bin/nightwatch -c nightwatch-sauce.conf.js -e safari,chrome,chromeMac,firefox,iphone,pixel,galaxys9,ucbrowser
 
