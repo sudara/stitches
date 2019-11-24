@@ -14,7 +14,7 @@ let nightwatch_config = {
       "launch_url": "http://localhost:8080",
       "skip_testcases_on_fail": false,
       "selenium_host": "ondemand.eu-central-1.saucelabs.com",
-      "selenium_port": 80,
+      "selenium_port": 4444,
       "tunnelIdentifier": 'stitches',
       "build": process.env.CIRCLE_BUILD_NUM,
       "username": process.env.SAUCELABS_USER,
