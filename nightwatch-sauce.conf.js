@@ -3,8 +3,8 @@ let nightwatch_config = {
 
   selenium : {
     "start_process": false,
-    "host": "127.0.0.1",
-    "port": 4445
+    "host": "ondemand.eu-central-1.saucelabs.com",
+    "port": 443
   },
   common_capabilities: {
     'javascriptEnabled': true,
@@ -14,8 +14,6 @@ let nightwatch_config = {
   test_settings: {
     default: {
       "launch_url": "http://localhost:8080",
-      "selenium_port": process.env.SELENIUM_PORT || 4445,
-      "selenium_host": process.env.SELENIUM_HOST || 'ondemand.eu-central-1.saucelabs.com',
       "skip_testcases_on_fail": false,
     },
     chrome: {
