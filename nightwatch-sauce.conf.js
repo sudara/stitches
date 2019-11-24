@@ -4,7 +4,7 @@ let nightwatch_config = {
   selenium : {
     "start_process": false,
     "host": "ondemand.eu-central-1.saucelabs.com",
-    "port": 443
+    "port": 4445
   },
   common_capabilities: {
     'javascriptEnabled': true,
@@ -15,6 +15,7 @@ let nightwatch_config = {
     default: {
       "launch_url": "http://localhost:8080",
       "skip_testcases_on_fail": false,
+      "tunnelIdentifier": 'stitches',
       "build": "${CIRCLE_BUILD_NUM}",
     },
     chrome: {

@@ -14,8 +14,15 @@ jobs:
             - run: npm install
             - saucelabs/install:
                 version: 4.5.4
-      - saucelabs/open_tunnel:
-          tunnel_identifier: stitches
+      - run:
+          name: Open Sauce Connect Proxy Tunnel
+          command: |
+            : ${SAUCELABS_USER:?"Required Env Variable not found!"}
+            : ${SAUCELABS_KEY:?"Required Env Variable not found!"}
+            # startup saucelabs tunnel as background task (its a blocking command)
+            sc -u ${SAUCELABS_USER} -k ${SAUCELABS_KEY} -i stitches -x -x https://eu-central-1.saucelabs.com/rest/v1 &
+            # wait for sauce tunnel up to 1 minute
+            wget --retry-connrefused --no-check-certificate -T 60 localhost:4445
       - run: npm start
       - run: node ./node_modules/.bin/nightwatch -c nightwatch-sauce.conf.js -e safari,chrome,chromeMac,firefox,iphone,pixel,galaxys9,ucbrowser
       - saucelabs/close_tunnel
