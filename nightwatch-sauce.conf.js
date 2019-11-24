@@ -4,7 +4,7 @@ let nightwatch_config = {
   selenium : {
     "start_process": false,
     "host": "127.0.0.1",
-    "port": 4445
+    "port": 4444
   },
   common_capabilities: {
     'javascriptEnabled': true,
