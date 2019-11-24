@@ -19,6 +19,8 @@ workflows:
     jobs:
       - build
       - saucelabs/with_proxy:
+          requires:
+            - build
           version: 4.5.4
           steps:
             - run: npm start
