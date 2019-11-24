@@ -13,15 +13,16 @@ export default class AudioNode {
     this.unlocked = false
     this.loadNext = null
     this.audio = new Audio()
-    this.audio.preload = preloadSrc ? "auto" : "none"
     this.audio.autoplay = false
     // https://developer.mozilla.org/en-US/docs/Web/Apps/Fundamentals/Audio_and_video_delivery/Cross-browser_audio_basics
     this.audio.onprogress = this.whileLoading.bind(this)
     this.audio.ontimeupdate = this.whilePlaying.bind(this)
-    this.audio.onended = this.onended.bind(this)
     this.audio.oncanplaythrough = this.loaded.bind(this)
+    this.audio.onloadeddata = this.onloading.bind(this)
+    this.audio.preload = preloadSrc ? "auto" : "none"
     this.src = preloadSrc || blankMP3
-    this.paused = true
+    this.isLoaded = false
+    this.isLoading = Boolean(preloadSrc)
   }
 
   get blank() {
@@ -33,6 +34,8 @@ export default class AudioNode {
   }
 
   set src(url) {
+    this.isLoaded = false
+    this.isLoading = false
     this.audio.src = url
     this.fileName = url.startsWith("data:audio") ? "data" : url.split("/").pop()
   }
@@ -42,7 +45,15 @@ export default class AudioNode {
   }
 
   seek(position) {
+    Log.trigger("audioNode:seek", {
+      position,
+      fileName: this.fileName
+    })
     this.audio.currentTime = this.audio.duration * position
+  }
+
+  load() {
+    this.audio.load()
   }
 
   // this can only be called on an interaction event like a click/touch
@@ -71,6 +82,10 @@ export default class AudioNode {
   }
 
   whilePlaying() {
+    // Updating the src seems to fire ontimeupdate and we ignore it to avoid
+    // triggering the event for tracks that actually aren't playing
+    if (this.audio.currentTime === 0) return
+
     Log.trigger("audioNode:whilePlaying", {
       currentTime: this.audio.currentTime,
       fileName: this.fileName
@@ -85,16 +100,17 @@ export default class AudioNode {
 
   async play(whilePlayingCallback) {
     while (this.unlocked === false) {
+      // Waiting for audio element to be unlocked, because we decided to not
+      // go further with playing it until it's available.
+      // This is done by leveraging the non-blocking nature of Promises.
       // eslint-disable-next-line no-await-in-loop
       await new Promise(resolve => setTimeout(resolve, 0))
     }
     this.whilePlayingCallback = whilePlayingCallback
-    this.paused = false
     return this.audio.play()
   }
 
   pause() {
-    this.paused = true
     this.audio.pause()
   }
 
@@ -102,18 +118,17 @@ export default class AudioNode {
     return this.audio.readyState >= 3
   }
 
-  loaded() {
-    // don't care about notifying on the blank mp3 loading since it's local
-    if (!this.blank) {
-      Log.trigger("audioNode:loaded")
-    }
+  onloading() {
+    this.isLoading = true
   }
 
-  onended() {
-    this.paused = true
+  loaded() {
+    this.isLoaded = true
+    // don't care about notifying on the blank mp3 loading since it's local
     if (!this.blank) {
-      Log.trigger("audioNode:ended")
+      Log.trigger("audioNode:loaded", {
+        fileName: this.fileName
+      })
     }
-    this.src = blankMP3
   }
 }

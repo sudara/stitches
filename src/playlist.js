@@ -1,16 +1,36 @@
 // import Log from './log'
 import Track from "./track.js"
+import NodePool from "./node_pool.js"
 
 export default class Playlist {
   constructor(options) {
-    const { preloadIndex = -1, selector } = options
+    const {
+      preloadIndex = -1,
+      tracksSelector,
+      playButtonSelector = ".stiches-play",
+      progressSelector = ".stiches-progress",
+      whilePlaying
+    } = options
     this.currentTrack = null
-    const elements = document.querySelectorAll(selector)
+    const elements = document.querySelectorAll(tracksSelector)
+    const pool = new NodePool(2)
     this.tracks = [...elements].map(
-      el => new Track(el, this.setCurrentTrack.bind(this))
+      el =>
+        new Track({
+          element: el,
+          pool,
+          setCurrentTrack: this.setCurrentTrack.bind(this),
+          playButtonSelector,
+          progressSelector,
+          whilePlaying
+        })
     )
     if (preloadIndex >= 0) this.tracks[preloadIndex].preload()
-    document.addEventListener("audioNode:ended", this.playNextTrack.bind(this))
+    document.addEventListener("track:ended", this.playNextTrack.bind(this))
+    document.addEventListener(
+      "track:preloadNextTrack",
+      this.preloadNextTrack.bind(this)
+    )
   }
 
   nextTrack() {
@@ -22,19 +42,32 @@ export default class Playlist {
       : undefined
   }
 
-  setCurrentTrack(track) {
+  async setCurrentTrack(track) {
     if (this.currentTrack) {
       this.currentTrack.pause()
     }
     this.currentTrack = track
-    this.currentTrack.play()
+    await this.currentTrack.play()
   }
 
-  async playNextTrack() {
+  trackIsPartOfPlaylist(evt) {
+    return this.tracks.some(track => track.id === evt.detail.id)
+  }
+
+  async playNextTrack(evt) {
+    if (!this.trackIsPartOfPlaylist(evt)) return
     const nextTrack = this.nextTrack()
     if (nextTrack) {
       await nextTrack.play()
       this.currentTrack = nextTrack
+    }
+  }
+
+  preloadNextTrack(evt) {
+    if (!this.trackIsPartOfPlaylist(evt)) return
+    const nextTrack = this.nextTrack()
+    if (nextTrack) {
+      nextTrack.load()
     }
   }
 }
