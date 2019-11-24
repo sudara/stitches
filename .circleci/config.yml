@@ -13,9 +13,9 @@ jobs:
           steps:
             - run: npm install
             - saucelabs/install:
-              version: 4.5.4
+                version: 4.5.4
       - saucelabs/open_tunnel:
-        tunnel_identifier: stitches
+          tunnel_identifier: stitches
       - run: npm start
       - run: node ./node_modules/.bin/nightwatch -c nightwatch-sauce.conf.js -e safari,chrome,chromeMac,firefox,iphone,pixel,galaxys9,ucbrowser
       - saucelabs/close_tunnel
