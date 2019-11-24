@@ -3,7 +3,6 @@ let nightwatch_config = {
   custom_commands_path: "./nightwatch_commands",
   selenium : {
     "start_process": false,
-    "host": "ondemand.eu-central-1.saucelabs.com"
   },
   common_capabilities: {
     'javascriptEnabled': true,
@@ -15,7 +14,7 @@ let nightwatch_config = {
       "launch_url": "http://localhost:8080",
       "skip_testcases_on_fail": false,
       "selenium_host": "ondemand.eu-central-1.saucelabs.com",
-      "selenium_port": 4444,
+      "selenium_port": 4445,
       "tunnelIdentifier": 'stitches',
       "build": "${CIRCLE_BUILD_NUM}",
       "username": "${SAUCELABS_USER}",
