@@ -11,7 +11,7 @@ let nightwatch_config = {
 
   test_settings: {
     default: {
-      "launch_url": "http://localhost:8080",
+      "launch_url": "http://localhost",
       "skip_testcases_on_fail": false,
       "selenium_host": "ondemand.eu-central-1.saucelabs.com",
       "selenium_port": 4445,
