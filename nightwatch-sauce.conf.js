@@ -14,8 +14,8 @@ let nightwatch_config = {
   test_settings: {
     default: {
       "launch_url": "http://localhost",
-      "selenium_port": process.env.SELENIUM_PORT || 80,
-      "selenium_host": process.env.SELENIUM_HOST || 'ondemand.saucelabs.com',
+      "selenium_port": process.env.SELENIUM_PORT || 4445,
+      "selenium_host": process.env.SELENIUM_HOST || 'ondemand.eu-central-1.saucelabs.com',
       "skip_testcases_on_fail": false,
     },
     chrome: {
