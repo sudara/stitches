@@ -12,19 +12,26 @@ jobs:
       - node/with-cache:
           steps:
             - run: npm install
+            - saucelabs/install:
+              version: 4.5.4
+      - saucelabs/open_tunnel:
+        tunnel_identifier: stitches
+      - run: npm start
+      - run: node ./node_modules/.bin/nightwatch -c nightwatch-sauce.conf.js -e safari,chrome,chromeMac,firefox,iphone,pixel,galaxys9,ucbrowser
+      - saucelabs/close_tunnel
 
-workflows:
-  version: 2.1
-  build_and_test:
-    jobs:
-      - build
-      - saucelabs/with_proxy:
-          requires:
-            - build
-          version: 4.5.4
-          steps:
-            - run: npm start
-            - run: node ./node_modules/.bin/nightwatch -c nightwatch-sauce.conf.js -e safari,chrome,chromeMac,firefox,iphone,pixel,galaxys9,ucbrowser
+# workflows:
+#   version: 2.1
+#   build_and_test:
+#     jobs:
+#       - build
+#       - saucelabs/with_proxy:
+#           requires:
+#             - build
+#           version: 4.5.4
+#           steps:
+#             - run: npm start
+#             - run: node ./node_modules/.bin/nightwatch -c nightwatch-sauce.conf.js -e safari,chrome,chromeMac,firefox,iphone,pixel,galaxys9,ucbrowser
 
   # jobs:
   #   - build:
