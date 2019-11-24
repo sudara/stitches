@@ -20,7 +20,7 @@ jobs:
             : ${SAUCELABS_USER:?"Required Env Variable not found!"}
             : ${SAUCELABS_KEY:?"Required Env Variable not found!"}
             # startup saucelabs tunnel as background task (its a blocking command)
-            sc -u ${SAUCELABS_USER} -k ${SAUCELABS_KEY} -i stitches -x -x https://eu-central-1.saucelabs.com/rest/v1 &
+            sc -u ${SAUCELABS_USER} -k ${SAUCELABS_KEY} -i stitches -x https://eu-central-1.saucelabs.com/rest/v1 &
             # wait for sauce tunnel up to 1 minute
             wget --retry-connrefused --no-check-certificate -T 60 localhost:4445
       - run: npm start
