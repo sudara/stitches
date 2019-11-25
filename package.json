@@ -31,7 +31,7 @@
     "chromedriver": "77.0.0",
     "eslint": "^6.5.1",
     "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-config-prettier": "^6.4.0",
+    "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-import": "^2.18.2",
     "http-server": "^0.11.1",
     "nightwatch": "^1.2.4",
