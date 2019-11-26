@@ -24,7 +24,7 @@ jobs:
             # wait for sauce tunnel up to 1 minute
             wget --retry-connrefused --no-check-certificate -T 60 localhost:4445
       - run: http-server -s c-1 -p 80 . &
-      - run: node ./node_modules/.bin/nightwatch -c nightwatch-sauce.conf.js -e safari,chrome,chromeMac,firefox,iphone,pixel,galaxys9,ucbrowser
+      - run: node ./node_modules/.bin/nightwatch -c nightwatch-sauce.conf.js -e chrome
       - saucelabs/close_tunnel
 
 # workflows:
