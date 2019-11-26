@@ -26,67 +26,10 @@ let nightwatch_config = {
       desiredCapabilities: {
         'platform': 'Windows 10',
         'browserName': 'Chrome',
-        'version': 'latest'
+        'version': 'latest',
+        "tunnelIdentifier": 'stitches',
       }
     },
-    chromeMac: {
-      desiredCapabilities: {
-        'os': 'OS X',
-        'os_version': 'Mojave',
-        'browser': 'Chrome',
-      }
-    },
-    firefox: {
-      desiredCapabilities: {
-        'os': 'Windows',
-        'os_version': '10',
-        'browser': 'Firefox'
-      }
-    },
-    safari: {
-      desiredCapabilities: {
-        'os': 'OS X',
-        'os_version': 'Mojave',
-        'browser': 'Safari'
-      }
-    },
-    edge: {
-      desiredCapabilities: {
-        'os': 'Windows',
-        'os_version': '10',
-        'browser': 'Edge'
-      }
-    },
-    iphone: {
-      desiredCapabilities: {
-        'device': 'iPhone 8',
-        'realMobile': 'true',
-        'os_version': '12.1',
-        'nativeWebTap': 'true'
-      }
-    },
-    galaxys9: {
-      desiredCapabilities: {
-        'device': 'Samsung Galaxy S9',
-        'realMobile': 'true',
-        'os_version': '8.0'
-      }
-    },
-    ucbrowser: {
-      desiredCapabilities: {
-        'device': 'Samsung Galaxy S9',
-        'realMobile': 'true',
-        'os_version': '8.0',
-        'browser': 'ucbrowser'
-      }
-    },
-    pixel: {
-      desiredCapabilities: {
-        'device': 'Google Pixel 3',
-        'realMobile': 'true',
-        'os_version': '9.0'
-      }
-    }
   }
 };
 
