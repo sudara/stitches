@@ -23,7 +23,7 @@ jobs:
             sc -u ${SAUCELABS_USER} -k ${SAUCELABS_KEY} -i stitches -x https://eu-central-1.saucelabs.com/rest/v1 &
             # wait for sauce tunnel up to 1 minute
             wget --retry-connrefused --no-check-certificate -T 60 localhost:4445
-      - run: http-server -s c-1 -p 80 . &
+      - run: http-server -s c-1 -p 8080 . &
       - run: node ./node_modules/.bin/nightwatch -c nightwatch-sauce.conf.js -e chrome
       - saucelabs/close_tunnel
 
