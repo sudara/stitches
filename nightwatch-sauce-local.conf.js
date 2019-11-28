@@ -11,13 +11,15 @@ let nightwatch_config = {
 
   test_settings: {
     default: {
-      "launch_url": "http://localhost:8080",
+      "launch_url": "http://127.0.0.1:8080",
       "selenium_host": "ondemand.eu-central-1.saucelabs.com",
       "selenium_port": 80,
       "use_ssl": false,
       "skip_testcases_on_fail": false,
       "tunnelIdentifier": 'stitches-local',
-      "build": process.env.CIRCLE_BUILD_NUM,
+      "build": '1',
+      "avoidProxy": true,
+      "public": "public",
       "username": process.env.SAUCELABS_USER,
       "access_key": process.env.SAUCELABS_KEY,
       "output": true
