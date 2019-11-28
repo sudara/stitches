@@ -12,6 +12,7 @@ jobs:
       - node/with-cache:
           steps:
             - run: npm install
+            - run: npm install http-server -g
             - saucelabs/install:
                 version: 4.5.4
       - run:
