@@ -28,7 +28,7 @@ module.exports = {
         form: {
           status: 'error',
           reason: 'failed',
-          name: `${envName} env: ${client.currentTest.module}`,
+          name: `${envName} env: ${browser.currentTest.module}`,
         },
       })
     } else {
@@ -40,7 +40,7 @@ module.exports = {
           pass: process.env.BROWSERSTACK_ACCESS_KEY,
         },
         form: {
-          name: `${envName} env: ${client.currentTest.module}`,
+          name: `${envName} env: ${browser.currentTest.module}`,
           status: 'passed'
         },
       })
