@@ -20,7 +20,7 @@ export default class Log {
         })
       }
 
-      el.insertAdjacentHTML("beforeend", `${message} - ${detailString}<br/>`)
+      el.insertAdjacentHTML("afterbegin", `${message} - ${detailString}<br/>`)
     }
   }
 }
