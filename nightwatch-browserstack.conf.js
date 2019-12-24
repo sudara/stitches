@@ -12,7 +12,7 @@ let nightwatch_config = {
 
     'browserstack.user': process.env.BROWSERSTACK_USERNAME,
     'browserstack.key': process.env.BROWSERSTACK_ACCESS_KEY,
-    'browserstack.appium_version': '1.15.0',
+    'browserstack.appium_version': '1.14.0',
     'browserstack.selenium_version': '4.0.0-alpha-2',
     'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
     'build': process.env.TRAVIS_BUILD_NUMBER || 'local',
