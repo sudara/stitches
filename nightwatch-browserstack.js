@@ -1,3 +1,5 @@
+const request = require('request')
+
 // modified from archived git repo example
 // https://github.com/blueimp/nightwatch-browserstack/blob/master/index.js
 module.exports = {
@@ -11,10 +13,12 @@ module.exports = {
   // which will in turn mark it as failed on browserstack and eventually travis.
   // Note that here we are just defining the function.
   // We still need to call it from an afterEach hook in each "suite" (js file)
-  updateStatus: function (browser) {
+  updateStatus (browser) {
+    const cliOptions = process.argv.slice(2);
+    const envIndex = cliOptions.indexOf('--env');
+    const envName = cliOptions[envIndex + 1];
     if (browser.currentTest.results.failed > 0) {
-      console.warn("FAILED")
-      require('request')({
+      request({
         method: 'PUT',
         uri: `https://api.browserstack.com/automate/sessions/${browser.sessionId}.json`,
         auth: {
@@ -23,7 +27,21 @@ module.exports = {
         },
         form: {
           status: 'error',
-          reason: 'failed'
+          reason: 'failed',
+          name: `${envName} env: ${client.currentTest.module}`,
+        },
+      })
+    } else {
+      request({
+        method: 'PUT',
+        uri: `https://api.browserstack.com/automate/sessions/${browser.sessionId}.json`,
+        auth: {
+          user: process.env.BROWSERSTACK_USERNAME,
+          pass: process.env.BROWSERSTACK_ACCESS_KEY,
+        },
+        form: {
+          name: `${envName} env: ${client.currentTest.module}`,
+          status: 'passed'
         },
       })
     }
