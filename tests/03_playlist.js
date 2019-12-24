@@ -14,7 +14,7 @@ module.exports = {
       .waitForElementPresent("#debug")
       .click("a.track:nth-of-type(1)")
       .assert.containsText("#debug", "nodepool:create")
-      .pause(1500)
+      .pause(2000)
       .assert.containsText(
         "#debug",
         "audioNode:loaded - short-continuous-2.mp3"
