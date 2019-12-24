@@ -1,4 +1,4 @@
-![](https://travis-ci.com/sudara/stitches.svg?branch=master)
+[![](https://travis-ci.com/sudara/stitches.svg?branch=master)](https://travis-ci.com/sudara/stitches)
 ![stitches6](logo.svg)
 
 Stitching Together MP3 Playback in HTML5 Audio with ES6
