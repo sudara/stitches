@@ -14,9 +14,6 @@ module.exports = {
   // Note that here we are just defining the function.
   // We still need to call it from an afterEach hook in each "suite" (js file)
   updateStatus (browser) {
-    const cliOptions = process.argv.slice(2);
-    const envIndex = cliOptions.indexOf('--env');
-    const envName = cliOptions[envIndex + 1];
     if (browser.currentTest.results.failed > 0) {
       request({
         method: 'PUT',
@@ -28,7 +25,7 @@ module.exports = {
         form: {
           status: 'error',
           reason: 'failed',
-          name: `${envName} env: ${browser.currentTest.module}`,
+          name: `${browser.currentTest.name}`,
         },
       })
     } else {
@@ -40,8 +37,8 @@ module.exports = {
           pass: process.env.BROWSERSTACK_ACCESS_KEY,
         },
         form: {
-          name: `${envName} env: ${browser.currentTest.module}`,
-          status: 'passed'
+          status: 'passed',
+          name: `${browser.currentTest.name}`,
         },
       })
     }
