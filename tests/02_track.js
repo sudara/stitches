@@ -26,6 +26,7 @@ module.exports = {
       .url(browser.launchUrl)
       .waitForElementPresent("body")
       .click("#logo") // unlock audio
+      .pause(500)
       .waitForElementPresent("#debug")
       .click("li:nth-of-type(1) > a")
       .assert.containsText("#debug", "nodepool:create")
