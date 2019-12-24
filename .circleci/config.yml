@@ -13,6 +13,7 @@ jobs:
             - run: npm install
             - saucelabs/install:
                 version: 4.5.4
+            - run: echo 127.0.0.1 sauce.local | sudo tee -a /etc/hosts
       - run:
           name: Open Sauce Connect Proxy Tunnel
           command: |

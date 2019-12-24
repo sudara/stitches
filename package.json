@@ -4,7 +4,7 @@
   "description": "Stitching Together MP3 Playback in HTML5 Audio with ES6",
   "main": "index.js",
   "scripts": {
-    "start": "http-server -s c-1 . & ",
+    "start": "http-server -s c-1 -p3000 . & ",
     "test": "npm start && nightwatch -c nightwatch-local.conf.json; npm stop",
     "stop": "pkill -f http-server",
     "localsauce": "sc -u ${SAUCELABS_USER} -k ${SAUCELABS_KEY} -i stitches-local -x https://eu-central-1.saucelabs.com/rest/v1 &",
