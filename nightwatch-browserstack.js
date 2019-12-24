@@ -14,33 +14,18 @@ module.exports = {
   // Note that here we are just defining the function.
   // We still need to call it from an afterEach hook in each "suite" (js file)
   updateStatus (browser) {
-    if (browser.currentTest.results.failed > 0) {
-      request({
-        method: 'PUT',
-        uri: `https://api.browserstack.com/automate/sessions/${browser.sessionId}.json`,
-        auth: {
-          user: process.env.BROWSERSTACK_USERNAME,
-          pass: process.env.BROWSERSTACK_ACCESS_KEY,
-        },
-        form: {
-          status: 'error',
-          reason: 'failed',
-          name: `${browser.currentTest.name}`,
-        },
-      })
-    } else {
-      request({
-        method: 'PUT',
-        uri: `https://api.browserstack.com/automate/sessions/${browser.sessionId}.json`,
-        auth: {
-          user: process.env.BROWSERSTACK_USERNAME,
-          pass: process.env.BROWSERSTACK_ACCESS_KEY,
-        },
-        form: {
-          status: 'passed',
-          name: `${browser.currentTest.name}`,
-        },
-      })
-    }
+    const status = browser.currentTest.results.failed > 0 ? 'failed' : 'passed'
+    request({
+      method: 'PUT',
+      uri: `https://api.browserstack.com/automate/sessions/${browser.sessionId}.json`,
+      auth: {
+        user: process.env.BROWSERSTACK_USERNAME,
+        pass: process.env.BROWSERSTACK_ACCESS_KEY,
+      },
+      form: {
+        status,
+        name: `${browser.currentTest.name}`,
+      },
+    })
   }
 }
