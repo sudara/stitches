@@ -14,7 +14,6 @@ module.exports = {
       .waitForElementPresent("#debug")
       .click("a.track:nth-of-type(1)")
       .assert.containsText("#debug", "nodepool:create")
-      .pause(2000)
       .assert.containsText(
         "#debug",
         "audioNode:loaded - short-continuous-2.mp3"
@@ -22,7 +21,6 @@ module.exports = {
     browser.expect
       .element("#debug")
       .text.to.match(/whilePlaying - \d\.\d+ short-continuous-1\.mp3/)
-    browser.pause(3000)
     browser.expect
       .element("#debug")
       .text.to.match(/whilePlaying - \d\.\d+ short-continuous-2\.mp3/)
@@ -35,12 +33,10 @@ module.exports = {
       .url(browser.launchUrl)
       .waitForElementPresent("#debug")
       .click("li:nth-of-type(4) > a")
-      .pause(1500)
     browser.expect
       .element("#debug")
       .text.to.match(/whilePlaying - \d\.\d+ short-continuous-4\.mp3/)
     browser
-      .pause(3000)
       .assert.containsText("#debug", "track:ended")
       .end()
   },
@@ -49,7 +45,6 @@ module.exports = {
       .url(browser.launchUrl)
       .waitForElementPresent("#debug")
       .click("#playlist2 li:nth-of-type(1) > a")
-      .pause(1500)
     browser.expect
       .element("#debug")
       .text.to.match(/whilePlaying - \d\.\d+ short-continuous-1\.mp3/)
