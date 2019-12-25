@@ -37,6 +37,7 @@ module.exports = {
       .element("#debug")
       .text.to.match(/whilePlaying - \d\.\d+ short-continuous-4\.mp3/)
     browser
+      .pause(2000)
       .assert.containsText("#debug", "track:ended")
       .end()
   },
