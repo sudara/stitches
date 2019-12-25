@@ -62,12 +62,18 @@ let nightwatch_config = {
         'browser': 'Edge'
       }
     },
-    iphone: {
+    iphoneXS: {
       desiredCapabilities: {
         'device': 'iPhone XS',
         'realMobile': 'true',
-        'os_version': '13',
-        'nativeWebTap': 'true'
+        'os_version': '12'
+      }
+    },
+    iphone11: {
+      desiredCapabilities: {
+        'device': 'iPhone 11',
+        'realMobile': 'true',
+        'os_version': '13'
       }
     },
     galaxys9: {
