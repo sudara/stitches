@@ -16,7 +16,7 @@ export default class Log {
       let detailString = ""
       if (detail) {
         Object.values(detail).map(value => {
-          detailString = `${detailString} ${value}`
+          detailString = `${detailString.trim()} ${value.trim()}`
         })
       }
 
