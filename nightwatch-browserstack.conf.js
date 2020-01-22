@@ -9,7 +9,7 @@ let nightwatch_config = {
     "port": 80
   },
   common_capabilities: {
-    'browserstack.appium_version': "1.15.0",
+    'browserstack.appium_version': "1.16.0",
     'browserstack.user': process.env.BROWSERSTACK_USERNAME,
     'browserstack.key': process.env.BROWSERSTACK_ACCESS_KEY,
     'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
