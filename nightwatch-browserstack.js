@@ -15,6 +15,8 @@ module.exports = {
   // We still need to call it from an afterEach hook in each "suite" (js file)
   updateStatus (browser) {
     const status = browser.currentTest.results.failed > 0 ? 'failed' : 'passed'
+
+    // See https://www.browserstack.com/automate/rest-api
     request({
       method: 'PUT',
       uri: `https://api.browserstack.com/automate/sessions/${browser.sessionId}.json`,
@@ -24,6 +26,18 @@ module.exports = {
       },
       form: {
         status,
+      },
+    })
+    // apparently we need to send the name of the test seperately from the status
+    // since updating tests as passing doesn't actually work
+    request({
+      method: 'PUT',
+      uri: `https://api.browserstack.com/automate/sessions/${browser.sessionId}.json`,
+      auth: {
+        user: process.env.BROWSERSTACK_USERNAME,
+        pass: process.env.BROWSERSTACK_ACCESS_KEY,
+      },
+      form: {
         name: `${browser.currentTest.name}`,
       },
     })
