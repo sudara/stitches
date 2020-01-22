@@ -66,7 +66,8 @@ let nightwatch_config = {
         'device': 'iPhone XS',
         'realMobile': 'true',
         'os_version': '12',
-        'nativeWebTap': 'true'
+        'nativeWebTap': 'true', // https://appiumpro.com/editions/36
+        'browser': 'Safari'
       }
     },
     iphone11: {
@@ -74,7 +75,8 @@ let nightwatch_config = {
         'device': 'iPhone 11',
         'realMobile': 'true',
         'os_version': '13',
-        'nativeWebTap': 'true'
+        'nativeWebTap': 'true',
+        'browser': 'Safari'
       }
     },
     galaxys9: {
