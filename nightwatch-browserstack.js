@@ -25,8 +25,7 @@ module.exports = {
         pass: process.env.BROWSERSTACK_ACCESS_KEY,
       },
       form: {
-        "status": status,
-        "name": `${browser.currentTest.name}`
+        "status": "passed"
       },
     })
   }
