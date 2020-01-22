@@ -52,8 +52,7 @@ let nightwatch_config = {
         'os': 'OS X',
         'os_version': 'Catalina',
         'browser_version': '13.0',
-        'browser': 'Safari'
-      }
+        'browser': 'Safari'      }
     },
     edge: {
       desiredCapabilities: {
@@ -66,14 +65,16 @@ let nightwatch_config = {
       desiredCapabilities: {
         'device': 'iPhone XS',
         'realMobile': 'true',
-        'os_version': '12'
+        'os_version': '12',
+        'nativeWebTap': 'true'
       }
     },
     iphone11: {
       desiredCapabilities: {
         'device': 'iPhone 11',
         'realMobile': 'true',
-        'os_version': '13'
+        'os_version': '13',
+        'nativeWebTap': 'true'
       }
     },
     galaxys9: {
