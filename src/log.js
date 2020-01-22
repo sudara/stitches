@@ -13,12 +13,7 @@ export default class Log {
     const el = document.querySelector("#debug")
 
     if (el) {
-      let detailString = ""
-      if (detail) {
-        Object.values(detail).map(value => {
-          detailString = `${detailString} ${value}`
-        })
-      }
+      const detailString = Object.values(detail || []).join(" ")
 
       el.insertAdjacentHTML("afterbegin", `${message} - ${detailString}<br/>`)
     }
