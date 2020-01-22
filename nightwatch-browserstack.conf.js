@@ -9,6 +9,7 @@ let nightwatch_config = {
     "port": 80
   },
   common_capabilities: {
+    'browserstack.appium_version': "1.16.0",
     'browserstack.user': process.env.BROWSERSTACK_USERNAME,
     'browserstack.key': process.env.BROWSERSTACK_ACCESS_KEY,
     'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
@@ -21,6 +22,9 @@ let nightwatch_config = {
   test_settings: {
     default: {
       "launch_url": "http://bs-local.com:8080",
+      globals: {
+        retryAssertionTimeout: 3000
+      }
     },
     chrome: {
       desiredCapabilities: {
@@ -48,8 +52,7 @@ let nightwatch_config = {
         'os': 'OS X',
         'os_version': 'Catalina',
         'browser_version': '13.0',
-        'browser': 'Safari'
-      }
+        'browser': 'Safari'      }
     },
     edge: {
       desiredCapabilities: {
@@ -58,12 +61,22 @@ let nightwatch_config = {
         'browser': 'Edge'
       }
     },
-    iphone: {
+    iphoneXS: {
       desiredCapabilities: {
         'device': 'iPhone XS',
         'realMobile': 'true',
+        'os_version': '12',
+        'nativeWebTap': 'true', // https://appiumpro.com/editions/36
+        'browser': 'Safari'
+      }
+    },
+    iphone11: {
+      desiredCapabilities: {
+        'device': 'iPhone 11',
+        'realMobile': 'true',
         'os_version': '13',
-        'nativeWebTap': 'true'
+        'nativeWebTap': 'true',
+        'browser': 'Safari'
       }
     },
     galaxys9: {
