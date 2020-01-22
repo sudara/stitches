@@ -25,20 +25,8 @@ module.exports = {
         pass: process.env.BROWSERSTACK_ACCESS_KEY,
       },
       form: {
-        status,
-      },
-    })
-    // apparently we need to send the name of the test seperately from the status
-    // since updating tests as passing doesn't actually work
-    request({
-      method: 'PUT',
-      uri: `https://api.browserstack.com/automate/sessions/${browser.sessionId}.json`,
-      auth: {
-        user: process.env.BROWSERSTACK_USERNAME,
-        pass: process.env.BROWSERSTACK_ACCESS_KEY,
-      },
-      form: {
-        name: `${browser.currentTest.name}`,
+        "status": status,
+        "name": `${browser.currentTest.name}`
       },
     })
   }
