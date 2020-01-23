@@ -21,6 +21,8 @@ let nightwatch_config = {
 
   test_settings: {
     default: {
+      end_session_on_fail: false,
+      skip_testcases_on_fail: false,
       "launch_url": "http://bs-local.com:8080",
       globals: {
         retryAssertionTimeout: 3000,
