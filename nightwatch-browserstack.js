@@ -16,6 +16,8 @@ module.exports = {
   updateStatus (browser) {
     const status = browser.currentTest.results.failed > 0 ? 'failed' : 'passed'
 
+    console.warn(browser.currentTest.name, browser.sessiodId, status)
+
     // See https://www.browserstack.com/automate/rest-api
     request({
       method: 'PUT',
@@ -25,8 +27,10 @@ module.exports = {
         pass: process.env.BROWSERSTACK_ACCESS_KEY,
       },
       form: {
-        "status": "passed"
+        "status": "passed",
+        "name": `${browser.currentTest.name}`
       },
     })
+
   }
 }
