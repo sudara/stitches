@@ -1,13 +1,4 @@
 module.exports = {
-  // this is so ugly, but the only way we can get failures to report properly
-  afterEach: (browser, done) => {
-    if (browser.launchUrl.includes("bs-local")) {
-      // eslint-disable-next-line global-require
-      require("../nightwatch-browserstack").updateStatus(browser)
-    }
-    done()
-  },
-
   "Next track starts once one has ended": browser => {
     browser
       .url(browser.launchUrl)

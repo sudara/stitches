@@ -23,7 +23,20 @@ let nightwatch_config = {
     default: {
       "launch_url": "http://bs-local.com:8080",
       globals: {
-        retryAssertionTimeout: 3000
+        retryAssertionTimeout: 3000,
+        // this is so ugly, but the only way we can get failures to report properly
+        // to browserstack. We actually are keeping the selenium browser connection open
+        // and ending it here in afterEach so we still have access to sessionId and friends
+        afterEach: (browser, done) => {
+          if (browser.launchUrl.includes("bs-local")) {
+            browser.perform(function() {
+              // eslint-disable-next-line global-require
+              require("./nightwatch-browserstack").updateStatus(browser)
+            }).end(function() {
+              done();
+            })
+          }
+        },
       }
     },
     chrome: {
