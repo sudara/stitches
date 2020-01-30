@@ -87,7 +87,7 @@ let nightwatch_config = {
     },
     iphone11: {
       desiredCapabilities: {
-        'device': 'iPhone 11',
+        'device': 'iPhone 11 Pro',
         'realMobile': 'true',
         'os_version': '13',
         'nativeWebTap': 'true',
@@ -111,9 +111,9 @@ let nightwatch_config = {
     },
     pixel: {
       desiredCapabilities: {
-        'device': 'Google Pixel 3',
+        'device': 'Google Pixel 4',
         'realMobile': 'true',
-        'os_version': '9.0'
+        'os_version': '10.0'
       }
     }
   }
