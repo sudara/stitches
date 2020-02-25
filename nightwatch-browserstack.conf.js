@@ -33,9 +33,7 @@ let nightwatch_config = {
           if (browser.launchUrl.includes("bs-local")) {
             browser.perform(function() {
               // eslint-disable-next-line global-require
-              require("./nightwatch-browserstack").updateStatus(browser)
-            }).end(function() {
-              done();
+              require("./nightwatch-browserstack").updateStatus(browser, done)
             })
           }
         },

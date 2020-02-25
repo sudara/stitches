@@ -13,10 +13,8 @@ module.exports = {
   // which will in turn mark it as failed on browserstack and eventually travis.
   // Note that here we are just defining the function.
   // We still need to call it from an afterEach hook in each "suite" (js file)
-  updateStatus (browser) {
+  updateStatus (browser, done) {
     const status = browser.currentTest.results.failed > 0 ? 'failed' : 'passed'
-
-    console.warn(browser.currentTest.name, browser.sessionId, status)
 
     // See https://www.browserstack.com/automate/rest-api
     request({
@@ -30,7 +28,8 @@ module.exports = {
         "status": status,
         "name": `${browser.currentTest.name}`
       },
+    }, function (res, status, body) {
+      done()
     })
-
   }
 }
