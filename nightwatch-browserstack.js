@@ -29,7 +29,7 @@ module.exports = {
         "name": `${browser.currentTest.name}`
       },
     }, function (res, status, body) {
-      done()
+        browser.end(function () { done() }
     })
   }
 }
