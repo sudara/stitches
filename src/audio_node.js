@@ -38,6 +38,7 @@ export default class AudioNode {
     this.isLoading = false
     this.audio.src = url
     this.fileName = url.startsWith("data:audio") ? "data" : url.split("/").pop()
+    Log.trigger("audioNode:srcchanged", { fileName: this.fileName } )
   }
 
   get src() {
@@ -56,20 +57,28 @@ export default class AudioNode {
     this.audio.load()
   }
 
-  // this can only be called on an interaction event like a click/touch
-  async unlock() {
+  // this can *only* be called via an interaction event like a click/touch
+  async unlock(delayPreloadingNodeUnlock) {
     // https://developers.google.com/web/updates/2016/03/play-returns-promise
     try {
       // if we've preloaded another src, switch src to unlock w/ blank
       if (!this.blank && !this.unlocked) {
-        Log.trigger("audioNode:unlockingpreloaded")
+        // if we clicked play directly, we might be in a race condition where unlock()
+        // is called twice, once from the play interaction and once from general unlockAll()
+        const preloadSrc = this.src
+        this.src = blankMP3
         await this.audio.play()
         this.audio.pause()
-      } else {
+        this.unlocked = true
+        this.src = preloadSrc
+        Log.trigger("audioNode:unlockedpreloaded")
+      } else if(!this.unlocked) {
         await this.audio.play()
+        Log.trigger("audioNode:unlocked")
+        this.unlocked = true
+      } else {
+        Log.trigger("audioNode:nodealreadyunlocked")
       }
-      Log.trigger("audioNode:unlocked")
-      this.unlocked = true
     } catch (err) {
       Log.trigger("audioNode:unlockfailed")
     }
@@ -86,11 +95,12 @@ export default class AudioNode {
     // triggering the event for tracks that actually aren't playing
     if (this.audio.currentTime === 0) return
 
-    Log.trigger("audioNode:whilePlaying", {
-      currentTime: this.audio.currentTime,
-      fileName: this.fileName
-    })
     if (this.whilePlayingCallback) {
+      Log.trigger("audioNode:whilePlaying", {
+        currentTime: this.audio.currentTime,
+        fileName: this.fileName
+      })
+
       this.whilePlayingCallback({
         currentTime: this.audio.currentTime,
         fileName: this.fileName
@@ -106,6 +116,7 @@ export default class AudioNode {
       // eslint-disable-next-line no-await-in-loop
       await new Promise(resolve => setTimeout(resolve, 0))
     }
+    // ideally this only fires on real playback, not when we are unlocking
     this.whilePlayingCallback = whilePlayingCallback
     return this.audio.play()
   }
