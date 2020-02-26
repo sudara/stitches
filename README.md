@@ -105,15 +105,26 @@ However, as time wore on, I found myself constantly having to keep up with the c
 
 ## Running tests
 
-For a project like this, given the somewhat sketchy state audio playback in browsers, it's absolutely critical to run tests against current browsers.
+Given the somewhat sketchy state of audio playback in browsers (especially Safari), it's absolutely critical to run tests against current browsers.
 
 Selenium tests are currently written in Nightwatch.
 
-You can run them locally with `yarn test` and it will run them in just against headless chrome as configured in `nightwatch-local.conf.json`.
+### Locally Against Chrome
 
-We are using browserstack to actually run the tests against multiple browsers. This is configured in `nightwatch-browserstack.conf.js` and uses a runner defined in `browserstack.runner.js`. Travis is setup to run browserstack, but you can also run browserstack locally (assuming you have credentials) with `yarn browserstack`
+You can run tests locally with `yarn test` which will run them against headless chrome as configured in `nightwatch-local.conf.json`.
 
-Note that test failures on selenium (and therefore browserstack) are manually registered via browserstack's API.
+### Browserstack
+
+We are using browserstack to run tests against multiple browsers. This is configured in `nightwatch-browserstack.conf.js` and uses a runner defined in `browserstack.runner.js`. Travis is setup to run browserstack.
+
+Test failures are manually reported via `afterEach` callbacks via browserstack's API which manually send 1 request per test case to Browserstack.
+
+### Locally against Browserstack
+
+You can also run browserstack locally (assuming you have the `BROWSERSTACK_USERNAME` and `BROWSERSTACK_ACCESS_KEY` credentials set as ENV variables) with `yarn browserstack`. I recommend reducing the number of browsers that are being run against in package.json.
+
+PROTIP: You won't see any "live" output from nightwatch when more than one browser is being run, as the tests are being run in parallel. If you want to see nightwatch output as it happens, just use one browser.
+
 
 ## Acknowledgements
 
