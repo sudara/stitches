@@ -18,7 +18,8 @@ export default class NodePool {
   makePreloadingNode(src, cleanupCallback) {
     const preloader = new AudioNode(src)
     preloader.cleanupCallback = cleanupCallback
-    // we want to grab the preloaded one last
+    // When we grab nodes we want to grab the preloaded one last
+    // so the data that has been preloaded has value for longer
     this.audioNodes.push(preloader)
     return preloader
   }
@@ -42,18 +43,19 @@ export default class NodePool {
     return audioNode
   }
 
-  unlockAllAudioNodes() {
+  unlockAllAudioNodes(delayPreloadingNodeUnlock=false) {
     Log.trigger("nodepool:unlockall")
     for (const audioNode of this.audioNodes) {
-      audioNode.unlock()
+      audioNode.unlock(delayPreloadingNodeUnlock)
     }
   }
 
+  // remember, this will file once per NodePool, aka once per Playlist
   setupEventListeners() {
     window.addEventListener("DOMContentLoaded", () => {
-      document.addEventListener("click", this.unlockAllAudioNodes.bind(this), {
+      document.addEventListener("click", () => this.unlockAllAudioNodes(true), {
         once: true,
-        capture: true
+        capture: false
       })
     })
   }
