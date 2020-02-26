@@ -1,5 +1,21 @@
 module.exports = {
-  "Clicking play on a track starts audio": browser => {
+  afterEach: (browser, done) => {
+    // eslint-disable-next-line global-require
+    require(".././nightwatch-browserstack").updateStatusIfBrowserstack(browser, done)
+  },
+  "Clicking play on a preloaded track starts audio": browser => {
+    browser
+      .url(browser.launchUrl)
+      .waitForElementPresent("body")
+      .click("#track1")
+      .assert.containsText("#debug", "nodepool:create")
+      .assert.containsText("#debug", "audioNode:unlockedpreloaded")
+      .assert.containsText("#debug", "whilePlaying - 1")
+      .getAttribute("li:nth-of-type(1) > progress", "value", result => {
+        browser.assert.ok(parseFloat(result.value) > 0.2)
+      })
+  },
+  "Clicking play on a non-preloaded track starts audio": browser => {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent("body")
@@ -9,9 +25,8 @@ module.exports = {
       .getAttribute("li:nth-of-type(1) > progress", "value", result => {
         browser.assert.ok(parseFloat(result.value) > 0.2)
       })
-      .end()
   },
-  "Clicking play on a track after clicking to unlock starts audio": browser => {
+  "Clicking play on a track AFTER manually unlocking also starts audio": browser => {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent("body")
@@ -19,8 +34,7 @@ module.exports = {
       .waitForElementPresent("#debug")
       .click("li:nth-of-type(1) > a")
       .assert.containsText("#debug", "nodepool:create")
-      .assert.containsText("#debug", "whilePlaying - 1")
-      .end()
+      .assert.containsText("#debug", "whilePlaying - 1") // safari has problems here
   },
   "Clicking play, pause and play on a track resumes playback": browser => {
     browser
@@ -37,6 +51,5 @@ module.exports = {
     browser
       .click("li:nth-of-type(2) > a")
       .assert.containsText("#debug", "whilePlaying - 2")
-      .end()
   }
 }

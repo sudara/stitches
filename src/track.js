@@ -26,7 +26,7 @@ export default class Track {
     this.paused = true
     this.displayPauseButton = false
     this.whilePlayingCallback = whilePlaying
-    this.playButtonElement.addEventListener("click", this.togglePlay.bind(this))
+    this.playButtonElement.addEventListener("click", this.togglePlay.bind(this), true)
     this.progressElement.addEventListener(
       "click",
       this.updatePosition.bind(this)
@@ -72,6 +72,7 @@ export default class Track {
 
       await this.audioNode.play(this.whilePlaying.bind(this))
 
+      // TODO: this needs to happen via callbacks
       if (this.audioNode.isLoaded) {
         this.playButtonElement.classList.add("stitches-playing")
         this.playButtonElement.classList.remove("stitches-paused")

@@ -1,4 +1,8 @@
 module.exports = {
+  afterEach: (browser, done) => {
+    // eslint-disable-next-line global-require
+    require(".././nightwatch-browserstack").updateStatusIfBrowserstack(browser, done)
+  },
   "Next track starts once one has ended": browser => {
     browser
       .url(browser.launchUrl)
