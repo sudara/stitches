@@ -14,8 +14,10 @@ export default class Log {
 
     if (el) {
       const detailString = Object.values(detail || []).join(" ")
-
-      el.insertAdjacentHTML("afterbegin", `${message} - ${detailString}<br/>`)
+      if (detailString.length > 0){
+        message += ` - ${ detailString }`
+      }
+      el.insertAdjacentHTML("afterbegin", `${message}<br/>`)
     }
   }
 }
