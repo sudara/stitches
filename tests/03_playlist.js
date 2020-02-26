@@ -21,7 +21,6 @@ module.exports = {
       .text.to.match(/whilePlaying - \d\.\d+ short-continuous-2\.mp3/)
     browser.assert
       .containsText("#debug", "audioNode:loaded - short-continuous-3.mp3") // checks for preloading the third one
-      .end()
   },
   "Playlist ends automatically after the last track": browser => {
     browser
@@ -34,7 +33,6 @@ module.exports = {
     browser
       .pause(2000)
       .assert.containsText("#debug", "track:ended")
-      .end()
   },
   "Playlist can contain the same track multiple times": browser => {
     browser
@@ -50,6 +48,5 @@ module.exports = {
     browser.expect
       .element("#debug")
       .text.to.match(/whilePlaying - 1\.\d+ short-continuous-1\.mp3/)
-    browser.end()
   }
 }

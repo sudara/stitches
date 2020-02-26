@@ -20,7 +20,6 @@ module.exports = {
       .url(browser.launchUrl)
       .waitForElementPresent("body")
       .click("#logo")
-      .pause(500)
       .assert.containsText("#debug", "audioNode:unlocked")
   }
 }
