@@ -1,6 +1,6 @@
 {
   "src_folders" : ["tests"],
-
+  "custom_assertions_path": "tests/custom_assertions",
   "webdriver" : {
     "start_process": true,
     "server_path": "node_modules/.bin/chromedriver",

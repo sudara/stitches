@@ -2,7 +2,7 @@ var browserstack = require('browserstack-local');
 
 let nightwatch_config = {
   src_folders: ["tests"],
-
+  custom_assertions_path: 'tests/custom_assertions',
   selenium : {
     "start_process": false,
     "host": "hub-cloud.browserstack.com",
