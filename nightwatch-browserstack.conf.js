@@ -13,7 +13,7 @@ let nightwatch_config = {
     'browserstack.user': process.env.BROWSERSTACK_USERNAME,
     'browserstack.key': process.env.BROWSERSTACK_ACCESS_KEY,
     'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
-    'build': process.env.TRAVIS_BUILD_NUMBER || 'local',
+    'build': process.env.TRAVIS_BUILD_NUMBER || `local-${process.pid}`,
     'browserstack.debug': true,
     'browserstack.local': true,
     'browserstack.console': 'info'
@@ -25,18 +25,7 @@ let nightwatch_config = {
       skip_testcases_on_fail: false,
       "launch_url": "http://bs-local.com:8080",
       globals: {
-        retryAssertionTimeout: 3000,
-        // this is so ugly, but the only way we can get failures to report properly
-        // to browserstack. We actually are keeping the selenium browser connection open
-        // and ending it here in afterEach so we still have access to sessionId and friends
-        afterEach: (browser, done) => {
-          if (browser.launchUrl.includes("bs-local")) {
-            browser.perform(function() {
-              // eslint-disable-next-line global-require
-              require("./nightwatch-browserstack").updateStatus(browser, done)
-            })
-          }
-        },
+        retryAssertionTimeout: 2000,
       }
     },
     chrome: {
