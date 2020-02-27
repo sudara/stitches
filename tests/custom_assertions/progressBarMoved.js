@@ -14,7 +14,7 @@ const progressBarMoved = function(definition, percentMoved=5) {
   };
 
   this.command = (callback) => {
-    return this.api.getValue(definition, callback); // passed to this.value
+    return this.api.getAttribute(definition, 'value', callback); // passed to this.value
   };
 };
 
