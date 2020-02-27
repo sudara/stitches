@@ -35,11 +35,11 @@ const playing = function (timestamp=0.3, mp3name=null) {
 
     // We care about actively catching the mp3 passing through a point in time,
     // Therefore we not only want to test that it's greater than that mark
-    // But that playback is actively within a 1 second tolerance window of that mark.
+    // But that playback is actively within a 2 second tolerance window of that mark.
     // This helps us test things like repeating the same track being played, etc
     if(value.match(playingRegex)) {
       const secondsPlayed = parseFloat(value.match(playingRegex)[1] || 0)
-      return (secondsPlayed > timestamp) && (secondsPlayed < (timestamp + 1))
+      return (secondsPlayed > timestamp) && (secondsPlayed < (timestamp + 2))
     }
     return false
   };
