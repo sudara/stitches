@@ -1,6 +1,12 @@
 {
-  "src_folders" : ["tests"],
+  "src_folders" : ["tests/suites"],
   "custom_assertions_path": "tests/custom_assertions",
+  "custom_commands_path": "tests/custom_commands",
+  "end_session_on_fail": false,
+  "skip_testcases_on_fail": false,
+  "globals": {
+    "waitForConditionPollInterval": 125
+  },
   "webdriver" : {
     "start_process": true,
     "server_path": "node_modules/.bin/chromedriver",

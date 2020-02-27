@@ -1,7 +1,16 @@
 var browserstack = require('browserstack-local');
 
 let nightwatch_config = {
-  src_folders: ["tests"],
+  src_folders: ["tests/suites"],
+  custom_assertions_path: 'tests/custom_assertions',
+  custom_commands_path: 'tests/custom_commands',
+  end_session_on_fail: false, // we are ending sessions in afterEach
+  skip_testcases_on_fail: false,
+  globals: {
+    // default is 500 which means playback is only checked 2x sec
+    // we would like to regularly check on playback progress, a bit more frequently
+    waitForConditionPollInterval: 125,
+  },
   selenium : {
     "start_process": false,
     "host": "hub-cloud.browserstack.com",
@@ -17,15 +26,9 @@ let nightwatch_config = {
     'browserstack.local': true,
     'browserstack.console': 'info'
   },
-
   test_settings: {
     default: {
-      end_session_on_fail: false,
-      skip_testcases_on_fail: false,
       "launch_url": "http://bs-local.com:8080",
-      globals: {
-        retryAssertionTimeout: 2000,
-      }
     },
     chrome: {
       desiredCapabilities: {
