@@ -12,7 +12,7 @@ module.exports = {
       .assert.containsText("#debug", "nodepool:create")
       .assert.containsText("#debug", "audioNode:unlockedpreloaded")
       .assert.playing()
-      .assert.progressBarMoved("li:nth-of-type(1) > progress")
+      .assert.progressBarMoved("#track1progress")
   },
 
   "Clicking play on a non-preloaded track starts audio": browser => {
@@ -22,7 +22,7 @@ module.exports = {
       .click("#track2")
       .assert.containsText("#debug", "nodepool:create")
       .assert.playing()
-      .assert.progressBarMoved("li:nth-of-type(2) > progress")
+      .assert.progressBarMoved("#track2progress")
   },
 
   "Clicking play on a track AFTER manually unlocking also starts audio": browser => {
