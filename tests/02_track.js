@@ -10,6 +10,7 @@ module.exports = {
       .click("#track1")
       .assert.containsText("#debug", "nodepool:create")
       .assert.containsText("#debug", "audioNode:unlockedpreloaded")
+      .pause(500)
       .assert.containsText("#debug", "whilePlaying - 1")
       .getAttribute("li:nth-of-type(1) > progress", "value", result => {
         browser.assert.ok(parseFloat(result.value) > 0.2)
@@ -21,6 +22,7 @@ module.exports = {
       .waitForElementPresent("body")
       .click("#track2")
       .assert.containsText("#debug", "nodepool:create")
+      .pause(500)
       .assert.containsText("#debug", "whilePlaying - 1")
       .getAttribute("li:nth-of-type(2) > progress", "value", result => {
         browser.assert.ok(parseFloat(result.value) > 0.2)

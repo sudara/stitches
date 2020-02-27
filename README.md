@@ -105,25 +105,29 @@ However, as time wore on, I found myself constantly having to keep up with the c
 
 ## Running tests
 
-Given the somewhat sketchy state of audio playback in browsers (especially Safari), it's absolutely critical to run tests against current browsers.
+Given the somewhat sketchy state of audio playback in browsers (especially Safari), it's absolutely critical to run tests against as many current browsers as possible.
 
 Selenium tests are currently written in Nightwatch.
 
+The full stack is fairly.... brittle. There are lots of places things can go wrong, and the most difficult part of this project was setting up this testing harness properly.
+
 ### Locally Against Chrome
 
-You can run tests locally with `yarn test` which will run them against headless chrome as configured in `nightwatch-local.conf.json`.
+You can run tests locally with `yarn test`. This will run tests against headless chrome as configured in `nightwatch-local.conf.json`.
 
 ### Browserstack
 
-We are using browserstack to run tests against multiple browsers. This is configured in `nightwatch-browserstack.conf.js` and uses a runner defined in `browserstack.runner.js`. Travis is setup to run browserstack.
+![Sessions Overview - BrowserStack Automate 2020-02-27 00-57-41](https://user-images.githubusercontent.com/472/75399491-9ef3c480-58fc-11ea-802a-301012d23aff.jpg)
 
-Test failures are manually reported via `afterEach` callbacks via browserstack's API which manually send 1 request per test case to Browserstack.
+We are using Browserstack to run tests against multiple browsers. This is configured in `nightwatch-browserstack.conf.js` and uses a runner defined in `browserstack.runner.js`. Travis is setup to run Browserstack.
+
+Test failures are manually reported via `afterEach` callbacks via Browserstack's API which manually send a request per test case to Browserstack, renaming the name of the test as well as reporting it as `passed` or `failed`.
 
 ### Locally against Browserstack
 
-You can also run browserstack locally (assuming you have the `BROWSERSTACK_USERNAME` and `BROWSERSTACK_ACCESS_KEY` credentials set as ENV variables) with `yarn browserstack`. I recommend reducing the number of browsers that are being run against in package.json.
+You can also run Browserstack locally (assuming you have the `BROWSERSTACK_USERNAME` and `BROWSERSTACK_ACCESS_KEY` credentials set as ENV variables) with `yarn browserstack`. This is useful for figuring out why something might be failing on one particular browser. For this use case, I recommend reducing the number of browsers that are being run in package.json, isolating the one browser that is causing problems.
 
-PROTIP: You won't see any "live" output from nightwatch when more than one browser is being run, as the tests are being run in parallel. If you want to see nightwatch output as it happens, just use one browser.
+PROTIP: You won't see any "live" output from nightwatch when more than one browser is being run, as in this case tests are being run in parallel and the log output wouldn't be very coherent. If you want to see nightwatch output as it happens, just use one browser.
 
 
 ## Acknowledgements
