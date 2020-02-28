@@ -26,8 +26,8 @@ module.exports = {
       .click("li:nth-of-type(4) > a")
       .assert.playing(1.0, "short-continuous-4.mp3")
       .assert.containsText("#debug", "track:ended")
+      .pause(200) // whilePlaying can fire one more time, let's prevent glitch
       .cleanDebug()
-      .pause(300) // whilePlaying can fire one more time, let's prevent glitch
       .assert.not.containsText("#debug", "whilePlaying")
   },
 
