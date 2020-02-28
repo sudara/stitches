@@ -21,6 +21,32 @@
       })
     </script>
     <style>
+      body {
+        padding: 40px;
+      }
+      h2 {
+        margin-top:1em;
+        margin-bottom:.5em;
+      }
+      ul {
+        padding:0;
+      }
+      li {
+        display: block;
+        width:300px;
+        list-style-type: none;
+        margin-bottom:10px;
+        padding:5px;
+        border: 1px solid #ccc;
+        border-radius:3px;
+      }
+      li a {
+        display:block;
+        text-decoration:none;
+      }
+      .stitches-progress {
+        width:300px;
+      }
       .stitches-loading {
         border: 3px solid red;
       }
@@ -36,49 +62,50 @@
     <header>
       <img src="logo.svg" id="logo" />
     </header>
-
+    <h2>Playlist of 4 different tracks</h2>
     <ul id="playlist">
       <li>
-        <a href="mp3/short-continuous-1.mp3" id="track1" class="track"
-          >&#9658; Play Track 1</a
-        ><br />
+        <a href="mp3/short-continuous-1.mp3" id="track1" class="track">
+          &#9658; Play Track 1
+        </a>
         <progress id="track1progress" value="0" class="stitches-progress"></progress>
       </li>
 
       <li>
-        <a href="mp3/short-continuous-2.mp3" id="track2" class="track"
-          >&#9658; Play Track 2</a
-        ><br />
+        <a href="mp3/short-continuous-2.mp3" id="track2" class="track">
+          &#9658; Play Track 2
+        </a>
         <progress id="track2progress" value="0" class="stitches-progress"></progress>
       </li>
 
       <li>
-        <a href="mp3/short-continuous-3.mp3" class="track"
-          >&#9658; Play Track 3</a
-        ><br />
+        <a href="mp3/short-continuous-3.mp3" class="track">
+          &#9658; Play Track 3
+        </a>
         <progress value="0" class="stitches-progress"></progress>
       </li>
 
       <li>
-        <a href="mp3/short-continuous-4.mp3" class="track"
-          >&#9658; Play Track 4</a
-        ><br />
+        <a href="mp3/short-continuous-4.mp3" class="track">
+          &#9658; Play Track 4
+        </a>
         <progress value="0" class="stitches-progress"></progress>
       </li>
     </ul>
 
+    <h2>Playlist with duplicate tracks</h2>
     <ul id="playlist2">
       <li>
-        <a href="mp3/short-continuous-1.mp3" id="playlist2-track1" class="track"
-          >&#9658; Play Track 1</a
-        ><br />
+        <a href="mp3/short-continuous-1.mp3" id="playlist2-track1" class="track">
+          &#9658; Play Track 1
+        </a>
         <progress value="0" class="stitches-progress"></progress>
       </li>
 
       <li>
-        <a href="mp3/short-continuous-1.mp3" class="track"
-          >&#9658; Play Track 1 again</a
-        ><br />
+        <a href="mp3/short-continuous-1.mp3" class="track">
+          &#9658; Play Track 1 again
+        </a>
         <progress value="0" class="stitches-progress"></progress>
       </li>
     </ul>
