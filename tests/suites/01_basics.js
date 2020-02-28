@@ -3,14 +3,10 @@ module.exports = {
     // eslint-disable-next-line global-require
     require("../../nightwatch-browserstack").updateStatusIfBrowserstack(browser, done)
   },
-  "Page Loads": browser => {
+  "StichES logs properly": browser => {
     browser
-      .url(browser.launchUrl)
       .waitForElementPresent("body")
-      .assert.title("StitchES6")
-  },
-  "StichES6 logs properly": browser => {
-    browser
+      .assert.title("StitchES")
       .url(browser.launchUrl)
       .waitForElementPresent("#debug")
       .assert.containsText("#debug", "nodepool:create")
