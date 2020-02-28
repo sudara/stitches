@@ -27,7 +27,7 @@ module.exports = {
       .assert.playing(1.0, "short-continuous-4.mp3")
       .assert.containsText("#debug", "track:ended")
       .cleanDebug()
-      .pause(200) // whilePlaying can fire one more time, let's prevent glitch
+      .pause(300) // whilePlaying can fire one more time, let's prevent glitch
       .assert.not.containsText("#debug", "whilePlaying")
   },
 
