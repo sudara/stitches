@@ -14,7 +14,7 @@ let nightwatch_config = {
   selenium : {
     "start_process": false,
     "host": "hub-cloud.browserstack.com",
-    "port": 80
+    "port": 443
   },
   common_capabilities: {
     'browserstack.appium_version': "1.16.0",
