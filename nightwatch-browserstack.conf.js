@@ -21,6 +21,7 @@ let nightwatch_config = {
     'browserstack.user': process.env.BROWSERSTACK_USERNAME,
     'browserstack.key': process.env.BROWSERSTACK_ACCESS_KEY,
     'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
+    'project': 'stitches',
     'build': process.env.TRAVIS_BUILD_NUMBER || `local-${process.pid}`,
     'browserstack.debug': true,
     'browserstack.local': true,
