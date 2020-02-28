@@ -53,11 +53,22 @@ let nightwatch_config = {
     },
     safari: {
       desiredCapabilities: {
-        'os': 'OS X',
-        'os_version': 'Catalina',
-        'browser_version': '13.0',
-        'browser': 'Safari'      }
+        "os": "OS X",
+        "os_version": "Mojave",
+        "browserName": "Safari",
+        "browser_version": "12.0",
+      }
     },
+    // Safari 13 webdriver is currently broken in a major way
+    // It cannot click accurately
+    // https://bugs.webkit.org/show_bug.cgi?id=202589
+    // safari: {
+    //   desiredCapabilities: {
+    //     'os': 'OS X',
+    //     'os_version': 'Catalina',
+    //     'browser_version': '13.0',
+    //     'browser': 'Safari'      }
+    // },
     edge: {
       desiredCapabilities: {
         'os': 'Windows',
