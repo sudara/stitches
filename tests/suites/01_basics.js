@@ -5,9 +5,9 @@ module.exports = {
   },
   "StichES logs properly": browser => {
     browser
+      .url(browser.launchUrl)
       .waitForElementPresent("body")
       .assert.title("StitchES")
-      .url(browser.launchUrl)
       .waitForElementPresent("#debug")
       .assert.containsText("#debug", "nodepool:create")
   },
