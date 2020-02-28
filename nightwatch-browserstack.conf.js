@@ -24,7 +24,8 @@ let nightwatch_config = {
     'build': process.env.TRAVIS_BUILD_NUMBER || `local-${process.pid}`,
     'browserstack.debug': true,
     'browserstack.local': true,
-    'browserstack.console': 'info'
+    'browserstack.console': 'info',
+    'resolution': '1920x1080'
   },
   test_settings: {
     default: {
@@ -40,7 +41,7 @@ let nightwatch_config = {
     chromeMac: {
       desiredCapabilities: {
         'os': 'OS X',
-        'os_version': 'Mojave',
+        'os_version': 'Catalina',
         'browser': 'Chrome',
       }
     },

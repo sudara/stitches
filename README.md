@@ -107,9 +107,11 @@ However, as time wore on, I found myself constantly having to keep up with the c
 
 Given the somewhat sketchy state of audio playback in browsers (especially Safari), it's absolutely critical to run tests against as many current browsers as possible.
 
-Selenium tests are currently written in Nightwatch.
+Selenium tests are currently written in [Nightwatch](http://nightwatchjs.org)
 
-The full stack is fairly.... brittle. There are lots of places things can go wrong, and the most difficult part of this project was setting up this testing harness properly.
+The full testing stack is VERY.... brittle.
+
+There are lots of places things can go wrong: The tests themselves, the testing framework, the webdriver for each browser, selenium, all sorts of infrastructure related things on browserstack's end... the most difficult part of this project is definitely maintaining this testing harness.
 
 ### Locally Against Chrome
 
