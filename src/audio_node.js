@@ -65,7 +65,7 @@ export default class AudioNode {
     try {
       // This will be reached only if preloaded track *wasn't* clicked on
       if (this.unlockedDirectlyViaUserInteraction){
-        Log.trigger("audioNodealreadyUnlockedDirectly")
+        Log.trigger("audioNode:alreadyUnlockedDirectly")
       } else if (!this.blank && !this.unlocked) {
         await this.unlockPreloaded()
         Log.trigger("audioNode:unlockedpreloaded")
@@ -77,7 +77,10 @@ export default class AudioNode {
       }
       this.unlocked = true
     } catch (err) {
-      Log.trigger("audioNode:unlockfailed")
+      Log.trigger("audioNode:unlockfailed", {
+        name: err.name,
+        message: err.message
+      })
     }
   }
 
@@ -86,11 +89,11 @@ export default class AudioNode {
   // This is an alternative to swapping the src out with the blank MP3
   // which risks having to load the actual audio file again
   async unlockPreloaded() {
-    this.audio.volume = 0.0
+    // safari 13 on macOS can't deal with volume being set before play(), playback stalls
+    //this.audio.muted = true
     await this.audio.play()
     this.audio.pause()
-    this.audio.currentTime = 0.0
-    this.audio.volume = 1.0
+    //this.audio.muted = false
   }
 
   // https://dev.w3.org/html5/spec-author-view/spec.html#mediaerror
@@ -120,18 +123,9 @@ export default class AudioNode {
   async play(whilePlayingCallback, firedFromUserInteraction=false) {
     Log.trigger("audioNode:play")
     this.unlockedDirectlyViaUserInteraction = firedFromUserInteraction
-    while (!firedFromUserInteraction && (this.unlocked === false)) {
-      // Waiting for audio element to be unlocked, because we decided to not
-      // go further with playing it until it's available.
-      // This is done by leveraging the non-blocking nature of Promises.
 
-      Log.trigger("audioNode:waitingForUnlock")
-      // eslint-disable-next-line no-await-in-loop
-      await new Promise(resolve => requestAnimationFrame(resolve))
-    }
     // This callback ideally only fires when we are actually playing, not unlocking
     this.whilePlayingCallback = whilePlayingCallback
-    console.log(this.audio)
     return this.audio.play()
   }
 

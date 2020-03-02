@@ -10,7 +10,7 @@ module.exports = {
       .waitForElementPresent("body")
       .click("#track1")
       .assert.containsText("#debug", "nodepool:create")
-      .assert.containsText("#debug", "audioNode:unlockedPreloaded")
+      .assert.containsText("#debug", "audioNode:alreadyUnlockedDirectly")
       .assert.playing()
       .assert.progressBarMoved("#track1progress")
   },
@@ -23,18 +23,6 @@ module.exports = {
       .assert.containsText("#debug", "nodepool:create")
       .assert.playing()
       .assert.progressBarMoved("#track2progress")
-  },
-
-  "Clicking play on a preloaded track AFTER manually unlock starts audio": browser => {
-    browser
-      .url(browser.launchUrl)
-      .waitForElementPresent("body")
-      .click("#logo") // unlock audio
-      .waitForElementPresent("#debug")
-      .click("#track1")
-      .assert.containsText("#debug", "nodepool:create")
-      .assert.containsText("#debug", "audioNode:alreadyUnlockedDirectly")
-      .assert.playing()
   },
 
   "Clicking play, pause and play on a track resumes playback": browser => {

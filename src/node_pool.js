@@ -12,7 +12,6 @@ export default class NodePool {
     this.audioNodes.forEach(audioNode => {
       audioNode.cleanupCallback = () => {}
     })
-    this.setupEventListeners()
   }
 
   makePreloadingNode(src, cleanupCallback) {
@@ -38,23 +37,15 @@ export default class NodePool {
     return audioNode
   }
 
-  unlockAllAudioNodes() {
+  // We used to unlock on any body interaction, but there's no point
+  // since we only care about being able to play a playlist on click
+  //   document.addEventListener("click", () => this.unlockAllAudioNodes(), {
+  //     once: true
+  //   })
+  async unlockAllAudioNodes() {
     Log.trigger("nodepool:unlockall")
     for (const audioNode of this.audioNodes) {
       audioNode.unlock()
     }
-  }
-
-  // These listeners are added per NodePool, aka once per Playlist
-  // Note: If a play button is clicked, that will fire first,
-  // before the bubbled event makes it to this handler.
-  // The unlock will then by bypassed on that node so playback can start more quickly
-  setupEventListeners() {
-    window.addEventListener("DOMContentLoaded", () => {
-      document.addEventListener("click", () => this.unlockAllAudioNodes(true), {
-        once: true,
-        capture: false
-      })
-    })
   }
 }

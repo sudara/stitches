@@ -11,11 +11,4 @@ module.exports = {
       .waitForElementPresent("#debug")
       .assert.containsText("#debug", "nodepool:create")
   },
-  "Clicking Anywhere unlocks audio": browser => {
-    browser
-      .url(browser.launchUrl)
-      .waitForElementPresent("body")
-      .click("#logo")
-      .assert.containsText("#debug", "audioNode:unlocked")
-  }
 }

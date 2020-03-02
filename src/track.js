@@ -17,7 +17,6 @@ export default class Track {
     this.url = this.playButtonElement.href
     this.progressElement = element.querySelector(progressSelector)
     this.playlistSetCurrentTrack = setCurrentTrack
-    Log.trigger("track:create")
     this.audioNode = null
     this.position = 0
     this.timeFromEnd = NaN
@@ -32,6 +31,7 @@ export default class Track {
       "click",
       this.updatePosition.bind(this)
     )
+    Log.trigger("track:create")
   }
 
   async preload() {
@@ -71,7 +71,8 @@ export default class Track {
         this.audioNode.src = this.url
       }
 
-      await this.audioNode.play(this.whilePlaying.bind(this), this.wasClicked)
+      this.audioNode.play(this.whilePlaying.bind(this), this.wasClicked)
+      this.pool.unlockAllAudioNodes()
 
       // TODO: this needs to happen via callbacks
       if (this.audioNode.isLoaded) {
@@ -87,8 +88,10 @@ export default class Track {
       this.paused = false
       Log.trigger("track:playing")
     } catch (err) {
-      Log.trigger("track:notplaying")
-      Log.trigger(err)
+      Log.trigger("track:notplaying", {
+        name: err.name,
+        message: err.message
+      })
     }
   }
 
