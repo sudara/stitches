@@ -1,6 +1,7 @@
 <html>
   <head>
     <title>StitchES</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script type="module">
       import Playlist from "/src/playlist.js"
       window.playlist = new Playlist({
@@ -22,7 +23,7 @@
     </script>
     <style>
       body {
-        padding: 40px;
+        padding: 20px;
       }
       h2 {
         margin-top:1em;
@@ -62,7 +63,7 @@
     <header>
       <img src="logo.svg" id="logo" />
     </header>
-    <h2>Playlist of 4 different tracks</h2>
+    <h2>4 different tracks</h2>
     <ul id="playlist">
       <li>
         <a href="mp3/short-continuous-1.mp3" id="track1" class="track">
@@ -93,7 +94,7 @@
       </li>
     </ul>
 
-    <h2>Playlist with duplicate tracks</h2>
+    <h2>2 duplicate tracks</h2>
     <ul id="playlist2">
       <li>
         <a href="mp3/short-continuous-1.mp3" id="playlist2-track1" class="track">
