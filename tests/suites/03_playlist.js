@@ -9,14 +9,13 @@ module.exports = {
       .waitForElementPresent("#debug")
       .click("a.track:nth-of-type(1)")
       .assert.containsText("#debug", "nodepool:create")
+      // checks for preloading the second track
       .assert.containsText(
         "#debug",
         "audioNode:loaded - short-continuous-2.mp3"
-      ) // checks for preloading the second one
-      .assert.playing(1.0, "short-continuous-1.mp3")
+      )
+      .assert.playing(2.0, "short-continuous-1.mp3")
       .assert.playing(0.3, "short-continuous-2.mp3")
-      .assert
-      .containsText("#debug", "audioNode:loaded - short-continuous-3.mp3") // checks for preloading the third one
   },
 
   "Playlist ends automatically after the last track": browser => {
