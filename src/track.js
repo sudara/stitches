@@ -21,6 +21,7 @@ export default class Track {
     this.audioNode = null
     this.position = 0
     this.timeFromEnd = NaN
+    this.wasClicked = false
     this.hasEnded = false
     this.preloadNextTrackDispatched = false
     this.paused = true
@@ -65,12 +66,12 @@ export default class Track {
         }
       } else {
         // grabbing a new node automatically results in position 0 for it and no seek(0) is needed
-        // TODO we should set the old position if it was partially played
+        // TODO: set the old position if it was partially played https://github.com/sudara/stitchES/issues/34
         await this.grabNode()
         this.audioNode.src = this.url
       }
 
-      await this.audioNode.play(this.whilePlaying.bind(this))
+      await this.audioNode.play(this.whilePlaying.bind(this), this.wasClicked)
 
       // TODO: this needs to happen via callbacks
       if (this.audioNode.isLoaded) {
@@ -155,8 +156,11 @@ export default class Track {
     Log.trigger("track:pause")
   }
 
+  // This is only called by the click handler
+  //
   togglePlay(evt) {
-    evt.preventDefault()
+    this.wasClicked = true // This lets us shortcut unlockAll for this particular track
+    evt.preventDefault() // This will still bubble up to fire unlockAll from body
     if (this.audioNode && !this.paused) {
       this.pause()
       this.playButtonElement.classList.remove("stitches-loading")

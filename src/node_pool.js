@@ -32,25 +32,23 @@ export default class NodePool {
     // attach the cleanup callback for the new track
     audioNode.cleanupCallback = cleanupCallback
     this.audioNodes.push(audioNode)
-    // if the node is not unlocked (edge case) then unlock it
-    // this happens if someone clicks play before interacting with document
-    if (!audioNode.unlocked) {
-      Log.trigger("nodepool:unlockingnode")
-      await audioNode.unlock()
-    }
+
     // fires on documunt interaction
     Log.trigger("nodepool:availablenode")
     return audioNode
   }
 
-  unlockAllAudioNodes(delayPreloadingNodeUnlock=false) {
+  unlockAllAudioNodes() {
     Log.trigger("nodepool:unlockall")
     for (const audioNode of this.audioNodes) {
-      audioNode.unlock(delayPreloadingNodeUnlock)
+      audioNode.unlock()
     }
   }
 
-  // remember, this will file once per NodePool, aka once per Playlist
+  // These listeners are added per NodePool, aka once per Playlist
+  // Note: If a play button is clicked, that will fire first,
+  // before the bubbled event makes it to this handler.
+  // The unlock will then by bypassed on that node so playback can start more quickly
   setupEventListeners() {
     window.addEventListener("DOMContentLoaded", () => {
       document.addEventListener("click", () => this.unlockAllAudioNodes(true), {

@@ -55,7 +55,7 @@ With raw html, you can:
 
 ## How does it work?
 
-We stitch together `<audio>` elements to provide a rudimentary (and hopefully excellent) playback experience.
+We stitch together `<audio>` elements to provide a seamless (and hopefully excellent) playback experience.
 
 Ideally browsers would be able to play a list of audio tracks. Instead we are stuck with creating individual `<audio>` elements, which in many browsers are each blocked from playing until after an user interaction event, such as a click.
 
@@ -66,6 +66,8 @@ To mitigate the fact that browsers sabotage this ability, we create a `NodePool`
 For continuous/gapless playback we really only need two `<audio>` elements: One to handle a currently playing track and another to preload the next audio track in. When a file is done playing, the node is released back to the pool.
 
 ## Visualizing the object relationships
+
+Each `Playlist` has `Tracks` that communicate to a `NodePool` containing `AudioNode`s.
 
 ```
                    ┌-----------┐
@@ -79,29 +81,38 @@ For continuous/gapless playback we really only need two `<audio>` elements: One 
                          ↓
           hi, can i have an unlocked node plz?
                          ↓
-                   ┌-----------┐
-                   | Node Pool |
-                   └-----------┘
-                    /    |    \
-                   /     |     \
-            ┌------┐  ┌------┐  ┌------┐
-            | Node |  | Node |  | Node |
-            └------┘  └------┘  └------┘
-                |         |         |
-             <Audio>   <Audio>   <Audio>
+                   ┌----------┐
+                   | NodePool |
+                   └----------┘
+                  /      |     \
+                 /       |      \
+          ┌------┐    ┌------┐   ┌------┐
+         AudioNode   AudioNode  AudioNode
+          └------┘    └------┘   └------┘
+              |           |          |
+           <audio>      <audio>   <audio>
 ```
 
-## Why?
+These `AudioNode`s map 1-1 with HTML5 audio elements which are "unlocked" on any user interaction. The `NodePool` manages these unlocked `AudioNode`s, supplying them as needed.
 
-10 years ago, I launched alonetone.com. Since then, I've written several wrappers around audio libraries such as SoundManager2 and Howler.js, both which are fantastic projects and very much enabled me to launch and maintain the site.
+Each `NodePool` (there's one per playlist) has exactly 3 `AudioNode`s, which allows for seamless preloading and playback with minimum amount of 🤹🏻‍♂️. For example they might all be in use in this situation:
+
+1. The last track that just played
+2. The current track that's playing now
+3. The next track that's preloading
+
+
+## Why do we need this library?
+
+10 years ago, I launched alonetone.com. Since then, I've written several wrappers around audio libraries such as SoundManager2 and Howler.js, both which are fantastic projects and enabled me to launch and maintain the site.
 
 However, as time wore on, I found myself constantly having to keep up with the changes to audio behavior in browsers anyway, and more recently, have found the implementations lacking. In particular, other libraries tend to:
 
 * Contain legacy/unrelated support of other methods of delivery like Flash and Web Audio
 * Don't have first class support for sequential playback of a playlist
-* Are written in Ye Olde JS™ vs. ES6/2017
+* Are written in Ye Olde JS™ vs. ES6/ES+
 * Are full of browser/feature detection code
-
+* Don't have cross browser tests
 
 ## Running tests
 
@@ -109,7 +120,7 @@ Given the somewhat sketchy state of audio playback in browsers (especially Safar
 
 Selenium tests are currently written in [Nightwatch](http://nightwatchjs.org)
 
-The full testing stack is VERY.... brittle.
+The full testing stack is by its nature VERY.... brittle.
 
 There are lots of places things can go wrong: The tests themselves, the testing framework, the webdriver for each browser, selenium, all sorts of infrastructure related things on browserstack's end... the most difficult part of this project is definitely maintaining this testing harness.
 
