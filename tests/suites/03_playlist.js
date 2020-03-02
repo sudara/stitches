@@ -17,6 +17,23 @@ module.exports = {
       .assert.playing(0.3, "short-continuous-2.mp3")
   },
 
+  "Playlist still plays next track when in background tab": browser => {
+    browser
+      .url(browser.launchUrl)
+      .waitForElementPresent("#debug")
+      .click("a.track:nth-of-type(1)")
+      .assert.containsText("#debug", "track:playing")
+      .openNewWindow('tab')
+      .windowHandles(function(result) {
+        this.switchWindow(result.value[1])
+        this.pause(5000)
+        this.switchWindow(result.value[0])
+        this.cleanDebug()
+      })
+      .assert.playing(2, "short-continuous-2.mp3")
+  },
+
+
   "Playlist ends automatically after the last track": browser => {
     browser
       .url(browser.launchUrl)
