@@ -50,7 +50,7 @@ module.exports = {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent("#debug")
-      .click("#playlist2 li:nth-of-type(1) svg") // this playlist has two tracks with same mp3 in it
+      .click("#playlist2-track1 svg") // this playlist has two tracks with same mp3 in it
       .assert.playing(1.0, "short-continuous-1.mp3")
       .pause(3000)
       .cleanDebug()

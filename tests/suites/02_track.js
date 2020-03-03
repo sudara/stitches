@@ -29,9 +29,9 @@ module.exports = {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent("#debug")
-      .click("li:nth-of-type(2) > a")
+      .click("#track2 svg")
       .assert.playing()
-      .click("li:nth-of-type(2) > a")
+      .click("#track2 svg")
       .assert.containsText("#debug", "track:pause")
       .cleanDebug()
       .assert.not.containsText("#debug", "whilePlaying")
