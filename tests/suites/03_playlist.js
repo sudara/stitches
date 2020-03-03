@@ -28,7 +28,6 @@ module.exports = {
         this.switchWindow(result.value[1])
         this.pause(5000)
         this.switchWindow(result.value[0])
-        this.cleanDebug()
       })
       .assert.playing(2, "short-continuous-2.mp3")
   },
