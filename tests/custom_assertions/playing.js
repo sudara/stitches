@@ -39,7 +39,7 @@ const playing = function (timestamp=0.3, mp3name=null) {
     // This helps us test things like repeating the same track being played, etc
     if(value.match(playingRegex)) {
       const secondsPlayed = parseFloat(value.match(playingRegex)[1] || 0)
-      return (secondsPlayed > timestamp) && (secondsPlayed < (timestamp + 2))
+      return (secondsPlayed > timestamp) && (secondsPlayed < (timestamp + 5))
     }
     return false
   };
