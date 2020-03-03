@@ -47,7 +47,12 @@ export default class AudioNode {
   }
 
   // position is a percentage
-  seek(position) {
+  async seek(position) {
+    while (isNaN(this.audio.duration)) {
+      Log.trigger('waiting for audio.duration')
+      await new Promise(resolve => setTimeout(resolve, 20))
+    }
+    Log.trigger(this.audio.duration)
     Log.trigger("audioNode:seek", {
       position,
       fileName: this.fileName

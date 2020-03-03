@@ -7,7 +7,7 @@ module.exports = {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent("#debug")
-      .click("a.track:nth-of-type(1)")
+      .click("#track1 svg")
       .assert.containsText("#debug", "nodepool:create")
       // checks for preloading the second track
       .assert.containsText(
@@ -21,7 +21,7 @@ module.exports = {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent("#debug")
-      .click("a.track:nth-of-type(1)")
+      .click("#track1 svg")
       .assert.containsText("#debug", "track:playing")
       .openNewWindow('tab')
       .windowHandles(function(result) {
@@ -38,7 +38,7 @@ module.exports = {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent("#debug")
-      .click("li:nth-of-type(4) > a")
+      .click("#track4 svg")
       .assert.playing(1.0, "short-continuous-4.mp3")
       .assert.containsText("#debug", "track:ended")
       .pause(200) // whilePlaying can fire one more time, let's prevent glitch
@@ -50,7 +50,7 @@ module.exports = {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent("#debug")
-      .click("#playlist2 li:nth-of-type(1) > a") // this playlist has two tracks with same mp3 in it
+      .click("#playlist2 li:nth-of-type(1) svg") // this playlist has two tracks with same mp3 in it
       .assert.playing(1.0, "short-continuous-1.mp3")
       .pause(3000)
       .cleanDebug()

@@ -127,6 +127,7 @@ export default class Track {
   }
 
   async updatePosition(evt) {
+    this.wasClicked = true // This lets us shortcut unlockAll for this particular track
     const offset =
       evt.clientX - this.progressElement.getBoundingClientRect().left
     const newPosition = offset / this.progressElement.offsetWidth

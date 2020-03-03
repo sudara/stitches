@@ -8,7 +8,7 @@ module.exports = {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent("body")
-      .click("#track1")
+      .click("#track1 svg")
       .assert.containsText("#debug", "nodepool:create")
       .assert.containsText("#debug", "audioNode:alreadyUnlockedDirectly")
       .assert.playing()
@@ -19,7 +19,7 @@ module.exports = {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent("body")
-      .click("#track2")
+      .click("#track2 svg")
       .assert.containsText("#debug", "nodepool:create")
       .assert.playing()
       .assert.progressBarMoved("#track2progress")
@@ -35,7 +35,7 @@ module.exports = {
       .assert.containsText("#debug", "track:pause")
       .cleanDebug()
       .assert.not.containsText("#debug", "whilePlaying")
-      .click("li:nth-of-type(2) > a")
+      .click("#track2 svg")
       .assert.playing(1)
   }
 }
