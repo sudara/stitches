@@ -7,6 +7,7 @@ import AudioNode from "./audio_node.js"
 // Unlock a few elements, inspired by https://github.com/goldfire/howler.js/pull/1008/files
 export default class NodePool {
   constructor(size) {
+    this.allUnlocked = false
     Log.trigger("nodepool:create")
     this.audioNodes = Array.from({ length: size }, () => new AudioNode())
     this.audioNodes.forEach(audioNode => {
@@ -47,5 +48,6 @@ export default class NodePool {
     for (const audioNode of this.audioNodes) {
       audioNode.unlock()
     }
+    this.allUnlocked = true
   }
 }

@@ -61,14 +61,14 @@ export default class AudioNode {
 
   // this can *only* be called via an interaction event like a click/touch
   async unlock() {
-    // https://developers.google.com/web/updates/2016/03/play-returns-promise
+     // https://developers.google.com/web/updates/2016/03/play-returns-promise
     try {
       // This will be reached only if preloaded track *wasn't* clicked on
       if (this.unlockedDirectlyViaUserInteraction){
         Log.trigger("audioNode:alreadyUnlockedDirectly")
       } else if (!this.blank && !this.unlocked) {
         await this.unlockPreloaded()
-        Log.trigger("audioNode:unlockedpreloaded")
+        Log.trigger("audioNode:unlockedPreloaded")
       } else if(!this.unlocked) {
         await this.audio.play()
         Log.trigger("audioNode:unlocked")

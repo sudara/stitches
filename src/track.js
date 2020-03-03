@@ -72,20 +72,21 @@ export default class Track {
       }
 
       this.audioNode.play(this.whilePlaying.bind(this), this.wasClicked)
-      this.pool.unlockAllAudioNodes()
+      if (!this.poolAllUnlocked) this.pool.unlockAllAudioNodes()
 
       // TODO: this needs to happen via callbacks
       if (this.audioNode.isLoaded) {
-        this.playButtonElement.classList.add("stitches-playing")
-        this.playButtonElement.classList.remove("stitches-paused")
+        this.element.classList.add("stitches-playing")
+        this.element.classList.remove("stitches-paused")
       } else {
-        this.playButtonElement.classList.add("stitches-loading")
-        this.playButtonElement.classList.remove("stitches-playing")
-        this.playButtonElement.classList.remove("stitches-paused")
+        this.element.classList.add("stitches-loading")
+        this.element.classList.remove("stitches-playing")
+        this.element.classList.remove("stitches-paused")
       }
 
       this.hasEnded = false
       this.paused = false
+      this.confirmPlayback()
       Log.trigger("track:playing")
     } catch (err) {
       Log.trigger("track:notplaying", {
@@ -113,8 +114,8 @@ export default class Track {
     }
 
     if (!this.displayPauseButton) {
-      this.playButtonElement.classList.remove("stitches-loading")
-      this.playButtonElement.classList.add("stitches-playing")
+      this.element.classList.remove("stitches-loading")
+      this.element.classList.add("stitches-playing")
       this.displayPauseButton = true
     }
 
@@ -124,6 +125,10 @@ export default class Track {
         fileName: this.url
       })
     }
+  }
+
+  confirmPlayback() {
+    setTimeout()
   }
 
   async updatePosition(evt) {
@@ -166,9 +171,9 @@ export default class Track {
     evt.preventDefault() // This will still bubble up to fire unlockAll from body
     if (this.audioNode && !this.paused) {
       this.pause()
-      this.playButtonElement.classList.remove("stitches-loading")
-      this.playButtonElement.classList.remove("stitches-playing")
-      this.playButtonElement.classList.add("stitches-paused")
+      this.element.classList.remove("stitches-loading")
+      this.element.classList.remove("stitches-playing")
+      this.element.classList.add("stitches-paused")
     } else {
       this.playlistSetCurrentTrack(this)
     }
