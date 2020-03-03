@@ -86,7 +86,6 @@ export default class Track {
 
       this.hasEnded = false
       this.paused = false
-      this.confirmPlayback()
       Log.trigger("track:playing")
     } catch (err) {
       Log.trigger("track:notplaying", {
@@ -125,10 +124,6 @@ export default class Track {
         fileName: this.url
       })
     }
-  }
-
-  confirmPlayback() {
-    setTimeout()
   }
 
   async updatePosition(evt) {
