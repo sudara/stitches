@@ -1,12 +1,8 @@
 version: 2.1
-orbs:
-  node: circleci/node@volatile
 jobs:
   chromedriver:
-    executor:
-      name: node/default
-      docker:
-        - image: circleci/node:latest-browsers
+    docker:
+      - image: circleci/node:latest-browsers
     steps:
       - checkout
       - node/with-cache:
@@ -16,10 +12,8 @@ jobs:
             - run: yarn install
       - run: yarn test
   safari:
-    executor:
-      name: node/default
-      docker:
-        - image: circleci/node:latest-browsers
+    docker:
+      - image: circleci/node:latest-browsers
     steps:
       - checkout
       - node/with-cache:
