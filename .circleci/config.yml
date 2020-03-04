@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  node: circleci/node@@volatile
+  node: circleci/node@volatile
 jobs:
   chromedriver:
     executor:
