@@ -7,12 +7,12 @@ import AudioNode from "./audio_node.js"
 // Unlock a few elements, inspired by https://github.com/goldfire/howler.js/pull/1008/files
 export default class NodePool {
   constructor(size) {
+    this.allUnlocked = false
     Log.trigger("nodepool:create")
     this.audioNodes = Array.from({ length: size }, () => new AudioNode())
     this.audioNodes.forEach(audioNode => {
       audioNode.cleanupCallback = () => {}
     })
-    this.setupEventListeners()
   }
 
   makePreloadingNode(src, cleanupCallback) {
@@ -32,31 +32,22 @@ export default class NodePool {
     // attach the cleanup callback for the new track
     audioNode.cleanupCallback = cleanupCallback
     this.audioNodes.push(audioNode)
-    // if the node is not unlocked (edge case) then unlock it
-    // this happens if someone clicks play before interacting with document
-    if (!audioNode.unlocked) {
-      Log.trigger("nodepool:unlockingnode")
-      await audioNode.unlock()
-    }
+
     // fires on documunt interaction
     Log.trigger("nodepool:availablenode")
     return audioNode
   }
 
-  unlockAllAudioNodes(delayPreloadingNodeUnlock=false) {
+  // We used to unlock on any body interaction, but there's no point
+  // since we only care about being able to play a playlist on click
+  //   document.addEventListener("click", () => this.unlockAllAudioNodes(), {
+  //     once: true
+  //   })
+  async unlockAllAudioNodes() {
     Log.trigger("nodepool:unlockall")
     for (const audioNode of this.audioNodes) {
-      audioNode.unlock(delayPreloadingNodeUnlock)
+      audioNode.unlock()
     }
-  }
-
-  // remember, this will file once per NodePool, aka once per Playlist
-  setupEventListeners() {
-    window.addEventListener("DOMContentLoaded", () => {
-      document.addEventListener("click", () => this.unlockAllAudioNodes(true), {
-        once: true,
-        capture: false
-      })
-    })
+    this.allUnlocked = true
   }
 }

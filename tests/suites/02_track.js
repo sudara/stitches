@@ -8,9 +8,9 @@ module.exports = {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent("body")
-      .click("#track1")
+      .click("#track1 svg")
       .assert.containsText("#debug", "nodepool:create")
-      .assert.containsText("#debug", "audioNode:unlockedpreloaded")
+      .assert.containsText("#debug", "audioNode:alreadyUnlockedDirectly")
       .assert.playing()
       .assert.progressBarMoved("#track1progress")
   },
@@ -19,34 +19,23 @@ module.exports = {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent("body")
-      .click("#track2")
+      .click("#track2 svg")
       .assert.containsText("#debug", "nodepool:create")
       .assert.playing()
       .assert.progressBarMoved("#track2progress")
-  },
-
-  "Clicking play on a track AFTER manually unlocking also starts audio": browser => {
-    browser
-      .url(browser.launchUrl)
-      .waitForElementPresent("body")
-      .click("#logo") // unlock audio
-      .waitForElementPresent("#debug")
-      .click("li:nth-of-type(1) > a")
-      .assert.containsText("#debug", "nodepool:create")
-      .assert.playing()
   },
 
   "Clicking play, pause and play on a track resumes playback": browser => {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent("#debug")
-      .click("li:nth-of-type(2) > a")
+      .click("#track2 svg")
       .assert.playing()
-      .click("li:nth-of-type(2) > a")
+      .click("#track2 svg")
       .assert.containsText("#debug", "track:pause")
       .cleanDebug()
       .assert.not.containsText("#debug", "whilePlaying")
-      .click("li:nth-of-type(2) > a")
+      .click("#track2 svg")
       .assert.playing(1)
   }
 }

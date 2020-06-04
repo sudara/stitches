@@ -17,10 +17,10 @@ export default class Track {
     this.url = this.playButtonElement.href
     this.progressElement = element.querySelector(progressSelector)
     this.playlistSetCurrentTrack = setCurrentTrack
-    Log.trigger("track:create")
     this.audioNode = null
     this.position = 0
     this.timeFromEnd = NaN
+    this.wasClicked = false
     this.hasEnded = false
     this.preloadNextTrackDispatched = false
     this.paused = true
@@ -31,6 +31,7 @@ export default class Track {
       "click",
       this.updatePosition.bind(this)
     )
+    Log.trigger("track:create")
   }
 
   async preload() {
@@ -65,29 +66,32 @@ export default class Track {
         }
       } else {
         // grabbing a new node automatically results in position 0 for it and no seek(0) is needed
-        // TODO we should set the old position if it was partially played
+        // TODO: set the old position if it was partially played https://github.com/sudara/stitchES/issues/34
         await this.grabNode()
         this.audioNode.src = this.url
       }
 
-      await this.audioNode.play(this.whilePlaying.bind(this))
+      this.audioNode.play(this.whilePlaying.bind(this), this.wasClicked)
+      if (!this.poolAllUnlocked) this.pool.unlockAllAudioNodes()
 
       // TODO: this needs to happen via callbacks
       if (this.audioNode.isLoaded) {
-        this.playButtonElement.classList.add("stitches-playing")
-        this.playButtonElement.classList.remove("stitches-paused")
+        this.element.classList.add("stitches-playing")
+        this.element.classList.remove("stitches-paused")
       } else {
-        this.playButtonElement.classList.add("stitches-loading")
-        this.playButtonElement.classList.remove("stitches-playing")
-        this.playButtonElement.classList.remove("stitches-paused")
+        this.element.classList.add("stitches-loading")
+        this.element.classList.remove("stitches-playing")
+        this.element.classList.remove("stitches-paused")
       }
 
       this.hasEnded = false
       this.paused = false
       Log.trigger("track:playing")
     } catch (err) {
-      Log.trigger("track:notplaying")
-      Log.trigger(err)
+      Log.trigger("track:notplaying", {
+        name: err.name,
+        message: err.message
+      })
     }
   }
 
@@ -109,8 +113,8 @@ export default class Track {
     }
 
     if (!this.displayPauseButton) {
-      this.playButtonElement.classList.remove("stitches-loading")
-      this.playButtonElement.classList.add("stitches-playing")
+      this.element.classList.remove("stitches-loading")
+      this.element.classList.add("stitches-playing")
       this.displayPauseButton = true
     }
 
@@ -123,6 +127,7 @@ export default class Track {
   }
 
   async updatePosition(evt) {
+    this.wasClicked = true // This lets us shortcut unlockAll for this particular track
     const offset =
       evt.clientX - this.progressElement.getBoundingClientRect().left
     const newPosition = offset / this.progressElement.offsetWidth
@@ -155,13 +160,16 @@ export default class Track {
     Log.trigger("track:pause")
   }
 
+  // This is only called by the click handler
+  //
   togglePlay(evt) {
-    evt.preventDefault()
+    this.wasClicked = true // This lets us shortcut unlockAll for this particular track
+    evt.preventDefault() // This will still bubble up to fire unlockAll from body
     if (this.audioNode && !this.paused) {
       this.pause()
-      this.playButtonElement.classList.remove("stitches-loading")
-      this.playButtonElement.classList.remove("stitches-playing")
-      this.playButtonElement.classList.add("stitches-paused")
+      this.element.classList.remove("stitches-loading")
+      this.element.classList.remove("stitches-playing")
+      this.element.classList.add("stitches-paused")
     } else {
       this.playlistSetCurrentTrack(this)
     }

@@ -21,6 +21,7 @@ export default class AudioNode {
     this.audio.onloadeddata = this.onloading.bind(this)
     this.audio.preload = preloadSrc ? "auto" : "none"
     this.src = preloadSrc || blankMP3
+    this.unlockedDirectlyViaUserInteraction = false
     this.isLoaded = false
     this.isLoading = Boolean(preloadSrc)
   }
@@ -45,7 +46,13 @@ export default class AudioNode {
     return this.audio.src
   }
 
-  seek(position) {
+  // position is a percentage
+  async seek(position) {
+    while (isNaN(this.audio.duration)) {
+      Log.trigger('waiting for audio.duration')
+      await new Promise(resolve => setTimeout(resolve, 20))
+    }
+    Log.trigger(this.audio.duration)
     Log.trigger("audioNode:seek", {
       position,
       fileName: this.fileName
@@ -58,30 +65,40 @@ export default class AudioNode {
   }
 
   // this can *only* be called via an interaction event like a click/touch
-  async unlock(delayPreloadingNodeUnlock) {
-    // https://developers.google.com/web/updates/2016/03/play-returns-promise
+  async unlock() {
+     // https://developers.google.com/web/updates/2016/03/play-returns-promise
     try {
-      // if we've preloaded another src, switch src to unlock w/ blank
-      if (!this.blank && !this.unlocked) {
-        // if we clicked play directly, we might be in a race condition where unlock()
-        // is called twice, once from the play interaction and once from general unlockAll()
-        const preloadSrc = this.src
-        this.src = blankMP3
-        await this.audio.play()
-        this.audio.pause()
-        this.unlocked = true
-        this.src = preloadSrc
-        Log.trigger("audioNode:unlockedpreloaded")
+      // This will be reached only if preloaded track *wasn't* clicked on
+      if (this.unlockedDirectlyViaUserInteraction){
+        Log.trigger("audioNode:alreadyUnlockedDirectly")
+      } else if (!this.blank && !this.unlocked) {
+        await this.unlockPreloaded()
+        Log.trigger("audioNode:unlockedPreloaded")
       } else if(!this.unlocked) {
         await this.audio.play()
         Log.trigger("audioNode:unlocked")
-        this.unlocked = true
       } else {
-        Log.trigger("audioNode:nodealreadyunlocked")
+        Log.trigger("audioNode:alreadyUnlocked")
       }
+      this.unlocked = true
     } catch (err) {
-      Log.trigger("audioNode:unlockfailed")
+      Log.trigger("audioNode:unlockfailed", {
+        name: err.name,
+        message: err.message
+      })
     }
+  }
+
+  // We get a burst of sound if we unlock a preloaded node,
+  // since intsead of a blank MP3, it's an actual audio file.
+  // This is an alternative to swapping the src out with the blank MP3
+  // which risks having to load the actual audio file again
+  async unlockPreloaded() {
+    // safari 13 on macOS can't deal with volume being set before play(), playback stalls
+    //this.audio.muted = true
+    await this.audio.play()
+    this.audio.pause()
+    //this.audio.muted = false
   }
 
   // https://dev.w3.org/html5/spec-author-view/spec.html#mediaerror
@@ -108,15 +125,11 @@ export default class AudioNode {
     }
   }
 
-  async play(whilePlayingCallback) {
-    while (this.unlocked === false) {
-      // Waiting for audio element to be unlocked, because we decided to not
-      // go further with playing it until it's available.
-      // This is done by leveraging the non-blocking nature of Promises.
-      // eslint-disable-next-line no-await-in-loop
-      await new Promise(resolve => setTimeout(resolve, 0))
-    }
-    // ideally this only fires on real playback, not when we are unlocking
+  async play(whilePlayingCallback, firedFromUserInteraction=false) {
+    Log.trigger("audioNode:play")
+    this.unlockedDirectlyViaUserInteraction = firedFromUserInteraction
+
+    // This callback ideally only fires when we are actually playing, not unlocking
     this.whilePlayingCallback = whilePlayingCallback
     return this.audio.play()
   }
