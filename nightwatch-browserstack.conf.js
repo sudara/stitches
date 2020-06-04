@@ -17,7 +17,7 @@ let nightwatch_config = {
     "port": 443
   },
   common_capabilities: {
-    'browserstack.appium_version': "1.16.0",
+    'browserstack.appium_version': "1.17.0",
     "browserstack.selenium_version": "3.141.59",
     'browserstack.user': process.env.BROWSERSTACK_USERNAME,
     'browserstack.key': process.env.BROWSERSTACK_ACCESS_KEY,
@@ -54,7 +54,7 @@ let nightwatch_config = {
         'browser': 'Firefox'
       }
     },
-    safari: {
+    safari12: {
       desiredCapabilities: {
         "os": "OS X",
         "os_version": "Mojave",
@@ -65,13 +65,14 @@ let nightwatch_config = {
     // Safari 13 webdriver is currently broken in a major way
     // It cannot click accurately
     // https://bugs.webkit.org/show_bug.cgi?id=202589
-    // safari: {
-    //   desiredCapabilities: {
-    //     'os': 'OS X',
-    //     'os_version': 'Catalina',
-    //     'browser_version': '13.0',
-    //     'browser': 'Safari'      }
-    // },
+    safari13: {
+      desiredCapabilities: {
+        'os': 'OS X',
+        'os_version': 'Catalina',
+        'browser_version': '13.1',
+        'browser': 'Safari'
+      }
+    },
     edge: {
       desiredCapabilities: {
         'os': 'Windows',
