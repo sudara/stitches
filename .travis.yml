@@ -12,4 +12,4 @@ node_js:
 
 script:
 - npm start
-- travis_wait node browserstack.runner.js -c nightwatch-browserstack.conf.js -e safari,chrome,chromeMac,firefox,iphoneXS,iphone11,pixel,galaxys9,ucbrowser
+- travis_wait node browserstack.runner.js -c nightwatch-browserstack.conf.js -e safari12,safari13,chrome,chromeMac,firefox,iphoneXS,iphone11,pixel,galaxys9,ucbrowser
