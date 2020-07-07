@@ -18,6 +18,7 @@ let nightwatch_config = {
   },
   common_capabilities: {
     'browserstack.appium_version': "1.17.0",
+    "browserstack.use_w3c": true,
     "browserstack.selenium_version": "3.141.59",
     'browserstack.user': process.env.BROWSERSTACK_USERNAME,
     'browserstack.key': process.env.BROWSERSTACK_ACCESS_KEY,
