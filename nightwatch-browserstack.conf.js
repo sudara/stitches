@@ -17,7 +17,7 @@ let nightwatch_config = {
     "port": 443
   },
   common_capabilities: {
-    'browserstack.appium_version': "1.17.0",
+    'browserstack.appium_version': "1.18.0",
     "browserstack.selenium_version": "3.141.59",
     'browserstack.user': process.env.BROWSERSTACK_USERNAME,
     'browserstack.key': process.env.BROWSERSTACK_ACCESS_KEY,
@@ -50,7 +50,12 @@ let nightwatch_config = {
     firefox: {
       desiredCapabilities: {
         'os': 'Windows',
-        'os_version': '10',
+        'browser': 'Firefox'
+      }
+    },
+    firefoxMac: {
+      desiredCapabilities: {
+        'os': 'OS X',
         'browser': 'Firefox'
       }
     },
@@ -69,14 +74,12 @@ let nightwatch_config = {
       desiredCapabilities: {
         'os': 'OS X',
         'os_version': 'Catalina',
-        'browser_version': '13.1',
         'browser': 'Safari'
       }
     },
     edge: {
       desiredCapabilities: {
         'os': 'Windows',
-        'os_version': '10',
         'browser': 'Edge'
       }
     },
@@ -89,11 +92,20 @@ let nightwatch_config = {
         'browser': 'Safari'
       }
     },
-    iphone11: {
+    ios13: {
       desiredCapabilities: {
         'device': 'iPhone 11 Pro',
         'realMobile': 'true',
         'os_version': '13',
+        'nativeWebTap': 'true',
+        'browser': 'Safari'
+      }
+    },
+    ios14: {
+      desiredCapabilities: {
+        'device': 'iPhone 11',
+        'realMobile': 'true',
+        'os_version': '14',
         'nativeWebTap': 'true',
         'browser': 'Safari'
       }
