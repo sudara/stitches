@@ -8,7 +8,7 @@
     "test": "npm start && nightwatch -c nightwatch-local.conf.json; npm stop",
     "test:single": "nightwatch -c nightwatch-local.conf.json",
     "stop": "pkill -f http-server",
-    "browserstack": "npm start && node browserstack.runner.js --suiteRetries 2 -c nightwatch-browserstack.conf.js -e safari12,safari13,chrome,chromeMac,firefox,iphoneXS,iphone11,pixel,galaxys9,ucbrowser; npm stop"
+    "browserstack": "npm start && node browserstack.runner.js --suiteRetries 2 -c nightwatch-browserstack.conf.js -e safari12,safari13,chrome,chromeMac,firefox,firefoxMac,edge,iphoneXS,ios13,ios14,pixel,galaxys9,ucbrowser; npm stop"
   },
   "repository": "git+https://github.com/sudara/stitches6.git",
   "keywords": [

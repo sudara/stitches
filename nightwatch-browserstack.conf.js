@@ -67,13 +67,9 @@ let nightwatch_config = {
         "browser_version": "12.0",
       }
     },
-    // Safari 13 webdriver is currently broken in a major way
-    // It cannot click accurately
-    // https://bugs.webkit.org/show_bug.cgi?id=202589
     safari13: {
       desiredCapabilities: {
         'os': 'OS X',
-        'os_version': 'Catalina',
         'browser': 'Safari'
       }
     },
