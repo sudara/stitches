@@ -50,12 +50,14 @@ let nightwatch_config = {
     firefox: {
       desiredCapabilities: {
         'os': 'Windows',
+        'os_version': '10',
         'browser': 'Firefox'
       }
     },
     firefoxMac: {
       desiredCapabilities: {
         'os': 'OS X',
+        "os_version": "Catalina",
         'browser': 'Firefox'
       }
     },
@@ -70,12 +72,14 @@ let nightwatch_config = {
     safari13: {
       desiredCapabilities: {
         'os': 'OS X',
+        "os_version": "Catalina",
         'browser': 'Safari'
       }
     },
     edge: {
       desiredCapabilities: {
         'os': 'Windows',
+        'os_version': '10',
         'browser': 'Edge'
       }
     },

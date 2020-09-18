@@ -126,7 +126,11 @@ There are lots of places things can go wrong: The tests themselves, the testing 
 
 ### Locally Against Chrome
 
-You can run tests locally with `yarn test`. This will run tests against headless chrome as configured in `nightwatch-local.conf.json`.
+You can run tests locally with:
+
+`yarn test`
+
+This will run tests against headless chrome as configured in `nightwatch-local.conf.json`.
 
 ### Browserstack
 
@@ -138,7 +142,11 @@ Test failures are manually reported via `afterEach` callbacks via Browserstack's
 
 ### Locally against Browserstack
 
-You can also run Browserstack locally (assuming you have the `BROWSERSTACK_USERNAME` and `BROWSERSTACK_ACCESS_KEY` credentials set as ENV variables) with `yarn browserstack`. This is useful for figuring out why something might be failing on one particular browser. For this use case, I recommend reducing the number of browsers that are being run in package.json, isolating the one browser that is causing problems.
+You can also run Browserstack locally (assuming you have the `BROWSERSTACK_USERNAME` and `BROWSERSTACK_ACCESS_KEY` credentials set as ENV variables)
+
+`yarn browserstack`
+
+This is useful for figuring out why something might be failing on one particular browser. For this use case, I recommend reducing the number of browsers that are being run in package.json, isolating the one browser that is causing problems.
 
 PROTIP: You won't see any "live" output from nightwatch when more than one browser is being run, as in this case tests are being run in parallel and the log output wouldn't be very coherent. If you want to see nightwatch output as it happens, just use one browser.
 
