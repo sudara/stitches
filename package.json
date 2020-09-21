@@ -34,7 +34,7 @@
     "eslint-config-prettier": "6.11.0",
     "eslint-plugin-import": "2.22.0",
     "http-server": "0.12.3",
-    "nightwatch": "1.4.2",
+    "nightwatch": "1.4.3",
     "prettier": "2.1.2",
     "request": "2.88.2"
   },
