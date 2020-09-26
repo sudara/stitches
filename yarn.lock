@@ -451,10 +451,10 @@ browser-stdout@1.3.1:
   resolved "https://registry.yarnpkg.com/browser-stdout/-/browser-stdout-1.3.1.tgz#baa559ee14ced73452229bad7326467c61fabd60"
   integrity sha512-qhAVI1+Av2X7qelOfAIYwXONood6XlZE/fXaBSmW/T5SzLAmCgzi+eiWE7fUvbHaeNBQH13UftjpXxsfLkMpgw==
 
-browserstack-local@1.4.7:
-  version "1.4.7"
-  resolved "https://registry.yarnpkg.com/browserstack-local/-/browserstack-local-1.4.7.tgz#f957e1cbb6fa3d29ea77ec35229a3d07cb002298"
-  integrity sha512-wZtMa/CDT+Vf7wZrK8zGkWcScaenC4lfLa6RQkHZX/OnP1b4ZDWuE0GevMf2/pe5i8thfzIkCaLhsJnanqql9A==
+browserstack-local@1.4.8:
+  version "1.4.8"
+  resolved "https://registry.yarnpkg.com/browserstack-local/-/browserstack-local-1.4.8.tgz#07f74a19b324cf2de69ffe65f9c2baa3a2dd9a0e"
+  integrity sha512-s+mc3gTOJwELdLWi4qFVKtGwMbb5JWsR+JxKlMaJkRJxoZ0gg3WREgPxAN0bm6iU5+S4Bi0sz0oxBRZT8BiNsQ==
   dependencies:
     https-proxy-agent "^4.0.0"
     is-running "^2.1.0"
@@ -943,10 +943,10 @@ eslint-config-airbnb-base@14.2.0:
     object.assign "^4.1.0"
     object.entries "^1.1.2"
 
-eslint-config-prettier@6.11.0:
-  version "6.11.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-6.11.0.tgz#f6d2238c1290d01c859a8b5c1f7d352a0b0da8b1"
-  integrity sha512-oB8cpLWSAjOVFEJhhyMZh6NOEOtBVziaqdDQ86+qhDHFbZXoRTM7pNSvFRfW/W/L/LrQ38C99J5CGuRBBzBsdA==
+eslint-config-prettier@6.12.0:
+  version "6.12.0"
+  resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-6.12.0.tgz#9eb2bccff727db1c52104f0b49e87ea46605a0d2"
+  integrity sha512-9jWPlFlgNwRUYVoujvWTQ1aMO8o6648r+K7qU7K5Jmkbyqav1fuEZC0COYpGBxyiAJb65Ra9hrmFx19xRGwXWw==
   dependencies:
     get-stdin "^6.0.0"
 
@@ -2105,10 +2105,10 @@ netmask@^1.0.6:
   resolved "https://registry.yarnpkg.com/netmask/-/netmask-1.0.6.tgz#20297e89d86f6f6400f250d9f4f6b4c1945fcd35"
   integrity sha1-ICl+idhvb2QA8lDZ9Pa0wZRfzTU=
 
-nightwatch@1.4.2:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/nightwatch/-/nightwatch-1.4.2.tgz#9bdbab8a9994ce0d20c6509a7b6591d1c9f02d9b"
-  integrity sha512-qbd8rCFrUjzLPvxZKHB3qRfwn7TbG8LABIJNf2GGNzfUetG83vY83iPWyWnOoZwOLfRAbJ9WWCssvH6nAl2oMw==
+nightwatch@1.4.3:
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/nightwatch/-/nightwatch-1.4.3.tgz#764e02fcd2180344b71aecf84632a364c17dc6ce"
+  integrity sha512-n57K99jt3rFruQ5Drjg1bxHeorjHrfyNhNhehL5Gg/p+PT+A5LKZVZkoF73owKc3y7KGhCTvjcLxPAyLvS6J8Q==
   dependencies:
     assertion-error "^1.1.0"
     chai-nightwatch "^0.4.0"
