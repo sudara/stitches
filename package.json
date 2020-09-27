@@ -10,7 +10,7 @@
     "stop": "pkill -f http-server",
     "browserstack": "npm start && node browserstack.runner.js --suiteRetries 2 -c nightwatch-browserstack.conf.js -e safari12,safari13,chrome,chromeMac,firefox,firefoxMac,edge,iphoneXS,ios13,ios14,pixel,galaxys9,ucbrowser; npm stop"
   },
-  "repository": "git+https://github.com/sudara/stitches6.git",
+  "repository": "git+https://github.com/sudara/stitches.git",
   "keywords": [
     "mp3",
     "html5",
@@ -21,9 +21,9 @@
   "author": "Sudara",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/sudara/stitches6/issues"
+    "url": "https://github.com/sudara/stitches/issues"
   },
-  "homepage": "https://github.com/sudara/stitches6#readme",
+  "homepage": "https://github.com/sudara/stitches#readme",
   "private": false,
   "devDependencies": {
     "babel-eslint": "10.1.0",

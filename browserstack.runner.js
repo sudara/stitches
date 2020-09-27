@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-var Nightwatch = require('nightwatch');
-var browserstack = require('browserstack-local');
-var bs_local;
+const Nightwatch = require('nightwatch');
+const browserstack = require('browserstack-local');
 
+let bs_local;
 try {
   process.mainModule.filename = "./node_modules/.bin/nightwatch"
 
