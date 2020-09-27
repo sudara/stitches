@@ -28,13 +28,13 @@ Unfortunately the state of HTML5 Audio support on browsers has not evolved much 
 
 * Unlocking multiple audio nodes on an interaction so you can play through multiple tracks
 
-* Abstracts out and normalizes HTML5 audio events so that they actually work cross-browser (For example, [onended in iOS has been broken for years](https://bugs.webkit.org/show_bug.cgi?id=173332)).
+* Abstracts out and normalizes HTML5 audio events so that they actually work cross-browser (For example, [onended in iOS was broken for years](https://bugs.webkit.org/show_bug.cgi?id=173332)).
 
 * Comes with defaults that enable gapless playback, with an ability to tune.
 
 ## Installation
 
-`yarn install stitches6`
+`yarn install stitches`
 
 ## Usage
 
