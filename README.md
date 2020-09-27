@@ -151,6 +151,16 @@ This is useful for figuring out why something might be failing on one particular
 PROTIP: You won't see any "live" output from nightwatch when more than one browser is being run, as in this case tests are being run in parallel and the log output wouldn't be very coherent. If you want to see nightwatch output as it happens, just use one browser.
 
 
+## Releasing
+
+Bump package number and publish:
+
+```
+npm version x.y.z
+npm publish
+```
+
+
 ## Acknowledgements
 
 * Thanks to [@smoofles](https://twitter.com/smoofles) for the name and logo!
