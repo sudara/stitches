@@ -1,6 +1,6 @@
 {
   "name": "stitches6",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Stitching Together MP3 Playback in HTML5 Audio with ES6",
   "main": "index.js",
   "scripts": {
