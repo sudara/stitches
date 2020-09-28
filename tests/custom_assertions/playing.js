@@ -24,7 +24,7 @@ const playing = function (timestamp=0.3, mp3name=null) {
     return true; // what the assertion is tested against
   };
 
-  this.pass = (value) => {
+  this.evaluate = (value) => {
     // see Log.trigger for the format of this
     //   /whilePlaying - \d\.\d+ short-continuous-1\.mp3/
     let playingRegex = new RegExp(`whilePlaying - (\\d\\.\\d+)`)

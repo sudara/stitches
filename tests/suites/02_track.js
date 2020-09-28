@@ -25,6 +25,22 @@ module.exports = {
       .assert.progressBarMoved("#track2progress")
   },
 
+  "The whilePlaying callback gets called" : browser => {
+    browser.url(browser.launchUrl)
+      .waitForElementPresent("body")
+      .click("#playlist2-track1 svg")
+      .assert.playing()
+      .assert.containsText("#debug", "FIRED: whilePlaying Callback")
+    },
+
+    "The onError callback gets called" : browser => {
+    browser.url(browser.launchUrl)
+      .waitForElementPresent("body")
+      .click("#track404 svg")
+      .assert.not.playing()
+      .assert.containsText("#debug", "FIRED: onError Callback")
+  },
+
   "Clicking play, pause and play on a track resumes playback": browser => {
     browser
       .url(browser.launchUrl)

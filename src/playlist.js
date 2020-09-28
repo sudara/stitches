@@ -9,7 +9,8 @@ export default class Playlist {
       tracksSelector,
       playButtonSelector = ".stiches-play",
       progressSelector = ".stiches-progress",
-      whilePlaying
+      whilePlaying,
+      onError
     } = options
     this.currentTrack = null
     const elements = document.querySelectorAll(tracksSelector)
@@ -22,7 +23,8 @@ export default class Playlist {
           setCurrentTrack: this.setCurrentTrack.bind(this),
           playButtonSelector,
           progressSelector,
-          whilePlaying
+          whilePlaying,
+          onError
         })
     )
     if (preloadIndex >= 0) this.tracks[preloadIndex].preload()

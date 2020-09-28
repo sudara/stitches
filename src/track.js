@@ -8,7 +8,8 @@ export default class Track {
     setCurrentTrack,
     playButtonSelector,
     progressSelector,
-    whilePlaying
+    whilePlaying,
+    onError
   }) {
     this.id = uniqueId()
     this.pool = pool
@@ -26,6 +27,7 @@ export default class Track {
     this.paused = true
     this.displayPauseButton = false
     this.whilePlayingCallback = whilePlaying
+    this.onErrorCallback = onError
     this.playButtonElement.addEventListener("click", this.togglePlay.bind(this), true)
     this.progressElement.addEventListener(
       "click",
@@ -71,7 +73,7 @@ export default class Track {
         this.audioNode.src = this.url
       }
 
-      this.audioNode.play(this.whilePlaying.bind(this), this.wasClicked)
+      this.audioNode.play(this.whilePlaying.bind(this), this.onErrorCallback, this.wasClicked)
       if (!this.poolAllUnlocked) this.pool.unlockAllAudioNodes()
 
       // TODO: this needs to happen via callbacks
@@ -88,6 +90,12 @@ export default class Track {
       this.paused = false
       Log.trigger("track:playing")
     } catch (err) {
+      if (this.onErrorCallback) {
+        this.onErrorCallback({
+          fileName: this.fileName,
+          error: err
+        })
+      }
       Log.trigger("track:notplaying", {
         name: err.name,
         message: err.message

@@ -9,16 +9,19 @@
         playButtonSelector: "a",
         progressSelector: "progress",
         preloadIndex: 0,
-        whilePlaying: data => {
-          // console.log(data)
-        }
       })
 
       window.playlist2 = new Playlist({
         tracksSelector: "#playlist2 li",
         playButtonSelector: "a",
         progressSelector: "progress",
-        preloadIndex: 0
+        preloadIndex: 0,
+        whilePlaying: data => {
+          document.querySelector("#debug").insertAdjacentHTML("afterbegin", `FIRED: whilePlaying Callback<br/>`)
+        },
+        onError: data => {
+          document.querySelector("#debug").insertAdjacentHTML("afterbegin", `FIRED: onError Callback<br/>`)
+        }
       })
     </script>
     <style>
@@ -109,19 +112,9 @@
         </a>
         <progress value="0" class="stitches-progress"></progress>
       </li>
-
-      <li>
-        <a href="mp3/short-continuous-4.mp3" class="track" id="track4">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
-            <use xlink:href="#playButton" width="50" height="50" />
-          </svg>
-          <div class="title">Play Track 4</div>
-        </a>
-        <progress value="0" class="stitches-progress"></progress>
-      </li>
     </ul>
 
-    <h2>2 duplicate tracks</h2>
+    <h2>2 duplicate tracks, 2 broken tracks w/ callbacks</h2>
     <ul id="playlist2">
       <li>
         <a href="mp3/short-continuous-1.mp3" id="playlist2-track1" class="track">
@@ -139,6 +132,26 @@
             <use xlink:href="#playButton" width="50" height="50" />
           </svg>
           <div class="title">Play Track 1 again</div>
+        </a>
+        <progress value="0" class="stitches-progress"></progress>
+      </li>
+
+      <li>
+        <a href="mp3/short-continuous-666.mp3" id="track404" class="track">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+            <use xlink:href="#playButton" width="50" height="50" />
+          </svg>
+          <div class="title">404 track</div>
+        </a>
+        <progress value="0" class="stitches-progress"></progress>
+      </li>
+
+      <li>
+        <a href="http://alonetone.com/error.mp3" id="track500" class="track">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+            <use xlink:href="#playButton" width="50" height="50" />
+          </svg>
+          <div class="title">500 track</div>
         </a>
         <progress value="0" class="stitches-progress"></progress>
       </li>

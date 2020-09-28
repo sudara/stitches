@@ -19,6 +19,7 @@ export default class AudioNode {
     this.audio.ontimeupdate = this.whilePlaying.bind(this)
     this.audio.oncanplaythrough = this.loaded.bind(this)
     this.audio.onloadeddata = this.onloading.bind(this)
+    this.audio.onerror = this.onError.bind(this)
     this.audio.preload = preloadSrc ? "auto" : "none"
     this.src = preloadSrc || blankMP3
     this.unlockedDirectlyViaUserInteraction = false
@@ -125,12 +126,26 @@ export default class AudioNode {
     }
   }
 
-  async play(whilePlayingCallback, firedFromUserInteraction=false) {
+  onError(e) {
+    if (this.onErrorCallback) {
+      this.onErrorCallback({
+        fileName: this.fileName,
+        error: e
+      })
+    }
+    Log.trigger("audioNode:onError", {
+      name: e.name,
+      message: e.message
+    })
+  }
+
+  async play(whilePlayingCallback, onErrorCallback, firedFromUserInteraction=false) {
     Log.trigger("audioNode:play")
     this.unlockedDirectlyViaUserInteraction = firedFromUserInteraction
 
     // This callback ideally only fires when we are actually playing, not unlocking
     this.whilePlayingCallback = whilePlayingCallback
+    this.onErrorCallback = onErrorCallback
     return this.audio.play()
   }
 

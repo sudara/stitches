@@ -37,7 +37,7 @@ module.exports = {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent("#debug")
-      .click("#track4 svg")
+      .click("#track3 svg")
       .assert.playing(1.0, "short-continuous-4.mp3")
       .assert.containsText("#debug", "track:ended")
       .pause(200) // whilePlaying can fire one more time, let's prevent glitch
