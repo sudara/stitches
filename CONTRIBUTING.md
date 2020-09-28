@@ -11,5 +11,5 @@ Visit `http://localhost:8080/`.
 
 ```sh
 yarn start
-yarn test:single --test tests/03_playlist.js
+yarn test:single --test tests/suites/03_playlist.js
 ```

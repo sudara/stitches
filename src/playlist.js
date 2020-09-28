@@ -7,8 +7,9 @@ export default class Playlist {
     const {
       preloadIndex = -1,
       tracksSelector,
-      playButtonSelector = ".stiches-play",
-      progressSelector = ".stiches-progress",
+      playButtonSelector = "a",
+      progressSelector = "progress",
+      timeSelector = "time",
       whilePlaying,
       onError
     } = options
@@ -23,6 +24,7 @@ export default class Playlist {
           setCurrentTrack: this.setCurrentTrack.bind(this),
           playButtonSelector,
           progressSelector,
+          timeSelector,
           whilePlaying,
           onError
         })

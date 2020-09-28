@@ -8,6 +8,7 @@ export default class Track {
     setCurrentTrack,
     playButtonSelector,
     progressSelector,
+    timeSelector,
     whilePlaying,
     onError
   }) {
@@ -17,8 +18,10 @@ export default class Track {
     this.playButtonElement = element.querySelector(playButtonSelector)
     this.url = this.playButtonElement.href
     this.progressElement = element.querySelector(progressSelector)
+    this.timeElement = element.querySelector(timeSelector)
     this.playlistSetCurrentTrack = setCurrentTrack
     this.audioNode = null
+    this.time = 0
     this.position = 0
     this.timeFromEnd = NaN
     this.wasClicked = false
@@ -29,10 +32,7 @@ export default class Track {
     this.whilePlayingCallback = whilePlaying
     this.onErrorCallback = onError
     this.playButtonElement.addEventListener("click", this.togglePlay.bind(this), true)
-    this.progressElement.addEventListener(
-      "click",
-      this.updatePosition.bind(this)
-    )
+    this.addProgressListener()
     Log.trigger("track:create")
   }
 
@@ -86,6 +86,10 @@ export default class Track {
         this.element.classList.remove("stitches-paused")
       }
 
+      if (this.timeElement) {
+        this.timeElement.innerText = this.formattedTime()
+      }
+
       this.hasEnded = false
       this.paused = false
       Log.trigger("track:playing")
@@ -104,8 +108,13 @@ export default class Track {
   }
 
   whilePlaying(data) {
+    this.time = data.currentTime
+    if (this.timeElement) {
+      this.timeElement.innerText = this.formattedTime()
+    }
+
     this.position = data.currentTime / this.audioNode.duration
-    this.timeFromEnd = this.audioNode.duration - data.currentTime
+    this.timeFromEnd = this.audioNode.duration - this.time
     if (!this.hasEnded && this.timeFromEnd < 0.2) {
       this.hasEnded = true
       this.paused = true
@@ -128,7 +137,9 @@ export default class Track {
 
     if (typeof this.whilePlayingCallback === "function") {
       this.whilePlayingCallback({
+        time: this.time,
         timeFromEnd: this.timeFromEnd,
+        percentPlayed: this.position,
         fileName: this.url
       })
     }
@@ -169,7 +180,6 @@ export default class Track {
   }
 
   // This is only called by the click handler
-  //
   togglePlay(evt) {
     this.wasClicked = true // This lets us shortcut unlockAll for this particular track
     evt.preventDefault() // This will still bubble up to fire unlockAll from body
@@ -181,5 +191,23 @@ export default class Track {
     } else {
       this.playlistSetCurrentTrack(this)
     }
+  }
+
+  addProgressListener() {
+    if (this.progressElement) {
+      this.progressElement.addEventListener(
+        "click",
+        this.updatePosition.bind(this)
+      )
+    } else {
+      Log.trigger("setup:noprogress")
+    }
+  }
+
+  formattedTime() {
+    const time = Math.floor(this.time)
+    const min = Math.floor(time / 60)
+    const sec = time % 60
+    return min + ':' + (sec >= 10 ? sec : '0' + sec)
   }
 }

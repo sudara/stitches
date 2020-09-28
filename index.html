@@ -6,16 +6,12 @@
       import Playlist from "/src/playlist.js"
       window.playlist = new Playlist({
         tracksSelector: "#playlist li",
-        playButtonSelector: "a",
-        progressSelector: "progress",
         preloadIndex: 0,
       })
 
       window.playlist2 = new Playlist({
         tracksSelector: "#playlist2 li",
-        playButtonSelector: "a",
         progressSelector: "progress",
-        preloadIndex: 0,
         whilePlaying: data => {
           document.querySelector("#debug").insertAdjacentHTML("afterbegin", `FIRED: whilePlaying Callback<br/>`)
         },
@@ -37,7 +33,8 @@
       }
       li {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
+        flex-wrap: wrap;
         width:300px;
         list-style-type: none;
         margin-bottom:10px;
@@ -57,14 +54,24 @@
         margin:-10px 0px 0px 46px;
       }
 
+      time {
+        float: right;
+        display: flex;
+      }
+
       li a {
         display:flex;
         line-height: 24px;
         text-decoration:none;
         color:rgba(0, 0, 0, 0.85)
       }
-      li a div.title {
-        text-indent: 10px;
+      div.title {
+        margin-left: 10px;
+        width: 220px;
+      }
+      time {
+        flex-grow: 2;
+        text-align: right;
       }
       .stitches-loading {
         border: 3px solid red;
@@ -81,16 +88,17 @@
     <header>
       <img src="logo.svg" id="logo" />
     </header>
-    <h2>4 different tracks</h2>
+    <h2>3 different tracks</h2>
     <ul id="playlist">
       <li>
         <a href="mp3/short-continuous-1.mp3" id="track1" class="track">
           <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
             <use xlink:href="#playButton" width="50" height="50" />
           </svg>
-          <div class="title">Play Track 1</div>
         </a>
-        <progress id="track1progress" value="0" class="stitches-progress"></progress>
+        <div class="title">Track 1 (preloaded) </div>
+        <time id="track1time">1:23</time>
+        <progress id="track1progress" value="0"></progress>
       </li>
 
       <li>
@@ -98,9 +106,9 @@
           <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
             <use xlink:href="#playButton" width="50" height="50" />
           </svg>
-          <div class="title">Play Track 2</div>
         </a>
-        <progress id="track2progress" value="0" class="stitches-progress"></progress>
+        <div class="title">Track 2 (no time element)</div>
+        <progress id="track2progress" value="0"></progress>
       </li>
 
       <li>
@@ -108,22 +116,23 @@
           <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
             <use xlink:href="#playButton" width="50" height="50" />
           </svg>
-          <div class="title">Play Track 3</div>
         </a>
-        <progress value="0" class="stitches-progress"></progress>
+        <div class="title">Track 3 (no progress element)</div>
+        <time>1:23</time>
       </li>
     </ul>
 
-    <h2>2 duplicate tracks, 2 broken tracks w/ callbacks</h2>
+    <h2>2 duplicate tracks, 2 broken tracks. With callbacks</h2>
     <ul id="playlist2">
       <li>
         <a href="mp3/short-continuous-1.mp3" id="playlist2-track1" class="track">
           <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
             <use xlink:href="#playButton" width="50" height="50" />
           </svg>
-          <div class="title">Play Track 1</div>
         </a>
-        <progress value="0" class="stitches-progress"></progress>
+        <div class="title">Play Track 1</div>
+        <time>1:23</time>
+        <progress value="0" class="progress"></progress>
       </li>
 
       <li>
@@ -131,9 +140,10 @@
           <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
             <use xlink:href="#playButton" width="50" height="50" />
           </svg>
-          <div class="title">Play Track 1 again</div>
         </a>
-        <progress value="0" class="stitches-progress"></progress>
+        <div class="title">Play Track 1 again</div>
+        <time>1:23</time>
+        <progress value="0" class="progress"></progress>
       </li>
 
       <li>
@@ -141,9 +151,10 @@
           <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
             <use xlink:href="#playButton" width="50" height="50" />
           </svg>
-          <div class="title">404 track</div>
         </a>
-        <progress value="0" class="stitches-progress"></progress>
+        <div class="title">404 track</div>
+        <time>1:23</time>
+        <progress value="0" class="progress"></progress>
       </li>
 
       <li>
@@ -151,9 +162,10 @@
           <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
             <use xlink:href="#playButton" width="50" height="50" />
           </svg>
-          <div class="title">500 track</div>
         </a>
-        <progress value="0" class="stitches-progress"></progress>
+        <div class="title">500 track</div>
+        <time>1:23</time>
+        <progress value="0" class="progress"></progress>
       </li>
     </ul>
 

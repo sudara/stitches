@@ -6,7 +6,7 @@ const progressBarMoved = function(definition, percentMoved=5) {
   }
 
   this.pass = (value) => {
-   return value > (parseFloat(percentMoved)/100)
+   return value > (parseFloat(percentMoved) / 100)
   }
 
   this.value = (result) => {

@@ -32,7 +32,6 @@ module.exports = {
       .assert.playing(2, "short-continuous-2.mp3")
   },
 
-
   "Playlist ends automatically after the last track": browser => {
     browser
       .url(browser.launchUrl)

@@ -4,27 +4,6 @@ module.exports = {
     require("../../nightwatch-browserstack").updateStatusIfBrowserstack(browser, done)
   },
 
-  "Clicking play on a preloaded track starts audio": browser => {
-    browser
-      .url(browser.launchUrl)
-      .waitForElementPresent("body")
-      .click("#track1 svg")
-      .assert.containsText("#debug", "nodepool:create")
-      .assert.containsText("#debug", "audioNode:alreadyUnlockedDirectly")
-      .assert.playing()
-      .assert.progressBarMoved("#track1progress")
-  },
-
-  "Clicking play on a non-preloaded track starts audio": browser => {
-    browser
-      .url(browser.launchUrl)
-      .waitForElementPresent("body")
-      .click("#track2 svg")
-      .assert.containsText("#debug", "nodepool:create")
-      .assert.playing()
-      .assert.progressBarMoved("#track2progress")
-  },
-
   "The whilePlaying callback gets called" : browser => {
     browser.url(browser.launchUrl)
       .waitForElementPresent("body")
@@ -33,7 +12,7 @@ module.exports = {
       .assert.containsText("#debug", "FIRED: whilePlaying Callback")
     },
 
-    "The onError callback gets called" : browser => {
+  "The onError callback gets called" : browser => {
     browser.url(browser.launchUrl)
       .waitForElementPresent("body")
       .click("#track404 svg")
@@ -41,17 +20,26 @@ module.exports = {
       .assert.containsText("#debug", "FIRED: onError Callback")
   },
 
-  "Clicking play, pause and play on a track resumes playback": browser => {
+  "The progress bar moves during playback" : browser => {
     browser
       .url(browser.launchUrl)
-      .waitForElementPresent("#debug")
-      .click("#track2 svg")
-      .assert.playing()
-      .click("#track2 svg")
-      .assert.containsText("#debug", "track:pause")
-      .cleanDebug()
-      .assert.not.containsText("#debug", "whilePlaying")
-      .click("#track2 svg")
-      .assert.playing(1)
+      .waitForElementPresent("body")
+      .click("#track1 svg")
+      .assert.progressBarMoved("#track1progress")
+  },
+
+  "The time updates at the start of playback" : browser => {
+    browser
+      .url(browser.launchUrl)
+      .click("#track1 svg")
+      .assert.timeUpdated("#track1time", "0:00")
+  },
+
+  "The time updates during playback": browser => {
+    browser
+      .url(browser.launchUrl)
+      .click("#track1 svg")
+      .assert.timeUpdated("#track1time", "0:01")
   }
+
 }
