@@ -33,13 +33,13 @@ export default class Track {
     this.onErrorCallback = onError
     this.playButtonElement.addEventListener("click", this.togglePlay.bind(this), true)
     this.addProgressListener()
-    Log.trigger("track:create")
+    this.log("track:create")
   }
 
   async preload() {
     // grab node from list
     // make sure this one is last to be unlocked
-    Log.trigger("track:preload")
+    this.log("track:preload")
     this.audioNode = this.pool.makePreloadingNode(
       this.url,
       this.cleanupAudioNode.bind(this)
@@ -47,7 +47,7 @@ export default class Track {
   }
 
   async grabNode() {
-    Log.trigger("track:grabNodeAndSetSrc")
+    this.log("track:grabNodeAndSetSrc")
     this.audioNode = await this.pool.nextAvailableNode(
       this.cleanupAudioNode.bind(this)
     )
@@ -59,7 +59,7 @@ export default class Track {
 
   // https://developers.google.com/web/updates/2016/03/play-returns-promise
   async play() {
-    Log.trigger("track:play")
+    this.log("track:play")
     try {
       if (this.audioNode) {
         // No need to check for unlocked audio nodes, since hasEnded means the audio node have been unlocked before
@@ -92,7 +92,7 @@ export default class Track {
 
       this.hasEnded = false
       this.paused = false
-      Log.trigger("track:playing")
+      this.log("track:playing")
     } catch (err) {
       if (this.onErrorCallback) {
         this.onErrorCallback({
@@ -100,7 +100,7 @@ export default class Track {
           error: err
         })
       }
-      Log.trigger("track:notplaying", {
+      this.log("track:notplaying", {
         name: err.name,
         message: err.message
       })
@@ -118,11 +118,11 @@ export default class Track {
     if (!this.hasEnded && this.timeFromEnd < 0.2) {
       this.hasEnded = true
       this.paused = true
-      Log.trigger("track:ended", { fileName: this.url, id: this.id })
+      this.log("track:ended")
     }
     if (!this.preloadNextTrackDispatched && this.timeFromEnd < 10) {
       this.preloadNextTrackDispatched = true
-      Log.trigger("track:preloadNextTrack", { id: this.id })
+      this.log("track:preloadNextTrack")
     }
 
     if (this.progressElement && !Number.isNaN(this.position)) {
@@ -176,7 +176,7 @@ export default class Track {
     this.audioNode.pause()
     this.paused = true
     this.displayPauseButton = false
-    Log.trigger("track:pause")
+    this.log("track:pause")
   }
 
   // This is only called by the click handler
@@ -202,6 +202,11 @@ export default class Track {
     } else {
       Log.trigger("setup:noprogress")
     }
+  }
+
+  // just keeps the logging a bit cleaner in the rest of the class
+  log(event, options={}) {
+    Log.trigger(event, Object.assign(options, { fileName: this.url, id: this.id }), this.element)
   }
 
   formattedTime() {

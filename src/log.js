@@ -1,12 +1,12 @@
 export default class Log {
-  static trigger(scope, detail) {
+  static trigger(scope, detail, dispatcher=document) {
     const message = `${performance.now().toFixed(1)} ms: ${scope}`
     /* eslint-disable no-console */
     console.log(message)
     /* eslint-disable */
     this.appendToElement(message, detail)
     const event = new CustomEvent(scope, { bubbles: true, detail })
-    document.dispatchEvent(event)
+    dispatcher.dispatchEvent(event)
   }
 
   static appendToElement(message, detail) {
