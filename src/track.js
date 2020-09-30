@@ -8,6 +8,7 @@ export default class Track {
     setCurrentTrack,
     playButtonSelector,
     progressSelector,
+    seekSelector,
     timeSelector,
     whilePlaying,
     onError
@@ -18,6 +19,7 @@ export default class Track {
     this.playButtonElement = element.querySelector(playButtonSelector)
     this.url = this.playButtonElement.href
     this.progressElement = element.querySelector(progressSelector)
+    this.seekElement = element.querySelector(seekSelector)
     this.timeElement = element.querySelector(timeSelector)
     this.playlistSetCurrentTrack = setCurrentTrack
     this.audioNode = null
@@ -30,7 +32,7 @@ export default class Track {
     this.whilePlayingCallback = whilePlaying
     this.onErrorCallback = onError
     this.playButtonElement.addEventListener("click", this.togglePlay.bind(this), true)
-    this.addProgressListener()
+    this.addSeekListener()
     this.reset()
     this.log("track:create")
   }
@@ -138,7 +140,10 @@ export default class Track {
     }
 
     if (this.progressElement && !Number.isNaN(this.position)) {
-      this.progressElement.value = this.position
+      if (this.progressElement.nodeName === "PROGRESS")
+        this.progressElement.value = this.position
+      else
+        this.progressElement.style.width
     }
 
     if (!this.displayPauseButton) {
@@ -160,8 +165,8 @@ export default class Track {
   async updatePosition(evt) {
     this.wasClicked = true // This lets us shortcut unlockAll for this particular track
     const offset =
-      evt.clientX - this.progressElement.getBoundingClientRect().left
-    const newPosition = offset / this.progressElement.offsetWidth
+      evt.clientX - this.seekElement.getBoundingClientRect().left
+    const newPosition = offset / this.seekElement.offsetWidth
     await this.playlistSetCurrentTrack(this)
     this.seek(newPosition)
   }
@@ -204,14 +209,14 @@ export default class Track {
     }
   }
 
-  addProgressListener() {
-    if (this.progressElement) {
-      this.progressElement.addEventListener(
+  addSeekListener() {
+    if (this.seekElement) {
+      this.seekElement.addEventListener(
         "click",
         this.updatePosition.bind(this)
       )
     } else {
-      Log.trigger("setup:noprogress")
+      Log.trigger("setup:noseek")
     }
   }
 

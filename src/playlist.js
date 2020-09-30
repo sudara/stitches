@@ -10,6 +10,7 @@ export default class Playlist {
       tracksSelector,
       playButtonSelector = "a",
       progressSelector = "progress",
+      seekSelector= "progress",
       timeSelector = "time",
       whilePlaying,
       onError,
@@ -26,6 +27,7 @@ export default class Playlist {
           setCurrentTrack: this.setCurrentTrack.bind(this),
           playButtonSelector,
           progressSelector,
+          seekSelector,
           timeSelector,
           whilePlaying,
           onError

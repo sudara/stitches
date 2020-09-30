@@ -94,7 +94,16 @@ Which child element of `tracksSelector` should be considered the playButton?
 
 Optional. Defaults to the first `progress` child of `tracksSelector` and fails silently if not present.
 
-This will update an attribute called `value` as well as register a click handler on the element so it can be used to seek the track.
+if the element is a progress element, this will update the attribute called `value` during the `whilePlaying` callback.
+
+For other elements, it will set the element's `style.width` to be the appropriate percentage.
+
+### seekSelector = "progress"
+
+Optional. Defaults to the first `progress` child of `tracksSelector` and fails silently if not present.
+
+This will register a click handler on the element so it can be used to seek the track.
+
 
 ### timeSelector = "time"
 
