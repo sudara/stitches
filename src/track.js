@@ -143,7 +143,7 @@ export default class Track {
       if (this.progressElement.nodeName === "PROGRESS")
         this.progressElement.value = this.position
       else
-        this.progressElement.style.width
+        this.progressElement.style.width = `${this.position * 100}%`
     }
 
     if (!this.displayPauseButton) {

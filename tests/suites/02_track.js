@@ -13,19 +13,27 @@ module.exports = {
     },
 
   "The onError callback gets called" : browser => {
-    browser.url(browser.launchUrl)
+    browser .url(browser.launchUrl)
       .waitForElementPresent("body")
       .click("#track404 svg")
       .assert.not.playing()
       .assert.containsText("#debug", "FIRED: onError Callback")
   },
 
-  "The progress bar moves during playback" : browser => {
+  "<progress> element updates during playback" : browser => {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent("body")
       .click("#track1 svg")
       .assert.progressBarMoved("#track1progress")
+  },
+
+  "Custom defined progress elements update their width": browser => {
+    browser
+      .url(browser.launchUrl)
+      .waitForElementPresent("body")
+      .click("#playlist2-track1 svg")
+      .assert.progressBarMoved("#customProgress")
   },
 
   "The time updates at the start of playback" : browser => {

@@ -11,7 +11,8 @@
 
       window.playlist2 = new Playlist({
         tracksSelector: "#playlist2 li",
-        progressSelector: "progress",
+        progressSelector: ".progress",
+        seekSelector: ".seek",
         whilePlaying: data => {
           document.querySelector("#debug").insertAdjacentHTML("afterbegin", `FIRED: whilePlaying Callback<br/>`)
         },
@@ -43,7 +44,7 @@
         border-radius:3px;
       }
 
-      progress {
+      .seek, .progress, progress {
         -webkit-appearance: none;
         appearance: none;
         background-color: #eee;
@@ -52,6 +53,12 @@
         height:10px;
         width:250px;
         margin:-10px 0px 0px 46px;
+      }
+
+      div.progress {
+        width:0%;
+        margin:0;
+        background-color: blue;
       }
 
       time {
@@ -130,9 +137,9 @@
             <use xlink:href="#playButton" width="50" height="50" />
           </svg>
         </a>
-        <div class="title">Play Track 1</div>
+        <div class="title">Track 1 (custom seek/progress)</div>
         <time>1:23</time>
-        <progress value="0" class="progress"></progress>
+        <div class="seek"><div id="customProgress" class="progress"></div></div>
       </li>
 
       <li>
@@ -143,7 +150,7 @@
         </a>
         <div class="title">Play Track 1 again</div>
         <time>1:23</time>
-        <progress value="0" class="progress"></progress>
+        <div class="seek"><div class="progress"></div></div>
       </li>
 
       <li>
