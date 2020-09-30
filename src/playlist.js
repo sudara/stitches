@@ -1,4 +1,5 @@
 // import Log from './log'
+import Log from "./log.js"
 import Track from "./track.js"
 import NodePool from "./node_pool.js"
 
@@ -11,7 +12,8 @@ export default class Playlist {
       progressSelector = "progress",
       timeSelector = "time",
       whilePlaying,
-      onError
+      onError,
+      logToConsole = true,
     } = options
     this.currentTrack = null
     const elements = document.querySelectorAll(tracksSelector)
@@ -35,6 +37,7 @@ export default class Playlist {
       "track:preloadNextTrack",
       this.preloadNextTrack.bind(this)
     )
+    Log.logToConsole(logToConsole);
   }
 
   nextTrack() {

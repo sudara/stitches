@@ -66,6 +66,107 @@ To mitigate the fact that browsers sabotage this ability, we create a `NodePool`
 
 For continuous/gapless playback we really only need two `<audio>` elements: One to handle a currently playing track and another to preload the next audio track in. When a file is done playing, the node is released back to the pool.
 
+## Options
+
+The following options can be passed to `new Playlist`
+
+### `tracksSelector`
+
+The only required option. No default, so you need to pass in some selector such as `.track`.
+
+This selector determines which elements are considered to be tracks in this playlist.
+
+The element type doesn't matter. What matters is other selectors such as `playButtonSelector` need to be children of this selector.
+
+### `preloadIndex = -1`
+
+Optional. Defaults to `-1` which doesn't load a track in the playlist.
+
+If set to an integer, it'll preload that index, so `0` will preload the first track in the playlist.
+
+### playButtonSelector = "a"
+
+Optional. Defaults to the first `<a>` child of `tracksSelector`.
+
+Which child element of `tracksSelector` should be considered the playButton?
+
+### progressSelector = "progress"
+
+Optional. Defaults to the first `progress` child of `tracksSelector` and fails silently if not present.
+
+This will update an attribute called `value` as well as register a click handler on the element so it can be used to seek the track.
+
+### timeSelector = "time"
+
+Optional. Defaults to the first `<time>` child of `tracksSelector` and fails silently if not present.
+
+### whilePlaying
+
+Optional. No default. Expects a function.
+
+The provided function is called *repeatedly* during a track's playback.
+
+### onError
+
+Optional. No default. Expects a function.
+
+The provided function is called if there's a problem with loading or playback.
+
+Good for registering error notification such as Bugsnag, etc.
+
+### logToConsole = false
+
+Optional. Defaults to false, keeping the console nice and clear.
+
+This is also exposed a static setter `Log.logToConsole` in case there's a need for a lil runtime funtime.
+
+## Events
+
+The following events fire:
+
+### `track:preload`
+
+This fires on *attempt* to preload a track in a playlist on page load, if and only if `preloadIndex` is set.
+
+### `track:play`
+
+This fires as soon as `play()` has been called on a track.
+
+It does not mean the track is playing, only that play has been called.
+
+### `track:loading`
+
+An `AudioNode` was assigned for the track and it has been told to play the appropriate url.
+
+### `track:notPlaying`
+
+This will be fired if the attempt to grab an `AudioNode` fails.
+
+
+### `track:playing`
+
+This is fired once as soon as we know for sure the track is actually producing audio and happily playing.
+
+### `track:whilePlaying`
+
+This is *repeatedly* called, a few times a second, while a track is actively producing audio.
+
+### `track:ended`
+
+This is called when a track is finished. It does not rely on the somewhat sketchy nature of `<audio>` tag events fired from the browser, it will fire approximately 200ms near the end of the track.
+
+## Why do we need this library?
+
+10 years ago, I launched alonetone.com. Since then, I've written several wrappers around audio libraries such as SoundManager2 and Howler.js, both which are fantastic projects and enabled me to launch and maintain the site.
+
+However, as time wore on, I found myself constantly having to keep up with the changes to audio behavior in browsers anyway, and more recently, have found the implementations lacking. In particular, other libraries tend to:
+
+* Contain legacy/unrelated support of other methods of delivery like Flash and Web Audio
+* Don't have first class support for sequential playback of a playlist
+* Are written in Ye Olde JS™ vs. ES6/ES+
+* Are full of browser/feature detection code
+* Don't have cross browser tests
+
 ## Visualizing the object relationships
 
 Each `Playlist` has `Tracks` that communicate to a `NodePool` containing `AudioNode`s.
@@ -101,19 +202,6 @@ Each `NodePool` (there's one per playlist) has exactly 3 `AudioNode`s, which all
 1. The last track that just played
 2. The current track that's playing now
 3. The next track that's preloading
-
-
-## Why do we need this library?
-
-10 years ago, I launched alonetone.com. Since then, I've written several wrappers around audio libraries such as SoundManager2 and Howler.js, both which are fantastic projects and enabled me to launch and maintain the site.
-
-However, as time wore on, I found myself constantly having to keep up with the changes to audio behavior in browsers anyway, and more recently, have found the implementations lacking. In particular, other libraries tend to:
-
-* Contain legacy/unrelated support of other methods of delivery like Flash and Web Audio
-* Don't have first class support for sequential playback of a playlist
-* Are written in Ye Olde JS™ vs. ES6/ES+
-* Are full of browser/feature detection code
-* Don't have cross browser tests
 
 ## Running tests
 

@@ -10,9 +10,6 @@ export default class NodePool {
     this.allUnlocked = false
     Log.trigger("nodepool:create")
     this.audioNodes = Array.from({ length: size }, () => new AudioNode())
-    this.audioNodes.forEach(audioNode => {
-      audioNode.cleanupCallback = () => {}
-    })
   }
 
   makePreloadingNode(src, cleanupCallback) {
@@ -27,8 +24,11 @@ export default class NodePool {
   // has Last in Last out behaviour e.g. [a, b, c] -> [b, c, a]
   async nextAvailableNode(cleanupCallback) {
     const audioNode = this.audioNodes.shift()
+
     // run the cleanup callback to cleanup the previous track
-    audioNode.cleanupCallback()
+    if (typeof audioNode.cleanupCallback === "function")
+      audioNode.cleanupCallback()
+
     // attach the cleanup callback for the new track
     audioNode.cleanupCallback = cleanupCallback
     this.audioNodes.push(audioNode)

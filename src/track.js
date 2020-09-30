@@ -25,15 +25,20 @@ export default class Track {
     this.position = 0
     this.timeFromEnd = NaN
     this.wasClicked = false
-    this.hasEnded = false
-    this.preloadNextTrackDispatched = false
     this.paused = true
     this.displayPauseButton = false
     this.whilePlayingCallback = whilePlaying
     this.onErrorCallback = onError
     this.playButtonElement.addEventListener("click", this.togglePlay.bind(this), true)
     this.addProgressListener()
+    this.reset()
     this.log("track:create")
+  }
+
+  reset() {
+    this.hasEnded = false
+    this.preloadNextTrackDispatched = false
+    this.playingEventDispatched = false
   }
 
   async preload() {
@@ -92,7 +97,7 @@ export default class Track {
 
       this.hasEnded = false
       this.paused = false
-      this.log("track:playing")
+      this.log("track:loading")
     } catch (err) {
       if (this.onErrorCallback) {
         this.onErrorCallback({
@@ -100,7 +105,7 @@ export default class Track {
           error: err
         })
       }
-      this.log("track:notplaying", {
+      this.log("track:notPlaying", {
         name: err.name,
         message: err.message
       })
@@ -108,6 +113,11 @@ export default class Track {
   }
 
   whilePlaying(data) {
+    if (!this.playingEventDispatched) {
+      this.log("track:playing")
+      this.playingEventDispatched = true
+    }
+
     this.time = data.currentTime
     if (this.timeElement) {
       this.timeElement.innerText = this.formattedTime()
@@ -115,11 +125,13 @@ export default class Track {
 
     this.position = data.currentTime / this.audioNode.duration
     this.timeFromEnd = this.audioNode.duration - this.time
+
     if (!this.hasEnded && this.timeFromEnd < 0.2) {
       this.hasEnded = true
       this.paused = true
       this.log("track:ended")
     }
+
     if (!this.preloadNextTrackDispatched && this.timeFromEnd < 10) {
       this.preloadNextTrackDispatched = true
       this.log("track:preloadNextTrack")
@@ -156,8 +168,7 @@ export default class Track {
 
   seek(position) {
     if (this.hasEnded) {
-      this.hasEnded = false
-      this.preloadNextTrackDispatched = false
+      this.reset()
     }
     this.audioNode.seek(position)
   }
