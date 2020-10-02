@@ -11,7 +11,8 @@
 
       window.playlist2 = new Playlist({
         tracksSelector: "#playlist2 li",
-        progressSelector: ".progress",
+        loadingProgressSelector: ".progress",
+        playProgressSelector: ".progress",
         seekSelector: ".seek",
         whilePlaying: data => {
           document.querySelector("#debug").insertAdjacentHTML("afterbegin", `FIRED: whilePlaying Callback<br/>`)
@@ -53,6 +54,7 @@
         height:10px;
         width:250px;
         margin:-10px 0px 0px 46px;
+        transition: width 0.75s ease;
       }
 
       div.progress {

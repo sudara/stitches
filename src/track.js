@@ -125,12 +125,7 @@ export default class Track {
 
   whileLoading(data) {
     const position = data.secondsLoaded / data.duration
-    if (this.loadingProgressElement) {
-      if (this.loadingProgressElement.nodeName === "PROGRESS")
-        this.loadingProgressElement.value = position
-      else
-        this.loadingProgressElement.style.width = `${position * 100}%`
-    }
+    this.updateLoadingProgressElement(position)
     if (typeof this.whileLoadingCallback === "function") {
       this.whileLoadingCallback(data)
     }
@@ -139,6 +134,7 @@ export default class Track {
   whilePlaying(data) {
     if (!this.playingEventDispatched) {
       this.log("track:playing")
+      this.updateLoadingProgressElement(1.0)
       this.playingEventDispatched = true
     }
 
@@ -245,6 +241,15 @@ export default class Track {
   // just keeps the logging a bit cleaner in the rest of the class
   log(event, options={}) {
     Log.trigger(event, Object.assign(options, { fileName: this.url, id: this.id }), this.element)
+  }
+
+  updateLoadingProgressElement(position) {
+    if (this.loadingProgressElement) {
+      if (this.loadingProgressElement.nodeName === "PROGRESS")
+        this.loadingProgressElement.value = position
+      else
+        this.loadingProgressElement.style.width = `${position * 100}%`
+    }
   }
 
   formattedTime() {

@@ -23,7 +23,7 @@ export default class AudioNode {
     this.audio.preload = preloadSrc ? "auto" : "none"
     this.src = preloadSrc || blankMP3
     this.unlockedDirectlyViaUserInteraction = false
-    this.isLoaded = false
+    this.reset()
     this.isLoading = Boolean(preloadSrc)
   }
 
@@ -36,8 +36,7 @@ export default class AudioNode {
   }
 
   set src(url) {
-    this.isLoaded = false
-    this.isLoading = false
+    this.reset()
     this.audio.src = url
     this.fileName = url.startsWith("data:audio") ? "data" : url.split("/").pop()
     Log.trigger("audioNode:srcchanged", { fileName: this.fileName } )
@@ -45,6 +44,12 @@ export default class AudioNode {
 
   get src() {
     return this.audio.src
+  }
+
+  reset() {
+    this.isLoaded = false
+    this.isLoading = false
+    this.lastSecondsLoaded = 0
   }
 
   // position is a percentage
@@ -106,20 +111,33 @@ export default class AudioNode {
 
   // https://developer.mozilla.org/en-US/docs/Web/Guide/Audio_and_video_delivery/buffering_seeking_time_ranges
   whileLoading() {
-    if (this.duration > 0) {
-      const payload = {
-        secondsLoaded: this.audio.buffered.end(0),
-        duration: this.duration,
-        fileName: this.fileName
-      }
-      Log.trigger('audioNode:whileLoading', payload)
+    // we can't do much with loading info until we have metadata
+    if (!this.duration) return
 
-      // this is Track's whileLoading
-      // This is set on play(), so a preloaded track won't have it
-      if (this.whileLoadingCallback) {
-        this.whileLoadingCallback(payload)
-      }
+    const secondsLoaded = this.audio.buffered.end(0)
+
+    // we don't want to fire on pointless / duplicate events
+    if (secondsLoaded <= this.lastSecondsLoaded) return
+
+    const payload = {
+      secondsLoaded,
+      duration: this.duration,
+      fileName: this.fileName
     }
+    Log.trigger('audioNode:whileLoading', payload)
+
+    // this is Track's whileLoading
+    // This is set on play(), so a preloaded track won't have it
+    if (this.whileLoadingCallback) {
+      this.whileLoadingCallback(payload)
+    }
+
+    // some browsers (FF 81) don't fire a last whileLoading
+    // lets give them a helping hand
+    if (secondsLoaded !== this.duration)
+      setTimeout(() => this.whileLoading, 1500)
+
+    this.lastSecondsLoaded = secondsLoaded
   }
 
   whilePlaying() {
@@ -176,6 +194,8 @@ export default class AudioNode {
     this.isLoading = true
   }
 
+  // this doesn't mean all data is loaded, just enough
+  // that the browser determines it canPlayThrough
   loaded() {
     this.isLoaded = true
     // don't care about notifying on the blank mp3 loading since it's internal

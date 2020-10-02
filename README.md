@@ -4,24 +4,24 @@
 
 Stitching Together MP3 Playback in HTML5 Audio with ES6
 
-## Our goal
+## The goal
 
-To distill and codify 10+ years experience of building dozens of web music players into a tight, usable library with 0 dependencies.
+To distill and codify 13+ years experience of building dozens of web music players into a tight, usable library with 0 dependencies.
 
 ## Features
 
 Stitches...
 
 * Is written in ES6+
+* Deals with "unlocking" audio elements from their auto-play restrictions to enable playlist playback
 * Completely ignores the Web Audio API (which doesn't allow buffering, therefore useless for music playback)
 * Only handles the MP3 format (pragmatically, the only format that matters)
 * Lets you decide if you want to babel things or just include in a `<script type=module>`
 * Is defensive, but doesn't test for browsers or feature detect
 * Assumes you have a playlist
-* Assumes you want to preload one of the tracks
+* Assumes you might want to preload one of the tracks
 * Assumes you want to have continuous playback of a playlist (preloads next tracks)
 * Assumes you care as much about mobile as you do desktop
-* Deals with "unlocking" audio elements from their auto-play restrictions
 
 ## We worked hard so you don't have to
 
