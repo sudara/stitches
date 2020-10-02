@@ -1,6 +1,6 @@
 [![](https://travis-ci.com/sudara/stitches.svg?branch=master)](https://travis-ci.com/sudara/stitches)
 
-![stitches6](logo.svg)
+![stitches](logo.svg)
 
 Stitching Together MP3 Playback in HTML5 Audio with ES6
 
@@ -10,7 +10,7 @@ To distill and codify 10+ years experience of building dozens of web music playe
 
 ## Features
 
-Stitches6...
+Stitches...
 
 * Is written in ES6+
 * Completely ignores the Web Audio API (which doesn't allow buffering, therefore useless for music playback)
@@ -42,7 +42,7 @@ Unfortunately the state of HTML5 Audio support on browsers has not evolved much 
 With a bundler like Webpack you can:
 
 `
-import Playlist from 'stitches6'
+import Playlist from 'stitches'
 `
 
 With raw html, you can:
@@ -84,13 +84,13 @@ Optional. Defaults to `-1` which doesn't load a track in the playlist.
 
 If set to an integer, it'll preload that index, so `0` will preload the first track in the playlist.
 
-### playButtonSelector = "a"
+### `playButtonSelector = "a"`
 
 Optional. Defaults to the first `<a>` child of `tracksSelector`.
 
 Which child element of `tracksSelector` should be considered the playButton?
 
-### progressSelector = "progress"
+### `progressSelector = "progress"`
 
 Optional. Defaults to the first `progress` child of `tracksSelector` and fails silently if not present.
 
@@ -98,24 +98,24 @@ if the element is a progress element, this will update the attribute called `val
 
 For other elements, it will set the element's `style.width` to be the appropriate percentage.
 
-### seekSelector = "progress"
+### `seekSelector = "progress"`
 
 Optional. Defaults to the first `progress` child of `tracksSelector` and fails silently if not present.
 
 This will register a click handler on the element so it can be used to seek the track.
 
 
-### timeSelector = "time"
+### `timeSelector = "time"`
 
 Optional. Defaults to the first `<time>` child of `tracksSelector` and fails silently if not present.
 
-### whilePlaying
+### `whilePlaying`
 
 Optional. No default. Expects a function.
 
 The provided function is called *repeatedly* during a track's playback.
 
-### onError
+### `onError`
 
 Optional. No default. Expects a function.
 
@@ -123,13 +123,17 @@ The provided function is called if there's a problem with loading or playback.
 
 Good for registering error notification such as Bugsnag, etc.
 
-### logToConsole = false
+Returns an attribute named `error` which contains a `name` and a `message` as [described in the standard](https://dev.w3.org/html5/spec-author-view/spec.html#mediaerror).
+
+### `logToConsole = false`
 
 Optional. Defaults to false, keeping the console nice and clear.
 
 This is also exposed a static setter `Log.logToConsole` in case there's a need for a lil runtime funtime.
 
 ## Events
+
+This events API is based on what an app would ideally wan't from a player and not necessarily [the dumpster fire that is HTML5 audio events](https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events).
 
 The following events fire:
 
