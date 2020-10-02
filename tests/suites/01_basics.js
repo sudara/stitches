@@ -4,7 +4,7 @@ module.exports = {
     require("../../nightwatch-browserstack").updateStatusIfBrowserstack(browser, done)
   },
 
-  "StichES logs properly": browser => {
+  "StitchES logs properly": browser => {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent("body")
@@ -31,7 +31,6 @@ module.exports = {
       .click("#track2 svg")
       .assert.containsText("#debug", "nodepool:create")
       .assert.playing()
-      .assert.progressBarMoved("#track2progress")
   },
 
   "Clicking play, pause and play on a track resumes playback": browser => {

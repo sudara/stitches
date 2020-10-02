@@ -19,7 +19,7 @@ export default class AudioNode {
     this.audio.ontimeupdate = this.whilePlaying.bind(this)
     this.audio.oncanplaythrough = this.loaded.bind(this)
     this.audio.onloadeddata = this.onloading.bind(this)
-    this.audio.onerror = this.onError.bind(this)
+    this.audio.onerror = this.onError
     this.audio.preload = preloadSrc ? "auto" : "none"
     this.src = preloadSrc || blankMP3
     this.unlockedDirectlyViaUserInteraction = false
@@ -51,6 +51,8 @@ export default class AudioNode {
   async seek(position) {
     while (isNaN(this.audio.duration)) {
       Log.trigger('waiting for audio.duration')
+
+      // eslint-disable-next-line no-await-in-loop
       await new Promise(resolve => setTimeout(resolve, 20))
     }
     Log.trigger(this.audio.duration)
@@ -102,23 +104,35 @@ export default class AudioNode {
     //this.audio.muted = false
   }
 
-  // https://dev.w3.org/html5/spec-author-view/spec.html#mediaerror
+  // https://developer.mozilla.org/en-US/docs/Web/Guide/Audio_and_video_delivery/buffering_seeking_time_ranges
   whileLoading() {
-    if (this.audio.b)
-      Log.trigger(`audioNode:whileLoading: ${this.audio.buffered.end(0)}`)
+    if (this.duration > 0) {
+      const payload = {
+        secondsLoaded: this.audio.buffered.end(0),
+        duration: this.duration,
+        fileName: this.fileName
+      }
+      Log.trigger('audioNode:whileLoading', payload)
+
+      // this is Track's whileLoading
+      // This is set on play(), so a preloaded track won't have it
+      if (this.whileLoadingCallback) {
+        this.whileLoadingCallback(payload)
+      }
+    }
   }
 
   whilePlaying() {
-    // Updating the src seems to fire ontimeupdate and we ignore it to avoid
+    // Updating src seems to fire ontimeupdate and we ignore it to avoid
     // triggering the event for tracks that actually aren't playing
     if (this.audio.currentTime === 0) return
 
-    if (this.whilePlayingCallback) {
-      Log.trigger("audioNode:whilePlaying", {
-        currentTime: this.audio.currentTime,
-        fileName: this.fileName
-      })
+    Log.trigger("audioNode:whilePlaying", {
+      currentTime: this.audio.currentTime,
+      fileName: this.fileName
+    })
 
+    if (this.whilePlayingCallback) {
       this.whilePlayingCallback({
         currentTime: this.audio.currentTime,
         fileName: this.fileName
@@ -126,6 +140,7 @@ export default class AudioNode {
     }
   }
 
+  // https://dev.w3.org/html5/spec-author-view/spec.html#mediaerror
   onError(e) {
     if (this.onErrorCallback) {
       this.onErrorCallback({
@@ -139,11 +154,11 @@ export default class AudioNode {
     })
   }
 
-  async play(whilePlayingCallback, onErrorCallback, firedFromUserInteraction=false) {
+  async play(whileLoadingCallback, whilePlayingCallback, onErrorCallback, firedFromUserInteraction=false) {
     Log.trigger("audioNode:play")
     this.unlockedDirectlyViaUserInteraction = firedFromUserInteraction
 
-    // This callback ideally only fires when we are actually playing, not unlocking
+    this.whileLoadingCallback = whileLoadingCallback
     this.whilePlayingCallback = whilePlayingCallback
     this.onErrorCallback = onErrorCallback
     return this.audio.play()
@@ -163,7 +178,7 @@ export default class AudioNode {
 
   loaded() {
     this.isLoaded = true
-    // don't care about notifying on the blank mp3 loading since it's local
+    // don't care about notifying on the blank mp3 loading since it's internal
     if (!this.blank) {
       Log.trigger("audioNode:loaded", {
         fileName: this.fileName

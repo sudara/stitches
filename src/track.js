@@ -7,9 +7,11 @@ export default class Track {
     pool,
     setCurrentTrack,
     playButtonSelector,
-    progressSelector,
+    loadingProgressSelector,
+    playProgressSelector,
     seekSelector,
     timeSelector,
+    whileLoading,
     whilePlaying,
     onError
   }) {
@@ -18,7 +20,8 @@ export default class Track {
     this.element = element
     this.playButtonElement = element.querySelector(playButtonSelector)
     this.url = this.playButtonElement.href
-    this.progressElement = element.querySelector(progressSelector)
+    this.loadingProgressElement = element.querySelector(loadingProgressSelector)
+    this.playProgressElement = element.querySelector(playProgressSelector)
     this.seekElement = element.querySelector(seekSelector)
     this.timeElement = element.querySelector(timeSelector)
     this.playlistSetCurrentTrack = setCurrentTrack
@@ -28,7 +31,8 @@ export default class Track {
     this.timeFromEnd = NaN
     this.wasClicked = false
     this.paused = true
-    this.displayPauseButton = false
+    this.displayingPauseButton = false
+    this.whileLoadingCallback = whileLoading
     this.whilePlayingCallback = whilePlaying
     this.onErrorCallback = onError
     this.playButtonElement.addEventListener("click", this.togglePlay.bind(this), true)
@@ -80,7 +84,12 @@ export default class Track {
         this.audioNode.src = this.url
       }
 
-      this.audioNode.play(this.whilePlaying.bind(this), this.onErrorCallback, this.wasClicked)
+      // we are binding Track's methods to audioNode's callbacks
+      this.audioNode.play(this.whileLoading.bind(this),
+        this.whilePlaying.bind(this),
+        this.onErrorCallback,
+        this.wasClicked)
+
       if (!this.poolAllUnlocked) this.pool.unlockAllAudioNodes()
 
       // TODO: this needs to happen via callbacks
@@ -114,6 +123,19 @@ export default class Track {
     }
   }
 
+  whileLoading(data) {
+    const position = data.secondsLoaded / data.duration
+    if (this.loadingProgressElement) {
+      if (this.loadingProgressElement.nodeName === "PROGRESS")
+        this.loadingProgressElement.value = position
+      else
+        this.loadingProgressElement.style.width = `${position * 100}%`
+    }
+    if (typeof this.whileLoadingCallback === "function") {
+      this.whileLoadingCallback(data)
+    }
+  }
+
   whilePlaying(data) {
     if (!this.playingEventDispatched) {
       this.log("track:playing")
@@ -139,17 +161,17 @@ export default class Track {
       this.log("track:preloadNextTrack")
     }
 
-    if (this.progressElement && !Number.isNaN(this.position)) {
-      if (this.progressElement.nodeName === "PROGRESS")
-        this.progressElement.value = this.position
+    if (this.playProgressElement && !Number.isNaN(this.position)) {
+      if (this.playProgressElement.nodeName === "PROGRESS")
+        this.playProgressElement.value = this.position
       else
-        this.progressElement.style.width = `${this.position * 100}%`
+        this.playProgressElement.style.width = `${this.position * 100}%`
     }
 
-    if (!this.displayPauseButton) {
+    if (!this.displayingPauseButton) {
       this.element.classList.remove("stitches-loading")
       this.element.classList.add("stitches-playing")
-      this.displayPauseButton = true
+      this.displayingPauseButton = true
     }
 
     if (typeof this.whilePlayingCallback === "function") {
@@ -191,7 +213,7 @@ export default class Track {
   pause() {
     this.audioNode.pause()
     this.paused = true
-    this.displayPauseButton = false
+    this.displayingPauseButton = false
     this.log("track:pause")
   }
 
@@ -216,7 +238,7 @@ export default class Track {
         this.updatePosition.bind(this)
       )
     } else {
-      Log.trigger("setup:noseek")
+      this.log("warning:noSeekElement")
     }
   }
 
