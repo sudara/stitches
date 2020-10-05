@@ -3,7 +3,10 @@ import Log from "./log.js"
 import Track from "./track.js"
 import NodePool from "./node_pool.js"
 
+const pool = new NodePool(2)
+
 export default class Playlist {
+
   constructor(options) {
     const {
       preloadIndex = -1,
@@ -19,7 +22,9 @@ export default class Playlist {
     } = options
     this.currentTrack = null
     const elements = document.querySelectorAll(tracksSelector)
-    const pool = new NodePool(2)
+    if(!elements.length) {
+      Log.trigger("tracksSelector not specified or contains no elements")
+    }
     this.tracks = [...elements].map(
       el =>
         new Track({
@@ -42,6 +47,13 @@ export default class Playlist {
       this.preloadNextTrack.bind(this)
     )
     Log.logToConsole(logToConsole);
+  }
+
+
+  reset() {
+    if (this.currentTrack) {
+      this.currentTrack.pause()
+    }
   }
 
   nextTrack() {

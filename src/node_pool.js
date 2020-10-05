@@ -12,29 +12,24 @@ export default class NodePool {
     this.audioNodes = Array.from({ length: size }, () => new AudioNode())
   }
 
-  makePreloadingNode(src, cleanupCallback) {
-    const preloader = new AudioNode(src)
-    preloader.cleanupCallback = cleanupCallback
-    // When we grab nodes we want to grab the preloaded one last
-    // so the data that has been preloaded has value for longer
-    this.audioNodes.push(preloader)
-    return preloader
-  }
-
   // has Last in Last out behaviour e.g. [a, b, c] -> [b, c, a]
-  async nextAvailableNode(cleanupCallback) {
+  async nextAvailableNode(cleanupCallback, preload=false) {
+
+    // grab the first track in line
     const audioNode = this.audioNodes.shift()
 
-    // run the cleanup callback to cleanup the previous track
+    // run the cleanup callback on it, breaking any relationship with a Track
     if (typeof audioNode.cleanupCallback === "function")
       audioNode.cleanupCallback()
 
-    // attach the cleanup callback for the new track
+    // attach a fresh cleanup callback for next time
     audioNode.cleanupCallback = cleanupCallback
+
+    // Move the node to the end of the line so it's least likely to get grabbed
     this.audioNodes.push(audioNode)
 
     // fires on documunt interaction
-    Log.trigger("nodepool:availablenode")
+    Log.trigger("nodepool:availableNode")
     return audioNode
   }
 
@@ -44,7 +39,7 @@ export default class NodePool {
   //     once: true
   //   })
   async unlockAllAudioNodes() {
-    Log.trigger("nodepool:unlockall")
+    Log.trigger("nodepool:unlockAll")
     for (const audioNode of this.audioNodes) {
       audioNode.unlock()
     }

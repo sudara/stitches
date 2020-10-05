@@ -6,6 +6,10 @@ export default class Log {
     logToConsole = newValue
   }
 
+  static warn(message) {
+    console.warn(message)
+  }
+
   static trigger(scope, detail, dispatcher=document) {
     const message = `${performance.now().toFixed(1)} ms: ${scope}`
 

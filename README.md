@@ -147,6 +147,10 @@ This fires as soon as `play()` has been called on a track.
 
 It does not mean the track is playing, only that play has been called.
 
+### `track:pause`
+
+Fires when `pause()` is called.
+
 ### `track:loading`
 
 An `AudioNode` was assigned for the track and it has been told to play the appropriate url.

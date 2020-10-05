@@ -49,12 +49,8 @@ export default class Track {
 
   async preload() {
     // grab node from list
-    // make sure this one is last to be unlocked
     this.log("track:preload")
-    this.audioNode = this.pool.makePreloadingNode(
-      this.url,
-      this.cleanupAudioNode.bind(this)
-    )
+    await this.load()
   }
 
   async grabNode() {
@@ -134,7 +130,6 @@ export default class Track {
   whilePlaying(data) {
     if (!this.playingEventDispatched) {
       this.log("track:playing")
-      this.updateLoadingProgressElement(1.0)
       this.playingEventDispatched = true
     }
 
