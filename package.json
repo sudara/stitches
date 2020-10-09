@@ -1,5 +1,5 @@
 {
-  "name": "stitches6",
+  "name": "@alonetone/stitches",
   "version": "2.0.0",
   "description": "Stitching Together MP3 Playback in HTML5 Audio with ES6",
   "main": "index.js",
@@ -10,7 +10,10 @@
     "stop": "pkill -f http-server",
     "browserstack": "npm start && node browserstack.runner.js --suiteRetries 2 -c nightwatch-browserstack.conf.js -e safari12,safari13,chrome,chromeMac,firefox,firefoxMac,edge,iphoneXS,ios13,ios14,pixel,galaxys9,ucbrowser; npm stop"
   },
-  "repository": "git+https://github.com/sudara/stitches.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sudara/stitches.git"
+  },
   "keywords": [
     "mp3",
     "html5",
@@ -40,5 +43,5 @@
   },
   "prettier": {
     "semi": false
-  }
+  },
 }
