@@ -1,20 +1,21 @@
-let logToConsole = false
+let enableConsoleLogging = false
 
 export default class Log {
 
-  static logToConsole(newValue) {
-    logToConsole = newValue
-  }
-
-  static warn(message) {
-    console.warn(message)
+  static enableConsoleLogging(newValue) {
+    enableConsoleLogging = newValue
   }
 
   static trigger(scope, detail, dispatcher=document) {
     const message = `${performance.now().toFixed(1)} ms: ${scope}`
 
     /* eslint-disable no-console */
-    if (this.logToConsole) console.log(message, detail, dispatcher )
+    if (this.enableConsoleLogging) {
+      const whatToLog = [message]
+      if (detail !== undefined) whatToLog.push(detail)
+      if (dispatcher !== document) whatToLog.push(dispatcher)
+      console.log(...whatToLog)
+    }
     /* eslint-disable */
 
     this.appendToElement(message, detail)

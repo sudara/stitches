@@ -67,6 +67,11 @@ export default class Track {
   // https://developers.google.com/web/updates/2016/03/play-returns-promise
   async play() {
     this.log("track:play")
+
+    // this helps us fire the track:playing event
+    // the first time that whileLoading is called
+    this.playingEventDispatched = false
+
     try {
       if (this.audioNode) {
         // No need to check for unlocked audio nodes, since hasEnded means the audio node have been unlocked before
@@ -81,7 +86,7 @@ export default class Track {
       }
 
       // we are binding Track's methods to audioNode's callbacks
-      this.audioNode.play(this.whileLoading.bind(this),
+      await this.audioNode.play(this.whileLoading.bind(this),
         this.whilePlaying.bind(this),
         this.onErrorCallback,
         this.wasClicked)
@@ -128,18 +133,29 @@ export default class Track {
   }
 
   whilePlaying(data) {
-    if (!this.playingEventDispatched) {
-      this.log("track:playing")
-      this.playingEventDispatched = true
-    }
-
     this.time = data.currentTime
-    if (this.timeElement) {
-      this.timeElement.innerText = this.formattedTime()
+    this.position = data.currentTime / data.duration
+    this.timeFromEnd = data.duration - this.time
+
+    const payload = {
+      duration: data.duration,
+      currentTime: this.formattedTime(),
+      timeFromEnd: this.timeFromEnd,
+      percentPlayed: this.position,
+      fileName: this.url
     }
 
-    this.position = data.currentTime / this.audioNode.duration
-    this.timeFromEnd = this.audioNode.duration - this.time
+    // this ensures track:playing always fires first
+    if (!this.playingEventDispatched) {
+      this.log("track:playing", payload)
+      this.playingEventDispatched = true
+    } else {
+      this.log("track:whilePlaying", payload)
+    }
+
+    if (this.timeElement) {
+      this.timeElement.innerText = payload.currentTime
+    }
 
     if (!this.hasEnded && this.timeFromEnd < 0.2) {
       this.hasEnded = true
@@ -166,21 +182,26 @@ export default class Track {
     }
 
     if (typeof this.whilePlayingCallback === "function") {
-      this.whilePlayingCallback({
-        time: this.time,
-        timeFromEnd: this.timeFromEnd,
-        percentPlayed: this.position,
-        fileName: this.url
-      })
+      this.whilePlayingCallback(payload)
     }
   }
 
-  async updatePosition(evt) {
+  async updatePosition(event) {
+
     this.wasClicked = true // This lets us shortcut unlockAll for this particular track
-    const offset =
-      evt.clientX - this.seekElement.getBoundingClientRect().left
-    const newPosition = offset / this.seekElement.offsetWidth
+
+    let newPosition
+
+    // if we weren't playing before, now is the time
     await this.playlistSetCurrentTrack(this)
+
+    // this is a custom event, we are getting the position
+    if (event.detail.position) {
+      newPosition = event.detail.position
+    } else if(this.seekElement) {
+      const offset = event.clientX - this.seekElement.getBoundingClientRect().left
+      newPosition = offset / this.seekElement.offsetWidth
+    }
     this.seek(newPosition)
   }
 
@@ -223,18 +244,18 @@ export default class Track {
   }
 
   addSeekListener() {
+    // allow an external source to seek our track via this event
+    this.element.addEventListener("track:seek", this.updatePosition.bind(this))
+
     if (this.seekElement) {
-      this.seekElement.addEventListener(
-        "click",
-        this.updatePosition.bind(this)
-      )
+      this.seekElement.addEventListener("click", this.updatePosition.bind(this))
     } else {
       this.log("warning:noSeekElement")
     }
   }
 
   // just keeps the logging a bit cleaner in the rest of the class
-  log(event, options={}) {
+  log(event, options = {}) {
     Log.trigger(event, Object.assign(options, { fileName: this.url, id: this.id }), this.element)
   }
 

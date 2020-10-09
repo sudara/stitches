@@ -10,18 +10,31 @@ To distill and codify 13+ years experience of building dozens of web music playe
 
 ## Features
 
-Stitches...
-
 * Is written in ES6+
 * Deals with "unlocking" audio elements from their auto-play restrictions to enable playlist playback
 * Completely ignores the Web Audio API (which doesn't allow buffering, therefore useless for music playback)
 * Only handles the MP3 format (pragmatically, the only format that matters)
 * Lets you decide if you want to babel things or just include in a `<script type=module>`
 * Is defensive, but doesn't test for browsers or feature detect
-* Assumes you have a playlist
-* Assumes you might want to preload one of the tracks
-* Assumes you want to have continuous playback of a playlist (preloads next tracks)
-* Assumes you care as much about mobile as you do desktop
+* Aims to perform well by doing the minimum amount of work necessary
+
+## Assumptions
+
+This is what stitches assumes your default case is:
+
+
+* You have at least one playlist (you can have more than one on a page)
+* You might want to preload one of the tracks
+* You'd love to have continuous playback within a playlist (preload upcoming tracks)
+* You care as much about mobile as you do desktop
+* You might have a SPA or a Rails turbolinks app and don't want to create and destroy `<audio>` tags willy nilly but instead reuse them.
+
+
+## Things stitches doesn't do (yet?)
+
+* Provide support for a global player
+* Deal with volume
+* Spport any other format than mp3 (might work, might not, who knows)
 
 ## We worked hard so you don't have to
 
@@ -125,7 +138,7 @@ Good for registering error notification such as Bugsnag, etc.
 
 Returns an attribute named `error` which contains a `name` and a `message` as [described in the standard](https://dev.w3.org/html5/spec-author-view/spec.html#mediaerror).
 
-### `logToConsole = false`
+### `enableConsoleLogging = false`
 
 Optional. Defaults to false, keeping the console nice and clear.
 
@@ -162,7 +175,9 @@ This will be fired if the attempt to grab an `AudioNode` fails.
 
 ### `track:playing`
 
-This is fired once as soon as we know for sure the track is actually producing audio and happily playing.
+This is fired as soon as we know for sure the track is actually producing audio and happily playing.
+
+It fires on every transition from a stopped or paused state to a playing one.
 
 ### `track:whilePlaying`
 

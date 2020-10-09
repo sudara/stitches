@@ -19,7 +19,7 @@ export default class AudioNode {
     this.audio.ontimeupdate = this.whilePlaying.bind(this)
     this.audio.oncanplaythrough = this.loaded.bind(this)
     this.audio.onloadeddata = this.onloading.bind(this)
-    this.audio.onerror = this.onError
+    this.audio.onerror = this.onError.bind(this)
     this.audio.preload = preloadSrc ? "auto" : "none"
     this.src = preloadSrc || blankMP3
     this.unlockedDirectlyViaUserInteraction = false
@@ -111,7 +111,7 @@ export default class AudioNode {
 
   // https://developer.mozilla.org/en-US/docs/Web/Guide/Audio_and_video_delivery/buffering_seeking_time_ranges
   whileLoading() {
-    // we can't do much with loading info until we have metadata
+    // we can't do much until we have metadata like duration
     if (!this.duration) return
 
     const secondsLoaded = this.audio.buffered.end(0)
@@ -145,14 +145,10 @@ export default class AudioNode {
     // triggering the event for tracks that actually aren't playing
     if (this.audio.currentTime === 0) return
 
-    Log.trigger("audioNode:whilePlaying", {
-      currentTime: this.audio.currentTime,
-      fileName: this.fileName
-    })
-
     if (this.whilePlayingCallback) {
       this.whilePlayingCallback({
         currentTime: this.audio.currentTime,
+        duration: this.duration,
         fileName: this.fileName
       })
     }
@@ -167,7 +163,7 @@ export default class AudioNode {
       })
     }
     Log.trigger("audioNode:onError", {
-      name: e.name,
+      fileName: this.fileName,
       message: e.message
     })
   }
