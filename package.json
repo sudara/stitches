@@ -14,6 +14,12 @@
     "type": "git",
     "url": "git+https://github.com/sudara/stitches.git"
   },
+  "files": [
+    "src/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "mp3",
     "html5",

@@ -86,7 +86,7 @@ export default class Track {
       }
 
       // we are binding Track's methods to audioNode's callbacks
-      await this.audioNode.play(this.whileLoading.bind(this),
+      this.audioNode.play(this.whileLoading.bind(this),
         this.whilePlaying.bind(this),
         this.onErrorCallback,
         this.wasClicked)
