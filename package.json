@@ -2,7 +2,7 @@
   "name": "@alonetone/stitches",
   "version": "2.0.0",
   "description": "Stitching Together MP3 Playback in HTML5 Audio with ES6",
-  "main": "index.js",
+  "main": "src/playlist.js",
   "scripts": {
     "start": "http-server -s c-1 . & ",
     "test": "npm start && nightwatch -c nightwatch-local.conf.json; npm stop",
