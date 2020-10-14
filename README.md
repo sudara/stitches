@@ -253,6 +253,14 @@ You can run tests locally with:
 
 This will run tests against headless chrome as configured in `nightwatch-local.conf.json`.
 
+### Run a single test
+
+```sh
+yarn start
+yarn test:single --test tests/suites/03_playlist.js
+```
+
+
 ### Browserstack
 
 ![Sessions Overview - BrowserStack Automate 2020-02-27 00-57-41](https://user-images.githubusercontent.com/472/75399491-9ef3c480-58fc-11ea-802a-301012d23aff.jpg)

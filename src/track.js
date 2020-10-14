@@ -146,12 +146,14 @@ export default class Track {
     this.position = data.currentTime / data.duration
     this.timeFromEnd = data.duration - this.time
 
+    // Achtung, the order of these are important for tests!
     const payload = {
+      time: this.time,
+      fileName: data.fileName,
       duration: data.duration,
-      currentTime: this.formattedTime(),
       timeFromEnd: this.timeFromEnd,
       percentPlayed: this.position,
-      fileName: this.url
+      currentTime: this.formattedTime(),
     }
 
     // this ensures track:playing always fires first
@@ -270,7 +272,7 @@ export default class Track {
 
   // just keeps the logging a bit cleaner in the rest of the class
   log(event, options = {}) {
-    Log.trigger(event, Object.assign(options, { fileName: this.url, id: this.id }), this.element)
+    Log.trigger(event, Object.assign(options, { id: this.id }), this.element)
   }
 
   updateLoadingProgressElement(position) {
