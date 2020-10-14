@@ -53,11 +53,25 @@ export default class Track {
     await this.load()
   }
 
+  // grabbing a new node automatically results in position 0 for it and no seek(0) is needed
+  // TODO: set the old position if it was partially played https://github.com/sudara/stitchES/issues/34
   async grabNode() {
     this.log("track:grabNodeAndSetSrc")
-    this.audioNode = await this.pool.nextAvailableNode(
-      this.cleanupAudioNode.bind(this)
-    )
+
+    if (this.audioNode) {
+      // No need to check for unlocked audio nodes,
+      // since hasEnded means the audio node have been unlocked before
+      if (this.hasEnded) {
+        this.seek(0)
+      }
+    } else {
+      // grabbing a new node automatically results in position 0 for it and no seek(0) is needed
+      // TODO: set the old position if it was partially played https://github.com/sudara/stitchES/issues/34
+      this.audioNode = await this.pool.nextAvailableNode(
+        this.cleanupAudioNode.bind(this)
+      )
+    }
+    this.audioNode.src = this.url
   }
 
   cleanupAudioNode() {
@@ -73,25 +87,18 @@ export default class Track {
     this.playingEventDispatched = false
 
     try {
-      if (this.audioNode) {
-        // No need to check for unlocked audio nodes, since hasEnded means the audio node have been unlocked before
-        if (this.hasEnded) {
-          this.seek(0)
-        }
-      } else {
-        // grabbing a new node automatically results in position 0 for it and no seek(0) is needed
-        // TODO: set the old position if it was partially played https://github.com/sudara/stitchES/issues/34
-        await this.grabNode()
-        this.audioNode.src = this.url
-      }
+      await this.grabNode()
 
       // we are binding Track's methods to audioNode's callbacks
+      // Normally we'd want a "await" here, but it broke continuous playback on ios
+      // This means that errors from playback won't bubble up here
+      // And instead need to be caught inside AudioNode
       this.audioNode.play(this.whileLoading.bind(this),
         this.whilePlaying.bind(this),
-        this.onErrorCallback,
+        this.onError.bind(this),
         this.wasClicked)
 
-      if (!this.poolAllUnlocked) this.pool.unlockAllAudioNodes()
+      await this.pool.unlockAllAudioNodes()
 
       // TODO: this needs to happen via callbacks
       if (this.audioNode.isLoaded) {
@@ -111,19 +118,20 @@ export default class Track {
       this.paused = false
       this.log("track:loading")
     } catch (err) {
-      if (this.onErrorCallback) {
-        this.onErrorCallback({
-          fileName: this.fileName,
-          error: err
-        })
-      }
-      this.log("track:notPlaying", {
-        name: err.name,
-        message: err.message
-      })
+      this.onError(err)
     }
   }
 
+  // called from an audioNode
+  onError(data) {
+    // call the user supplied callback
+    if (this.onErrorCallback) {
+      this.onErrorCallback(data)
+    }
+    this.log("track:notPlaying", data)
+  }
+
+  // called from an audioNode
   whileLoading(data) {
     const position = data.secondsLoaded / data.duration
     this.updateLoadingProgressElement(position)
@@ -132,6 +140,7 @@ export default class Track {
     }
   }
 
+  // called from an audioNode
   whilePlaying(data) {
     this.time = data.currentTime
     this.position = data.currentTime / data.duration
@@ -193,7 +202,8 @@ export default class Track {
     let newPosition
 
     // if we weren't playing before, now is the time
-    await this.playlistSetCurrentTrack(this)
+    this.playlistSetCurrentTrack(this)
+    await this.play()
 
     // this is a custom event, we are getting the position
     if (event.detail.position) {
@@ -229,7 +239,8 @@ export default class Track {
     this.log("track:pause")
   }
 
-  // This is only called by the click handler
+  // This is called by the click handler
+  // And the event we are "riding" to unlock everything
   togglePlay(evt) {
     this.wasClicked = true // This lets us shortcut unlockAll for this particular track
     evt.preventDefault() // This will still bubble up to fire unlockAll from body
@@ -239,7 +250,10 @@ export default class Track {
       this.element.classList.remove("stitches-playing")
       this.element.classList.add("stitches-paused")
     } else {
+      // all exceptions are handled and caught in this.play()
+      // hence we don't need to await / try / catch
       this.playlistSetCurrentTrack(this)
+      this.play()
     }
   }
 

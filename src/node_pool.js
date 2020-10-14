@@ -39,6 +39,8 @@ export default class NodePool {
   //     once: true
   //   })
   async unlockAllAudioNodes() {
+    if (this.allUnlocked) return
+
     Log.trigger("nodepool:unlockAll")
     for (const audioNode of this.audioNodes) {
       audioNode.unlock()

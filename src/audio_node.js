@@ -156,16 +156,20 @@ export default class AudioNode {
 
   // https://dev.w3.org/html5/spec-author-view/spec.html#mediaerror
   onError(e) {
-    if (this.onErrorCallback) {
-      this.onErrorCallback({
-        fileName: this.fileName,
-        error: e
-      })
-    }
-    Log.trigger("audioNode:onError", {
+    if(e.target ) { e = e.target.error } // when e is an event
+    const codes = ['MEDIA_ERR_ABORTED', 'MEDIA_ERR_NETWORK',
+      'MEDIA_ERR_DECODE', 'MEDIA_ERR_SRC_NOT_SUPPORTED']
+    const payload = {
       fileName: this.fileName,
+      code: `${e.code}: ${codes[parseInt(e.code, 10) - 1]}`,
       message: e.message
-    })
+    }
+
+    // useful internally to make sure our error handling works
+    Log.trigger("audioNode:onError", payload)
+
+    // bubble this up to the Track in charge
+    this.onErrorCallback(payload)
   }
 
   async play(whileLoadingCallback, whilePlayingCallback, onErrorCallback, firedFromUserInteraction=false) {
@@ -175,7 +179,13 @@ export default class AudioNode {
     this.whileLoadingCallback = whileLoadingCallback
     this.whilePlayingCallback = whilePlayingCallback
     this.onErrorCallback = onErrorCallback
-    return this.audio.play()
+
+    // we need to resolrve this promise here
+    // as our caller (Track#play) cannot await our promise
+    // In the case of an error, the onError handler will handle it
+    try {
+      await this.audio.play()
+    } catch(e) { /* no-op */ }
   }
 
   pause() {

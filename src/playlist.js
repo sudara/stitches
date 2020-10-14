@@ -80,7 +80,6 @@ export default class Playlist {
       this.currentTrack.pause()
     }
     this.currentTrack = track
-    await this.currentTrack.play()
   }
 
   trackIsPartOfPlaylist(evt) {
