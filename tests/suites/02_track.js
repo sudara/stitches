@@ -48,6 +48,27 @@ module.exports = {
       .url(browser.launchUrl)
       .click("#track1 svg")
       .assert.timeUpdated("#track1time", "0:01")
+  },
+
+  "Seeking works and doesn't reload track": browser => {
+    browser
+      .url(browser.launchUrl)
+      .waitForElementPresent("body")
+      .click("#track1 svg") // play
+
+       // wait long enough for next track to start loading
+       // important because it fires src:changed
+       // which we are looking for later
+      .pause(500)
+      .click("#track1 svg") // pause
+      .cleanDebug()
+      .click("#track1progress") // seek
+      .assert.containsText('#debug', 'audioNode:seek')
+      .pause(50)
+      .assert.not.containsText('#debug', 'audioNode:srcchanged')
+      .assert.not.containsText('#debug', 'audioNode:whileLoading')
+      .click("#track1 svg") // pause
+      .assert.playing(2.0) // assumes test tracks are more than 4 seconds long
   }
 
 }

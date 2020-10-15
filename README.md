@@ -48,7 +48,7 @@ Unfortunately the state of HTML5 Audio support on browsers has not evolved much 
 
 ## Installation
 
-`yarn install stitches`
+`yarn add  @alonetone/stitches`
 
 ## Usage
 

@@ -58,7 +58,7 @@ export default class Track {
   async grabNode() {
     this.log("track:grabNodeAndSetSrc")
 
-    if (this.audioNode) {
+    if (this.audioNode !== null) {
       // No need to check for unlocked audio nodes,
       // since hasEnded means the audio node have been unlocked before
       if (this.hasEnded) {
@@ -70,8 +70,9 @@ export default class Track {
       this.audioNode = await this.pool.nextAvailableNode(
         this.cleanupAudioNode.bind(this)
       )
+      this.audioNode.src = this.url
+      this.log("track:loading")
     }
-    this.audioNode.src = this.url
   }
 
   cleanupAudioNode() {
@@ -113,10 +114,8 @@ export default class Track {
       if (this.timeElement) {
         this.timeElement.innerText = this.formattedTime()
       }
-
       this.hasEnded = false
       this.paused = false
-      this.log("track:loading")
     } catch (err) {
       this.onError(err)
     }

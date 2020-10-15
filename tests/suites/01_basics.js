@@ -37,14 +37,16 @@ module.exports = {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent("#debug")
-      .click("#track2 svg")
-      .assert.playing()
-      .click("#track2 svg")
+      .click("#track2 svg") // play
+      .assert.playing(0.4) // verify it played through 400ms
+      .click("#track2 svg") // pause
       .assert.containsText("#debug", "track:pause")
       .cleanDebug()
       .assert.not.containsText("#debug", "whilePlaying")
-      .click("#track2 svg")
-      .assert.playing(1)
+      .click("#track2 svg") // play
+      .pause(250)
+      .click("#track2 svg") // pause
+      .assert.playing(0.5) // verify it resumed, not restarted at 0.00
   }
 
 }
