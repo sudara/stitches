@@ -135,8 +135,8 @@ export default class AudioNode {
     Log.trigger('audioNode:whileLoading', payload)
 
     // this is Track's whileLoading
-    // This is set on play(), so a preloaded track won't have it
-    this.whileLoadingCallback(payload)
+    // We don't want it to fire on blank mp3, etc
+    if (this.whileLoadingCallback) this.whileLoadingCallback(payload)
 
     // some browsers (FF 81) don't fire a last whileLoading
     // lets give them a helping hand
