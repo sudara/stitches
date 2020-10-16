@@ -178,11 +178,10 @@ export default class AudioNode {
     this.onErrorCallback(payload)
   }
 
-  async play(whileLoadingCallback, whilePlayingCallback, onErrorCallback, firedFromUserInteraction=false) {
+  async play(whilePlayingCallback, onErrorCallback, firedFromUserInteraction=false) {
     Log.trigger("audioNode:play")
     this.unlockedDirectlyViaUserInteraction = firedFromUserInteraction
 
-    this.whileLoadingCallback = whileLoadingCallback
     this.whilePlayingCallback = whilePlayingCallback
     this.onErrorCallback = onErrorCallback
 
@@ -212,6 +211,7 @@ export default class AudioNode {
     this.isLoaded = true
     // don't care about notifying on the blank mp3 loading since it's internal
     if (!this.blank) {
+      this.whileLoading()
       Log.trigger("audioNode:loaded", {
         fileName: this.fileName
       })

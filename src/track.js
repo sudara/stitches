@@ -56,8 +56,6 @@ export default class Track {
   // grabbing a new node automatically results in position 0 for it and no seek(0) is needed
   // TODO: set the old position if it was partially played https://github.com/sudara/stitchES/issues/34
   async grabNode() {
-    this.log("track:grabNodeAndSetSrc")
-
     if (this.audioNode !== null) {
       // No need to check for unlocked audio nodes,
       // since hasEnded means the audio node have been unlocked before
@@ -67,10 +65,13 @@ export default class Track {
     } else {
       // grabbing a new node automatically results in position 0 for it and no seek(0) is needed
       // TODO: set the old position if it was partially played https://github.com/sudara/stitchES/issues/34
+      this.log("track:grabNodeAndSetSrc")
+
       this.audioNode = await this.pool.nextAvailableNode(
         this.cleanupAudioNode.bind(this)
       )
       this.audioNode.src = this.url
+      this.audioNode.whileLoadingCallback = this.whileLoading.bind(this)
       this.log("track:loading")
     }
   }
@@ -94,8 +95,7 @@ export default class Track {
       // Normally we'd want a "await" here, but it broke continuous playback on ios
       // This means that errors from playback won't bubble up here
       // And instead need to be caught inside AudioNode
-      this.audioNode.play(this.whileLoading.bind(this),
-        this.whilePlaying.bind(this),
+      this.audioNode.play(this.whilePlaying.bind(this),
         this.onError.bind(this),
         this.wasClicked)
 
@@ -156,8 +156,12 @@ export default class Track {
       currentTime: this.formattedTime(),
     }
 
-    // this ensures track:playing always fires first
+    // ensures track:playing always fires before whilePlaying
     if (!this.playingEventDispatched) {
+      // manually fire one last whileLoading
+      // as browsers are a bit inconsistent about this
+      // and we'd like to always see the full loading progress
+      this.audioNode.whileLoading()
       this.log("track:playing", payload)
       this.playingEventDispatched = true
     } else {
@@ -205,7 +209,7 @@ export default class Track {
 
     // if we weren't playing before, now is the time
     this.playlistSetCurrentTrack(this)
-    await this.play()
+    if(this.paused) await this.play()
 
     // this is a custom event, we are getting the position
     if (event.detail.position) {

@@ -64,8 +64,9 @@ module.exports = {
       .pause(500)
       .click("#track1 svg") // pause
       .cleanDebug()
-      .click("#track1progress") // seek
+      .click("#track1progress") // seek (and start play)
       .assert.containsText('#debug', 'audioNode:seek')
+      .assert.containsText('#debug', 'track:playing')
 
       // stop playing right after seek
       // this is important because we want to assert we seeked
@@ -75,6 +76,15 @@ module.exports = {
       .assert.not.containsText('#debug', 'audioNode:whileLoading')
       .click("#track1 svg") // pause
       .assert.playing(2.0) // assumes test tracks are more than 4 seconds long
-  }
 
+      // Verify that seeking while playing doesn't trigger the "play" callback
+      .click("#track1 svg") // play
+      .assert.containsText('#debug', 'track:playing')
+      .cleanDebug()
+      .click("#track1progress") // seek
+      .pause(50)
+      .click("#track1 svg") // pause
+      .assert.containsText('#debug', 'audioNode:seek')
+      //.assert.not.containsText('#debug', 'track:playing')
+  }
 }
