@@ -59,11 +59,17 @@ module.exports = {
        // wait long enough for next track to start loading
        // important because it fires src:changed
        // which we are looking for later
+      .assert.containsText('#debug', 'audioNode:srcchanged - short-continuous-2.mp3')
+      .assert.containsText('#debug', 'audioNode:whileLoading')
       .pause(500)
       .click("#track1 svg") // pause
       .cleanDebug()
       .click("#track1progress") // seek
       .assert.containsText('#debug', 'audioNode:seek')
+
+      // stop playing right after seek
+      // this is important because we want to assert we seeked
+      // into the track vs. just played it longer
       .pause(50)
       .assert.not.containsText('#debug', 'audioNode:srcchanged')
       .assert.not.containsText('#debug', 'audioNode:whileLoading')
