@@ -137,6 +137,7 @@ export default class Track {
     if (typeof this.whileLoadingCallback === "function") {
       this.whileLoadingCallback(data)
     }
+    this.log("track:whileLoading", data)
   }
 
   // called from an audioNode

@@ -114,7 +114,15 @@ export default class AudioNode {
     // we can't do much until we have metadata like duration
     if (!this.duration) return
 
-    const secondsLoaded = this.audio.buffered.end(0)
+    // When the audio element is not ready in safari
+    // we sometimes see the following error
+    // IndexSizeError: The index is not in the allowed range.
+    let secondsLoaded = 0
+    try {
+      secondsLoaded = this.audio.buffered.end(0)
+    } catch {
+      Log.trigger('audioNode:indexSizeError')
+    }
 
     // we don't want to fire on pointless / duplicate events
     if (secondsLoaded <= this.lastSecondsLoaded) return
@@ -128,9 +136,7 @@ export default class AudioNode {
 
     // this is Track's whileLoading
     // This is set on play(), so a preloaded track won't have it
-    if (this.whileLoadingCallback) {
-      this.whileLoadingCallback(payload)
-    }
+    this.whileLoadingCallback(payload)
 
     // some browsers (FF 81) don't fire a last whileLoading
     // lets give them a helping hand
