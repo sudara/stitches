@@ -1,12 +1,14 @@
 const timeUpdated = function (element, toString) {
-  this.message = `Testing if time was updated to ${toString}`
+  this.message = `Testing if time went past ${toString}`
 
   this.expected = () => {
     return toString; // what the assertion is tested against
   }
 
   this.pass = (value) => {
-    return value === toString;
+    // value is in clock format like: 0:01
+    // We want to make sure it's at least passed 0:01
+    return parseInt(value.substr(-2), 10) >= parseInt(toString.substr(-2), 10)
   }
 
   this.value = (result) => {

@@ -40,7 +40,7 @@ module.exports = {
     browser
       .url(browser.launchUrl)
       .click("#track1 svg")
-      .assert.timeUpdated("#track1time", "0:00")
+      .assert.containsText("#track1time", "0:00")
   },
 
   "The time updates during playback": browser => {
