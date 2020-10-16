@@ -21,7 +21,7 @@ module.exports = {
       .assert.containsText("#debug", "nodepool:create")
       .assert.containsText("#debug", "audioNode:alreadyUnlockedDirectly")
       .assert.playing()
-      .assert.progressBarMoved("#track1progress")
+
   },
 
   "Clicking play on a non-preloaded track starts audio": browser => {
@@ -45,6 +45,7 @@ module.exports = {
       .assert.not.containsText("#debug", "whilePlaying")
       .click("#track2 svg") // play
       .pause(250)
+      .assert.not.containsText("#debug", "track:pause") // shouldn't have fired yet
       .click("#track2 svg") // pause
       .assert.playing(0.5) // verify it resumed, not restarted at 0.00
   }

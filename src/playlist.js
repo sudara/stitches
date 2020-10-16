@@ -76,7 +76,7 @@ export default class Playlist {
   }
 
   async setCurrentTrack(track) {
-    if (this.currentTrack) {
+    if (this.currentTrack && (this.currentTrack !== track)) {
       this.currentTrack.pause()
     }
     this.currentTrack = track
