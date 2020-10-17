@@ -148,6 +148,13 @@ This is also exposed a static setter `Log.logToConsole` in case there's a need f
 
 This events API is based on what an app would ideally wan't from a player and not necessarily [the dumpster fire that is HTML5 audio events](https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events).
 
+Stitches will respond to the following event firing:
+
+### `track:seek`
+
+This will seek the track to the `position` supplied in the event detail.
+
+
 The following events fire:
 
 ### `track:preload`
@@ -179,6 +186,8 @@ This is fired as soon as we know for sure the track is actually producing audio 
 
 It fires on every transition from a stopped or paused state to a playing one.
 
+Note: it does not fire after seeking if seeking occurred while track was already playing.
+
 ### `track:whilePlaying`
 
 This is *repeatedly* called, a few times a second, while a track is actively producing audio.
@@ -186,6 +195,11 @@ This is *repeatedly* called, a few times a second, while a track is actively pro
 ### `track:ended`
 
 This is called when a track is finished. It does not rely on the somewhat sketchy nature of `<audio>` tag events fired from the browser, it will fire approximately 200ms near the end of the track.
+
+### `track:seeked`
+
+This is called after a track has successfully seeked and is playing again. Note that `track:playing` will not call after seek unless the track was stopped at the point of seeking.
+
 
 ## Why do we need this library?
 

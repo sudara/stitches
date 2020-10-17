@@ -25,6 +25,7 @@ export default class AudioNode {
     this.unlockedDirectlyViaUserInteraction = false
     this.reset()
     this.isLoading = Boolean(preloadSrc)
+    this.seeked = false
   }
 
   get blank() {
@@ -60,8 +61,8 @@ export default class AudioNode {
       // eslint-disable-next-line no-await-in-loop
       await new Promise(resolve => setTimeout(resolve, 20))
     }
-    Log.trigger(this.audio.duration)
-    Log.trigger("audioNode:seek", {
+    this.seeked = true
+    Log.trigger("audioNode:seeked", {
       position,
       fileName: this.fileName
     })
@@ -151,6 +152,12 @@ export default class AudioNode {
     // triggering the event for tracks that actually aren't playing
     if (this.audio.currentTime === 0) return
 
+    if (this.seeked) {
+      this.seeked = false
+      if (this.onSeekCallback) this.onSeekCallback()
+
+    }
+
     if (this.whilePlayingCallback) {
       this.whilePlayingCallback({
         currentTime: this.audio.currentTime,
@@ -178,12 +185,13 @@ export default class AudioNode {
     this.onErrorCallback(payload)
   }
 
-  async play(whilePlayingCallback, onErrorCallback, firedFromUserInteraction=false) {
+  async play(whilePlayingCallback, onErrorCallback, onSeekCallback, firedFromUserInteraction=false) {
     Log.trigger("audioNode:play")
     this.unlockedDirectlyViaUserInteraction = firedFromUserInteraction
 
     this.whilePlayingCallback = whilePlayingCallback
     this.onErrorCallback = onErrorCallback
+    this.onSeekCallback = onSeekCallback
 
     // we need to resolrve this promise here
     // as our caller (Track#play) cannot await our promise

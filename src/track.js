@@ -96,7 +96,7 @@ export default class Track {
       // This means that errors from playback won't bubble up here
       // And instead need to be caught inside AudioNode
       this.audioNode.play(this.whilePlaying.bind(this),
-        this.onError.bind(this),
+        this.onError.bind(this), this.onSeek.bind(this),
         this.wasClicked)
 
       await this.pool.unlockAllAudioNodes()
@@ -128,6 +128,11 @@ export default class Track {
       this.onErrorCallback(data)
     }
     this.log("track:notPlaying", data)
+  }
+
+  // called from an audioNode
+  onSeek() {
+    this.log("track:seeked")
   }
 
   // called from an audioNode
