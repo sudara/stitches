@@ -40,6 +40,11 @@ module.exports = {
     browser
       .url(browser.launchUrl)
       .click("#track1 svg")
+
+      // Some browsers take too long to run the next assertion
+      // So we must pause here so we don't drift into 0:01 etc
+      .pause(50)
+      .click("#track1 svg")
       .assert.containsText("#track1time", "0:00")
   },
 
