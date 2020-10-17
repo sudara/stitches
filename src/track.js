@@ -45,6 +45,7 @@ export default class Track {
     this.hasEnded = false
     this.preloadNextTrackDispatched = false
     this.playingEventDispatched = false
+    this.registerListenEventDispatched = false
   }
 
   async preload() {
@@ -171,6 +172,11 @@ export default class Track {
       this.playingEventDispatched = true
     } else {
       this.log("track:whilePlaying", payload)
+    }
+
+    if (!this.registerListenEventDispatched && (this.position > 0.15)) {
+      this.log("track:registerListen")
+      this.registerListenEventDispatched = true
     }
 
     if (this.timeElement) {

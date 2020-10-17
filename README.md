@@ -200,6 +200,10 @@ This is called when a track is finished. It does not rely on the somewhat sketch
 
 This is called after a track has successfully seeked and is playing again. Note that `track:playing` will not call after seek unless the track was stopped at the point of seeking.
 
+### `track:registerListen`
+
+After 15% of the track has been played, this fires. This is a good place to hook into for play stats.
+
 
 ## Why do we need this library?
 

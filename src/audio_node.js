@@ -51,6 +51,7 @@ export default class AudioNode {
     this.isLoaded = false
     this.isLoading = false
     this.lastSecondsLoaded = 0
+    this.lastSeeked = false
   }
 
   // position is a percentage
@@ -152,15 +153,25 @@ export default class AudioNode {
     // triggering the event for tracks that actually aren't playing
     if (this.audio.currentTime === 0) return
 
-    if (this.seeked) {
-      this.seeked = false
-      if (this.onSeekCallback) this.onSeekCallback()
+    const currentTime = this.audio.currentTime
 
+    // Seeking will fire the timeupdate event too
+    // and sometimes there can be up to 2-3 events before time is moving again
+    // but we don't want to fire whilePlaying, as we technically aren't playing
+    if (this.seeked)  {
+      if (this.lastSeeked) {
+        this.seeked = false
+        this.lastSeeked = false
+        if (this.onSeekCallback) this.onSeekCallback()
+      } else {
+        this.lastSeeked = true
+        return
+      }
     }
 
     if (this.whilePlayingCallback) {
       this.whilePlayingCallback({
-        currentTime: this.audio.currentTime,
+        currentTime,
         duration: this.duration,
         fileName: this.fileName
       })

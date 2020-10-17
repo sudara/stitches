@@ -43,7 +43,6 @@ module.exports = {
 
       // Some browsers take too long to run the next assertion
       // So we must pause here so we don't drift into 0:01 etc
-      .pause(50)
       .click("#track1 svg")
       .assert.containsText("#track1time", "0:00")
   },
@@ -94,5 +93,17 @@ module.exports = {
       .assert.containsText('#debug', 'audioNode:seeked')
       .assert.containsText('#debug', 'track:seeked')
       .assert.not.containsText('#debug', 'track:playing')
+  },
+
+  "A listen is registered after 15% of the track is complete": browser => {
+    browser
+      .url(browser.launchUrl)
+      .waitForElementPresent("body")
+      .click("#track1 svg") // play
+      .assert.containsText('#debug', 'track:playing')
+      .click("#track1 svg") // pause
+      .assert.not.containsText('#debug', 'track:registerListen')
+      .click("#track1 svg") // resume
+      .assert.containsText('#debug', 'track:registerListen')
   }
 }
