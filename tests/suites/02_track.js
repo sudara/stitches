@@ -74,7 +74,6 @@ module.exports = {
       // into the track vs. just played it through 2 seconds
       .click("#track1 svg") // pause
       .assert.containsText('#debug', 'audioNode:seeked')
-      .assert.containsText('#debug', 'track:seeked')
       .assert.containsText('#debug', 'track:playing')
       .assert.not.containsText('#debug', 'audioNode:srcchanged')
       .assert.not.containsText('#debug', 'audioNode:whileLoading')
@@ -95,13 +94,14 @@ module.exports = {
       .assert.not.containsText('#debug', 'track:playing')
   },
 
-  "A listen is registered after 15% of the track is complete": browser => {
+  "A listen is registered after 15 percent of the track is complete": browser => {
     browser
       .url(browser.launchUrl)
       .waitForElementPresent("body")
       .click("#track1 svg") // play
       .assert.containsText('#debug', 'track:playing')
       .click("#track1 svg") // pause
+      .assert.containsText('#debug', 'track:playing')
       .assert.not.containsText('#debug', 'track:registerListen')
       .click("#track1 svg") // resume
       .assert.containsText('#debug', 'track:registerListen')

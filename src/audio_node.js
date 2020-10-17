@@ -51,7 +51,7 @@ export default class AudioNode {
     this.isLoaded = false
     this.isLoading = false
     this.lastSecondsLoaded = 0
-    this.lastSeeked = false
+    this.lastSeeked = 0
   }
 
   // position is a percentage
@@ -155,16 +155,18 @@ export default class AudioNode {
 
     const currentTime = this.audio.currentTime
 
-    // Seeking will fire the timeupdate event too
-    // and sometimes there can be up to 2-3 events before time is moving again
-    // but we don't want to fire whilePlaying, as we technically aren't playing
+    // Seeking will fire the timeupdate event
+    // and sometimes there can be up to 2-3 events before time is moving again.
+    // In these cases, we don't want to fire whilePlaying, as we aren't playing.
+    // Warning: In some browsers, the event that fires on seek can have a different
+    // decimal precision to the next event, despite no time passing.
     if (this.seeked)  {
-      if (this.lastSeeked) {
-        this.seeked = false
-        this.lastSeeked = false
+      if ((this.lastSeeked > 0) && (this.lastSeeked !== currentTime.toFixed(3))) {
+      this.seeked = false
+        this.lastSeeked = 0.0
         if (this.onSeekCallback) this.onSeekCallback()
       } else {
-        this.lastSeeked = true
+        this.lastSeeked = currentTime.toFixed(3)
         return
       }
     }
