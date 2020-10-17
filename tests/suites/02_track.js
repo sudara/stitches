@@ -101,7 +101,6 @@ module.exports = {
       .click("#track1 svg") // play
       .assert.containsText('#debug', 'track:playing')
       .click("#track1 svg") // pause
-      .assert.containsText('#debug', 'track:playing')
       .assert.not.containsText('#debug', 'track:registerListen')
       .click("#track1 svg") // resume
       .assert.containsText('#debug', 'track:registerListen')
