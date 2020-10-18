@@ -99,10 +99,11 @@ module.exports = {
       .url(browser.launchUrl)
       .waitForElementPresent("body")
       .click("#track1 svg") // play
-      .assert.containsText('#debug', 'track:playing')
-      .click("#track1 svg") // pause
       .assert.not.containsText('#debug', 'track:registerListen')
-      .click("#track1 svg") // resume
+      .pause(1500)
+      .click("#track1 svg") // pause
+      // ideally we'd test this doesn't fire beforehand,
+      // but 15% of 4 seconds is very fast, so this was producing flakey tests
       .assert.containsText('#debug', 'track:registerListen')
   }
 }
