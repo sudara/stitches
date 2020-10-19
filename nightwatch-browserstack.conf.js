@@ -11,6 +11,10 @@ let nightwatch_config = {
     // we would like to regularly check on playback progress, a bit more frequently
     waitForConditionPollInterval: 125,
   },
+  webdriver: {
+    timeout_options: { timeout: 10000, retry_attempts: 3 },
+    keep_alive: true,
+  },
   selenium : {
     "start_process": false,
     "host": "hub-cloud.browserstack.com",
