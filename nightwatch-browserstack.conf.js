@@ -12,7 +12,7 @@ let nightwatch_config = {
     waitForConditionPollInterval: 125,
   },
   webdriver: {
-    timeout_options: { timeout: 10000, retry_attempts: 3 },
+    timeout_options: { timeout: 60000, retry_attempts: 3 },
     keep_alive: true,
   },
   selenium : {
