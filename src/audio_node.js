@@ -121,7 +121,8 @@ export default class AudioNode {
     // IndexSizeError: The index is not in the allowed range.
     let secondsLoaded = 0
     try {
-      secondsLoaded = this.audio.buffered.end(0)
+      // https://developer.mozilla.org/en-US/docs/Web/Guide/Audio_and_video_delivery/buffering_seeking_time_ranges#Seekable
+      secondsLoaded = this.audio.seekable.end(this.audio.seekable.length - 1)
     } catch {
       Log.trigger('audioNode:indexSizeError')
     }
