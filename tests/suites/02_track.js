@@ -36,7 +36,7 @@ module.exports = {
       .assert.progressBarMoved("#customProgress")
   },
 
-  "The time updates at the start of playback" : browser => {
+  "The time updates at the start and during playback" : browser => {
     browser
       .url(browser.launchUrl)
       .click("#track1 svg")
@@ -44,14 +44,9 @@ module.exports = {
       // Some browsers take too long to run the next assertion
       // So we must pause here so we don't drift into 0:01 etc
       // But that's not possible either, so we have to accept
-      // Sometimes the time will be 0:001
+      // Sometimes the time will be 0:01 or 0:002 to start
       .click("#track1 svg")
       .assert.containsText("#track1time", "0:0")
-  },
-
-  "The time updates during playback": browser => {
-    browser
-      .url(browser.launchUrl)
       .click("#track1 svg")
       .assert.timeUpdated("#track1time", "0:01")
   },
