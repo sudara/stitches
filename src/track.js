@@ -194,12 +194,7 @@ export default class Track {
       this.log("track:preloadNextTrack")
     }
 
-    if (this.playProgressElement && !Number.isNaN(this.position)) {
-      if (this.playProgressElement.nodeName === "PROGRESS")
-        this.playProgressElement.value = this.position
-      else
-        this.playProgressElement.style.width = `${this.position * 100}%`
-    }
+    this.updatePlayProgressElement()
 
     if (!this.displayingPauseButton) {
       this.element.classList.remove("stitches-loading")
@@ -229,7 +224,7 @@ export default class Track {
       const offset = event.clientX - this.seekElement.getBoundingClientRect().left
       newPosition = offset / this.seekElement.offsetWidth
     }
-    this.updateLoadingProgressElement(newPosition)
+    this.updatePlayProgressElement(newPosition)
     this.seek(newPosition)
   }
 
@@ -297,6 +292,15 @@ export default class Track {
         this.loadingProgressElement.value = position
       else
         this.loadingProgressElement.style.width = `${position * 100}%`
+    }
+  }
+
+  updatePlayProgressElement(position=this.position) {
+    if (this.playProgressElement && !Number.isNaN(position)) {
+      if (this.playProgressElement.nodeName === "PROGRESS")
+        this.playProgressElement.value = position
+      else
+        this.playProgressElement.style.width = `${position * 100}%`
     }
   }
 
