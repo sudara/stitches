@@ -229,6 +229,7 @@ export default class Track {
       const offset = event.clientX - this.seekElement.getBoundingClientRect().left
       newPosition = offset / this.seekElement.offsetWidth
     }
+    this.updateLoadingProgressElement(newPosition)
     this.seek(newPosition)
   }
 
