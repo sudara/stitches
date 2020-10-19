@@ -198,12 +198,11 @@ export default class AudioNode {
     this.onErrorCallback(payload)
   }
 
-  async play(whilePlayingCallback, onErrorCallback, onSeekCallback, firedFromUserInteraction=false) {
+  async play(whilePlayingCallback, onSeekCallback, firedFromUserInteraction=false) {
     Log.trigger("audioNode:play")
     this.unlockedDirectlyViaUserInteraction = firedFromUserInteraction
 
     this.whilePlayingCallback = whilePlayingCallback
-    this.onErrorCallback = onErrorCallback
     this.onSeekCallback = onSeekCallback
 
     // we need to resolrve this promise here

@@ -71,8 +71,13 @@ export default class Track {
       this.audioNode = await this.pool.nextAvailableNode(
         this.cleanupAudioNode.bind(this)
       )
-      this.audioNode.src = this.url
+
+      // Both of these events can happen before play is passed
+      // So we need to be sure the set these callbacks ASAP
       this.audioNode.whileLoadingCallback = this.whileLoading.bind(this)
+      this.audioNode.onErrorCallback = this.onError.bind(this)
+
+      this.audioNode.src = this.url
       this.log("track:loading")
     }
   }
@@ -96,8 +101,7 @@ export default class Track {
       // Normally we'd want a "await" here, but it broke continuous playback on ios
       // This means that errors from playback won't bubble up here
       // And instead need to be caught inside AudioNode
-      this.audioNode.play(this.whilePlaying.bind(this),
-        this.onError.bind(this), this.onSeek.bind(this),
+      this.audioNode.play(this.whilePlaying.bind(this), this.onSeek.bind(this),
         this.wasClicked)
 
       await this.pool.unlockAllAudioNodes()
