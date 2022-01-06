@@ -144,65 +144,55 @@ Optional. Defaults to false, keeping the console nice and clear.
 
 This is also exposed a static setter `Log.logToConsole` in case there's a need for a lil runtime funtime.
 
-## Events
+## Events Fired 
 
-This events API is based on what an app would ideally wan't from a player and not necessarily [the dumpster fire that is HTML5 audio events](https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events).
+Stitches emits a number of events to deliver what an app typically expects from a player. Underneath the hook, many of these are built upon [the dumpster fire that is HTML5 audio events](https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events), but with additional sanity checks and detail.
 
-Stitches will respond to the following event firing:
+`track:preload`
+Fires on *attempt* to preload a track in a playlist on page load, if and only if `preloadIndex` is set.
 
-### `track:seek`
+`track:play`
+Fires as soon as `play()` has been called on a track.
+Note: This does not mean the track is actively playing yet, only that play has been called.
 
-This will seek the track to the `position` supplied in the event detail.
-
-
-The following events fire:
-
-### `track:preload`
-
-This fires on *attempt* to preload a track in a playlist on page load, if and only if `preloadIndex` is set.
-
-### `track:play`
-
-This fires as soon as `play()` has been called on a track.
-
-It does not mean the track is playing, only that play has been called.
-
-### `track:pause`
-
+`track:pause`
 Fires when `pause()` is called.
 
-### `track:loading`
-
+`track:loading`
 An `AudioNode` was assigned for the track and it has been told to play the appropriate url.
 
-### `track:notPlaying`
+`track:notPlaying`
+Fired if the attempt to grab an `AudioNode` fails.
 
-This will be fired if the attempt to grab an `AudioNode` fails.
-
-
-### `track:playing`
-
+`track:playing`
 This is fired as soon as we know for sure the track is actually producing audio and happily playing.
-
 It fires on every transition from a stopped or paused state to a playing one.
-
 Note: it does not fire after seeking if seeking occurred while track was already playing.
 
-### `track:whilePlaying`
-
+`track:whilePlaying`
 This is *repeatedly* called, a few times a second, while a track is actively producing audio.
 
-### `track:ended`
-
+`track:ended`
 This is called when a track is finished. It does not rely on the somewhat sketchy nature of `<audio>` tag events fired from the browser, it will fire approximately 200ms near the end of the track.
 
-### `track:seeked`
-
+`track:seeked`
 This is called after a track has successfully seeked and is playing again. Note that `track:playing` will not call after seek unless the track was stopped at the point of seeking.
 
-### `track:registerListen`
-
+`track:registerListen`
 After 15% of the track has been played, this fires. This is a good place to hook into for play stats.
+
+## Events Listened To
+
+There are only a few listeners that stiches sets up by default.
+
+`click` is listened to on `playButtonSelector`
+This allows play buttons to be clicked.
+
+`click` is listened to on `seekElement`
+Seeks the track, deriving the track position from the mouse click position within `seekElement`.
+
+`track:seek`
+Seeks the track to the `position` supplied in the event detail.
 
 
 ## Why do we need this library?
