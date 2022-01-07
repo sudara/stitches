@@ -7,6 +7,7 @@ jobs:
       - image: cimg/node:current-browsers # pre-baked with selenium
     steps:
       - checkout
+      - browser-tools/install-chrome
       - browser-tools/install-chromedriver
       - restore_cache:
           name: Restore Yarn Package Cache
