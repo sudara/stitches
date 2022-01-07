@@ -5,6 +5,7 @@
   "main": "src/playlist.js",
   "scripts": {
     "start": "http-server -s c-1 . & ",
+    "ci": "npm start && nightwatch -c nightwatch-local.conf.json",
     "test": "npm start && nightwatch -c nightwatch-local.conf.json; npm stop",
     "test:single": "nightwatch -c nightwatch-local.conf.json",
     "stop": "pkill -f http-server",
