@@ -1,13 +1,13 @@
 version: 2.1
 orbs:
-	browser-tools: circleci/browser-tools@latest
+  browser-tools: circleci/browser-tools@latest
 jobs:
   chromedriver:
     docker:
       - image: cimg/node:current-browsers # pre-baked with selenium
     steps:
       - checkout
-			- browser-tools/install-chromedriver
+      - browser-tools/install-chromedriver
       - restore_cache:
           name: Restore Yarn Package Cache
           keys:
