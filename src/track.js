@@ -39,6 +39,8 @@ export default class Track {
     this.addSeekListener()
     this.reset()
     this.log("track:create")
+		this.customEventDetail = {}
+		this.extractCustomEventDetail()
   }
 
   reset() {
@@ -46,6 +48,7 @@ export default class Track {
     this.preloadNextTrackDispatched = false
     this.playingEventDispatched = false
     this.registerListenEventDispatched = false
+		
   }
 
   async preload() {
@@ -147,7 +150,7 @@ export default class Track {
     if (typeof this.whileLoadingCallback === "function") {
       this.whileLoadingCallback(data)
     }
-    this.log("track:whileLoading", data)
+    this.log("track:whileLoading", {...data, ...this.customEventDetail})
   }
 
   // called from an audioNode
@@ -164,8 +167,9 @@ export default class Track {
       timeFromEnd: this.timeFromEnd,
       percentPlayed: this.position,
       currentTime: this.formattedTime(),
+			...this.customEventDetail,
     }
-
+    		
     // ensures track:playing always fires before whilePlaying
     if (!this.playingEventDispatched) {
       // manually fire one last whileLoading
@@ -179,7 +183,7 @@ export default class Track {
     }
 
     if (!this.registerListenEventDispatched && (this.position > 0.15)) {
-      this.log("track:registerListen")
+      this.log("track:registerListen", payload)
       this.registerListenEventDispatched = true
     }
 
@@ -190,7 +194,7 @@ export default class Track {
     if (!this.hasEnded && this.timeFromEnd < 0.2) {
       this.hasEnded = true
       this.paused = true
-      this.log("track:ended")
+      this.log("track:ended", payload)
     }
 
     if (!this.preloadNextTrackDispatched && this.timeFromEnd < 10) {
@@ -314,4 +318,16 @@ export default class Track {
     const sec = time % 60
     return min + ':' + (sec >= 10 ? sec : '0' + sec)
   }
+	
+	extractCustomEventDetail() {
+		for (const dataAttribute in this.element.dataset)
+		{
+			if (dataAttribute.startsWith("stitches"))
+			{
+				// stitchesTrackName becomes trackName
+				const newAttributeName = dataAttribute[8].toLowerCase() + dataAttribute.substring(9)
+				this.customEventDetail[newAttributeName] = this.element.dataset[dataAttribute]
+			}
+		}
+	}
 }

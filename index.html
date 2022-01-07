@@ -7,6 +7,7 @@
       window.playlist = new Playlist({
         tracksSelector: "#playlist li",
         preloadIndex: 0,
+        enableConsoleLogging: true
       })
 
       window.playlist2 = new Playlist({
@@ -14,12 +15,13 @@
         loadingProgressSelector: ".progress",
         playProgressSelector: ".progress",
         seekSelector: ".seek",
-        whilePlaying: data => {
-          document.querySelector("#debug").insertAdjacentHTML("afterbegin", `FIRED: whilePlaying Callback<br/>`)
+        whilePlaying: (detail) => {
+          document.querySelector("#debug").insertAdjacentHTML("afterbegin", `FIRED: whilePlaying Callback, id: ${detail.trackId}`)
         },
-        onError: data => {
+        onError: (detail) => {
           document.querySelector("#debug").insertAdjacentHTML("afterbegin", `FIRED: onError Callback<br/>`)
-        }
+        },
+        enableConsoleLogging: true
       })
     </script>
     <style>
@@ -133,7 +135,7 @@
 
     <h2>2 duplicate tracks, 2 broken tracks. With callbacks</h2>
     <ul id="playlist2">
-      <li>
+      <li data-stitches-track-id="456">
         <a href="mp3/short-continuous-1.mp3" id="playlist2-track1" class="track">
           <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
             <use xlink:href="#playButton" width="50" height="50" />

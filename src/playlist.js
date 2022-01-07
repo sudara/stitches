@@ -32,7 +32,7 @@ export default class Playlist {
       timeSelector = "time",
       whilePlaying,
       onError,
-      enableConsoleLogging = true,
+      enableConsoleLogging = false,
     } = options
     this.reset()
     const elements = document.querySelectorAll(tracksSelector)

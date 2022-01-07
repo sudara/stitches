@@ -11,7 +11,15 @@ module.exports = {
       .assert.playing()
       .assert.containsText("#debug", "FIRED: whilePlaying Callback")
     },
-
+    
+  "Callback event detail is present in whilePlaying" : browser => {
+    browser.url(browser.launchUrl)
+      .waitForElementPresent("body")
+      .click("#playlist2-track1 svg")
+      .assert.playing()
+      .assert.containsText("#debug", "id: 456")
+  },
+    
   "The onError callback gets called" : browser => {
     browser .url(browser.launchUrl)
       .waitForElementPresent("body")

@@ -7,7 +7,7 @@
     "start": "http-server -s c-1 . & ",
     "ci": "npm start && nightwatch -c nightwatch-local.conf.json",
     "test": "npm start && nightwatch -c nightwatch-local.conf.json; npm stop",
-    "test:single": "nightwatch -c nightwatch-local.conf.json",
+    "test:single": "npm start && nightwatch -c nightwatch-local.conf.json",
     "stop": "pkill -f http-server",
     "browserstack": "npm start && node browserstack.runner.js -c nightwatch-browserstack.conf.js -e safari12,safari13,chrome,chromeMac,firefox,firefoxMac,edge,iphoneXS,ios13,ios14,pixel,galaxys9,ucbrowser; npm stop",
     "localBS": "npm start && node browserstack.runner.js -c nightwatch-browserstack.conf.js -e safari13"
