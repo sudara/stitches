@@ -1,4 +1,4 @@
-[![](https://travis-ci.com/sudara/stitches.svg?branch=master)](https://travis-ci.com/sudara/stitches)
+[![CircleCI](https://circleci.com/gh/sudara/stitches/tree/main.svg?style=svg)](https://circleci.com/gh/sudara/stitches/tree/main)
 
 ![stitches](logo.svg)
 
