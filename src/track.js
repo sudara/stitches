@@ -327,17 +327,14 @@ export default class Track {
   
   // Achtung, the browser tests rely on this.time being logged first!
   payload(data) {
-    let defaultPayload = {
+    return {
       time: this.time,
       duration: this.duration,
+      fileName: data === undefined ? "" : data.fileName,
       timeFromEnd: this.timeFromEnd,
       percentPlayed: this.position,
       currentTime: this.formattedTime(),
-			...this.customEventDetail,
+      ...this.customEventDetail,
     }
-    if (data === undefined)
-      return defaultPayload
-    else
-      return Object.assign(defaultPayload, data)
   }
 }
