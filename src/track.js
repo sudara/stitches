@@ -325,8 +325,9 @@ export default class Track {
 		}
 	}
   
+  // Achtung, the browser tests rely on this.time being logged first!
   payload(data) {
-    let  defaultPayload = {
+    let defaultPayload = {
       time: this.time,
       duration: this.duration,
       timeFromEnd: this.timeFromEnd,

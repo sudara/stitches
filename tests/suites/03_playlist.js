@@ -50,7 +50,7 @@ module.exports = {
       .waitForElementPresent("#debug")
       .click("#playlist2-track1 svg") // this playlist has two tracks with same mp3 in it
       .assert.playing(1.0, "short-continuous-1.mp3")
-      .pause(3000)
+      .pause(4000)
       .cleanDebug()
       .assert.playing(1.0, "short-continuous-1.mp3") // We should see this mp3 cross the 1.0 second mark again
   }
