@@ -12,17 +12,6 @@ module.exports = {
       .waitForElementPresent("#debug")
       .assert.containsText("#debug", "nodepool:create")
   },
-  
-  "Logs to console": browser => {
-    let consoleText;
-    browser.getLog('browser', function(log) { consoleText=log.at(-1) })
-    browser
-      .url(browser.launchUrl)
-      .waitForElementPresent("body")
-      .assert.title("StitchES")
-      .waitForElementPresent("#debug")
-      .assert.containsText("#debug", consoleText)
-  },
 
   "Clicking play on a preloaded track starts audio": browser => {
     browser
