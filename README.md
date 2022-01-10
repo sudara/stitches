@@ -148,6 +148,35 @@ This is also exposed a static setter `Log.logToConsole` in case there's a need f
 
 Stitches emits a number of events to deliver what an app typically expects from a player. Underneath the hook, many of these are built upon [the dumpster fire that is HTML5 audio events](https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events), but with additional sanity checks and detail.
 
+### Event detail
+
+The follow event detail are included in all `track` events.
+
+`time`: A Number in seconds specifying how far in the track the audio element has played
+`fileName`: A String containing all characters after the last `/` in the mp3 url (or `data` for inline data)
+`duration`: A Number in seconds specifying how long the mp3 is
+`timeFromEnd`: The number in seconds before the end of the mp3
+`percentPlayed`: A float number between 0 and 1.0 specifying the current playback position
+`currentTime`: A formatted String representing the elapsed time, such as "0:00" or "1:23"
+```
+
+Please be aware that for the earlier events like `track:create` or `track:loading`, most of these values will be 0 or `NaN`, as their values are not yet known.
+
+
+### Custom event detail
+
+Custom event detail can also be emitted on each of these events when it's specifyed in the html via data attributes. Simply prefix the data attribute with "stitches" and make sure the attribute is on each element of `.tracksSelector`. 
+
+For example, if your tracks are each an `<li>` and have a database track ID you'd like to send with all events, you could specify `<li data-stitches-track-id="5">` and `event.detail` in js will contain a property `trackId` with the value `"5"`.
+
+### List of Events
+
+`track:create`
+Fires from the javascript's constructor when a track is found in the DOM.
+
+`track:grabNodeAndSetSrc`
+Fired right before the track becomes associated with an audio node, either on preload or right before play.
+
 `track:preload`  
 Fires on *attempt* to preload a track in a playlist on page load, if and only if `preloadIndex` is set.
 
@@ -159,7 +188,7 @@ Note: This does not mean the track is actively playing yet, only that play has b
 Fires when `pause()` is called.
 
 `track:loading`  
-An `AudioNode` was assigned for the track and it has been told to play the appropriate url.
+An `AudioNode` was assigned for the track and it has been told to play the appropriate url via the src attribute being set.
 
 `track:notPlaying`  
 Fired if the attempt to grab an `AudioNode` fails.

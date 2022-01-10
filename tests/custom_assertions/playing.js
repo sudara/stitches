@@ -26,11 +26,12 @@ const playing = function (timestamp=0.3, mp3name=null) {
 
   this.evaluate = (value) => {
     // works with track:whilePlaying and track:playing
-    //   /whilePlaying - \d\.\d+ short-continuous-1\.mp3/
-    let playingRegex = new RegExp(`laying - (\\d\\.\\d+)`)
+    let playingRegex = new RegExp(`laying - (\\d+\\.\\d+)`)
 
+    // Supports variable numbers before the track name
+    // 5981.4 ms: track:whilePlaying - 0.66181 4.4408 3.7789900000000003 0.14902945415240496 0.66181 short-continuous-2.mp3 2
     if (mp3name) {
-      playingRegex = new RegExp(`laying - (\\d\\.\\d+) ${mp3name.replace('.', '\\.')}`)
+      playingRegex = new RegExp(`laying - (\\d+\\.\\d+\\s)+${mp3name.replace('.', '\\.')}`)
     }
 
     // We care about actively catching the mp3 passing through a point in time,

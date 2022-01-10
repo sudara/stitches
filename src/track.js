@@ -26,6 +26,7 @@ export default class Track {
     this.timeElement = element.querySelector(timeSelector)
     this.playlistSetCurrentTrack = setCurrentTrack
     this.audioNode = null
+    this.duration = 0
     this.time = 0
     this.position = 0
     this.timeFromEnd = NaN
@@ -38,7 +39,7 @@ export default class Track {
     this.playButtonElement.addEventListener("click", this.togglePlay.bind(this), true)
     this.addSeekListener()
     this.reset()
-    this.log("track:create")
+    this.log("track:create", this.payload())
 		this.customEventDetail = {}
 		this.extractCustomEventDetail()
   }
@@ -53,7 +54,7 @@ export default class Track {
 
   async preload() {
     // grab node from list
-    this.log("track:preload")
+    this.log("track:preload", this.payload())
     await this.load()
   }
 
@@ -69,7 +70,7 @@ export default class Track {
     } else {
       // grabbing a new node automatically results in position 0 for it and no seek(0) is needed
       // TODO: set the old position if it was partially played https://github.com/sudara/stitchES/issues/34
-      this.log("track:grabNodeAndSetSrc")
+      this.log("track:grabNodeAndSetSrc", this.payload())
 
       this.audioNode = await this.pool.nextAvailableNode(
         this.cleanupAudioNode.bind(this)
@@ -81,7 +82,7 @@ export default class Track {
       this.audioNode.onErrorCallback = this.onError.bind(this)
 
       this.audioNode.src = this.url
-      this.log("track:loading")
+      this.log("track:loading", this.payload())
     }
   }
 
@@ -91,7 +92,7 @@ export default class Track {
 
   // https://developers.google.com/web/updates/2016/03/play-returns-promise
   async play() {
-    this.log("track:play")
+    this.log("track:play", this.payload())
 
     // this helps us fire the track:playing event
     // the first time that whileLoading is called
@@ -135,22 +136,23 @@ export default class Track {
     if (this.onErrorCallback) {
       this.onErrorCallback(data)
     }
-    this.log("track:notPlaying", data)
+    this.log("track:notPlaying", this.payload())
   }
 
   // called from an audioNode
   onSeek() {
-    this.log("track:seeked")
+    this.log("track:seeked", this.payload())
   }
 
   // called from an audioNode
   whileLoading(data) {
+    this.duration = data.duration
     const position = data.secondsLoaded / data.duration
     this.updateLoadingProgressElement(position)
     if (typeof this.whileLoadingCallback === "function") {
       this.whileLoadingCallback(data)
     }
-    this.log("track:whileLoading", {...data, ...this.customEventDetail})
+    this.log("track:whileLoading", this.payload(data))
   }
 
   // called from an audioNode
@@ -160,16 +162,8 @@ export default class Track {
     this.timeFromEnd = data.duration - this.time
 
     // Achtung, the order of these are important for tests!
-    const payload = {
-      time: this.time,
-      fileName: data.fileName,
-      duration: data.duration,
-      timeFromEnd: this.timeFromEnd,
-      percentPlayed: this.position,
-      currentTime: this.formattedTime(),
-			...this.customEventDetail,
-    }
-    		
+    const payload = this.payload(data)		
+        
     // ensures track:playing always fires before whilePlaying
     if (!this.playingEventDispatched) {
       // manually fire one last whileLoading
@@ -188,7 +182,7 @@ export default class Track {
     }
 
     if (this.timeElement) {
-      this.timeElement.innerText = payload.currentTime
+      this.timeElement.innerText = this.formattedTime()
     }
 
     if (!this.hasEnded && this.timeFromEnd < 0.2) {
@@ -199,7 +193,7 @@ export default class Track {
 
     if (!this.preloadNextTrackDispatched && this.timeFromEnd < 10) {
       this.preloadNextTrackDispatched = true
-      this.log("track:preloadNextTrack")
+      this.log("track:preloadNextTrack", payload)
     }
 
     this.updatePlayProgressElement()
@@ -330,4 +324,19 @@ export default class Track {
 			}
 		}
 	}
+  
+  payload(data) {
+    let  defaultPayload = {
+      time: this.time,
+      duration: this.duration,
+      timeFromEnd: this.timeFromEnd,
+      percentPlayed: this.position,
+      currentTime: this.formattedTime(),
+			...this.customEventDetail,
+    }
+    if (data === undefined)
+      return defaultPayload
+    else
+      return Object.assign(defaultPayload, data)
+  }
 }

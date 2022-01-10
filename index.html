@@ -16,7 +16,7 @@
         playProgressSelector: ".progress",
         seekSelector: ".seek",
         whilePlaying: (detail) => {
-          document.querySelector("#debug").insertAdjacentHTML("afterbegin", `FIRED: whilePlaying Callback, id: ${detail.trackId}`)
+          document.querySelector("#debug").insertAdjacentHTML("afterbegin", `FIRED: whilePlaying Callback, id: ${detail.trackId}<br/>`)
         },
         onError: (detail) => {
           document.querySelector("#debug").insertAdjacentHTML("afterbegin", `FIRED: onError Callback<br/>`)
