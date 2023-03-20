@@ -205,7 +205,7 @@ This is *repeatedly* called, a few times a second, while a track is actively pro
 This is called when a track is finished. It does not rely on the somewhat sketchy nature of `<audio>` tag events fired from the browser, it will fire approximately 200ms near the end of the track.
 
 `track:seeked`  
-This is called after a track has successfully seeked and is playing again. Note that `track:playing` will not call after seek unless the track was stopped at the point of seeking.
+This is called after a track has successfully seeked and is playing again. Note that `track:playing` will not fire.
 
 `track:registerListen`  
 After 15% of the track has been played, this fires. This is a good place to hook into for play stats.
@@ -221,7 +221,11 @@ This allows play buttons to be clicked.
 Seeks the track, deriving the track position from the mouse click position within `seekElement`.
 
 `track:seek`  
-Seeks the track to the `position` supplied in the event detail.
+Seeks the track to the `position` property in the event `detail`.
+
+```
+new CustomEvent('track:seek', { 'detail': { 'position': 23.0 }, 'bubbles': true })
+```
 
 
 ## Why do we need this library?
