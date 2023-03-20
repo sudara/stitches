@@ -10,7 +10,7 @@ module.exports = {
       .waitForElementPresent("body")
       .assert.title("StitchES")
       .waitForElementPresent("#debug")
-      .assert.containsText("#debug", "nodepool:create")
+      .assert.textContains("#debug", "nodepool:create")
   },
 
   "Clicking play on a preloaded track starts audio": browser => {
@@ -18,8 +18,8 @@ module.exports = {
       .url(browser.launchUrl)
       .waitForElementPresent("body")
       .click("#track1 svg")
-      .assert.containsText("#debug", "nodepool:create")
-      .assert.containsText("#debug", "audioNode:alreadyUnlockedDirectly")
+      .assert.textContains("#debug", "nodepool:create")
+      .assert.textContains("#debug", "audioNode:alreadyUnlockedDirectly")
       .assert.playing()
 
   },
@@ -29,7 +29,7 @@ module.exports = {
       .url(browser.launchUrl)
       .waitForElementPresent("body")
       .click("#track2 svg")
-      .assert.containsText("#debug", "nodepool:create")
+      .assert.textContains("#debug", "nodepool:create")
       .assert.playing()
   },
 
@@ -40,12 +40,12 @@ module.exports = {
       .click("#track2 svg") // play
       .assert.playing(0.4) // verify it played through 400ms
       .click("#track2 svg") // pause
-      .assert.containsText("#debug", "track:pause")
+      .assert.textContains("#debug", "track:pause")
       .cleanDebug()
-      .assert.not.containsText("#debug", "whilePlaying")
+      .assert.not.textContains("#debug", "whilePlaying")
       .click("#track2 svg") // play
       .pause(250)
-      .assert.not.containsText("#debug", "track:pause") // shouldn't have fired yet
+      .assert.not.textContains("#debug", "track:pause") // shouldn't have fired yet
       .click("#track2 svg") // pause
       .assert.playing(0.5) // verify it resumed, not restarted at 0.00
   }

@@ -8,9 +8,9 @@ module.exports = {
       .url(browser.launchUrl)
       .waitForElementPresent("#debug")
       .click("#track1 svg")
-      .assert.containsText("#debug", "nodepool:create")
+      .assert.textContains("#debug", "nodepool:create")
       // checks for preloading the second track
-      .assert.containsText(
+      .assert.textContains(
         "#debug",
         "audioNode:loaded - short-continuous-2.mp3"
       )
@@ -22,7 +22,7 @@ module.exports = {
       .url(browser.launchUrl)
       .waitForElementPresent("#debug")
       .click("#track1 svg")
-      .assert.containsText("#debug", "track:playing")
+      .assert.textContains("#debug", "track:playing")
       .openNewWindow('tab')
       .windowHandles(function(result) {
         this.switchWindow(result.value[1])
@@ -38,10 +38,10 @@ module.exports = {
       .waitForElementPresent("#debug")
       .click("#track3 svg")
       .assert.playing(1.0, "short-continuous-3.mp3")
-      .assert.containsText("#debug", "track:ended")
+      .assert.textContains("#debug", "track:ended")
       .pause(200) // whilePlaying can fire one more time, let's prevent glitch
       .cleanDebug()
-      .assert.not.containsText("#debug", "whilePlaying")
+      .assert.not.textContains("#debug", "whilePlaying")
   },
 
   "Playlist can contain the same track multiple times": browser => {
