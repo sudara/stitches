@@ -38,6 +38,6 @@ module.exports = {
           },
         })
       }
-    }).end(() => done())
+    }).end(done)
   }
 }

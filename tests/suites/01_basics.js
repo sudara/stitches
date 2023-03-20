@@ -2,6 +2,7 @@ module.exports = {
   afterEach: (browser, done) => {
     // eslint-disable-next-line global-require
     require("../../nightwatch-browserstack").updateStatusIfBrowserstack(browser, done)
+    done()
   },
 
   "StitchES logs properly": browser => {
