@@ -1,0 +1,26 @@
+# BrowserStack Automate SDK config for the opt-in real-device lane.
+# Run with: npm run browserstack  (needs BROWSERSTACK_USERNAME +
+# BROWSERSTACK_ACCESS_KEY in the environment; the SDK reads them automatically).
+#
+# UNVALIDATED: this needs a real BrowserStack account to confirm the device /
+# capability names below — adjust against current BrowserStack Playwright docs.
+framework: playwright
+
+buildName: stitches
+projectName: stitches
+
+# the local http-server (started by Playwright's webServer) is reached through
+# the tunnel the SDK manages
+browserstackLocal: true
+parallelsPerPlatform: 1
+
+platforms:
+  # the unique value over local Playwright: real mobile devices
+  - deviceName: iPhone 15
+    osVersion: "17"
+    browserName: playwright-webkit
+    realMobile: "true"
+  - deviceName: Samsung Galaxy S23
+    osVersion: "13.0"
+    browserName: playwright-chromium
+    realMobile: "true"
