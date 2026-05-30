@@ -30,9 +30,8 @@ This is what stitches assumes your default case is:
 
 ## Things stitches doesn't do (yet?)
 
-- Provide support for a global player
 - Deal with volume
-- Spport any other format than mp3 (might work, might not, who knows)
+- Support any other format than mp3 (might work, might not, who knows)
 
 ## We worked hard so you don't have to
 
