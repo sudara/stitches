@@ -37,7 +37,7 @@ export default class Playlist {
     const elements = document.querySelectorAll(tracksSelector)
     if (!elements.length) {
       Log.trigger(
-        "Stiches tracksSelector' not specified or contains no elements",
+        "Stitches: tracksSelector not specified or contains no elements",
       )
     }
     this.tracks = [...elements].map(
