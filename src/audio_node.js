@@ -59,7 +59,6 @@ export default class AudioNode {
     while (isNaN(this.audio.duration)) {
       Log.trigger('waiting for audio.duration')
 
-      // eslint-disable-next-line no-await-in-loop
       await new Promise(resolve => setTimeout(resolve, 20))
     }
     this.seeked = true
@@ -211,7 +210,7 @@ export default class AudioNode {
     // In the case of an error, the onError handler will handle it
     try {
       await this.audio.play()
-    } catch(e) { /* no-op */ }
+    } catch { /* no-op */ }
   }
 
   pause() {
