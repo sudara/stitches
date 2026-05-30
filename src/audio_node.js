@@ -146,9 +146,11 @@ export default class AudioNode {
     if (this.whileLoadingCallback) this.whileLoadingCallback(payload)
 
     // some browsers (FF 81) don't fire a last whileLoading
-    // lets give them a helping hand
-    if (secondsLoaded !== this.duration)
-      setTimeout(() => this.whileLoading, 1500)
+    // lets give them a helping hand (debounced so we schedule just one nudge)
+    if (secondsLoaded !== this.duration) {
+      clearTimeout(this.loadingNudge)
+      this.loadingNudge = setTimeout(() => this.whileLoading(), 1500)
+    }
 
     this.lastSecondsLoaded = secondsLoaded
   }

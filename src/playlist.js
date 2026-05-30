@@ -23,7 +23,7 @@ export default class Playlist {
   setup(options) {
     const {
       tracksSelector,
-      preloadIndex = 0,
+      preloadIndex = -1,
       playButtonSelector = "a",
       loadingProgressSelector = "progress",
       playProgressSelector = "progress",
