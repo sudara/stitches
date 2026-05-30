@@ -170,10 +170,18 @@ export default class PlaybackController {
   }
 
   seek(position) {
+    if (!this.audioNode) return
     if (this.hasEnded) {
       this.reset()
     }
     this.audioNode.seek(position)
+  }
+
+  // pause the audio without emitting — used when tearing down or switching
+  // tracks so we don't surface a spurious pause for the outgoing track
+  stop() {
+    this.audioNode?.pause()
+    this.paused = true
   }
 
   async load() {

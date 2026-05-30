@@ -21,6 +21,7 @@ export default class Player {
     this._controllers = []
     this._currentIndex = -1
     this._isPlaying = false
+    this._advanced = false
   }
 
   get queue() {
@@ -70,6 +71,8 @@ export default class Player {
 
   play() {
     this.unlock()
+    // committing to (re)play the current track re-arms the advance latch
+    this._advanced = false
     this._controllers[this._currentIndex]?.play()
   }
 
@@ -123,9 +126,7 @@ export default class Player {
   }
 
   _stopCurrent() {
-    // pause the audio directly (not via controller.pause) so tearing down a
-    // queue doesn't emit a spurious player:paused for the outgoing track
-    this._controllers[this._currentIndex]?.audioNode?.pause()
+    this._controllers[this._currentIndex]?.stop()
     this._isPlaying = false
   }
 
@@ -158,7 +159,10 @@ export default class Player {
       case "ended":
         this._isPlaying = false
         this._dispatch("ended", detail)
-        this._advance()
+        if (!this._advanced) {
+          this._advanced = true
+          this._advance()
+        }
         break
       case "preloadNextTrack":
         if (this.preloadNext) this._controllers[index + 1]?.load()
@@ -166,7 +170,10 @@ export default class Player {
       case "notPlaying":
         this._isPlaying = false
         this._dispatch("error", detail)
-        this._advance()
+        if (!this._advanced) {
+          this._advanced = true
+          this._advance()
+        }
         break
       default:
         break
@@ -186,9 +193,9 @@ export default class Player {
 
   _dispatch(type, core = {}) {
     const track = this._queue[this._currentIndex] || null
-    const percent = Number.isNaN(core.percentPlayed)
-      ? 0
-      : core.percentPlayed || 0
+    const percent = Number.isFinite(core.percentPlayed)
+      ? Math.min(1, Math.max(0, core.percentPlayed))
+      : 0
     const detail = {
       track,
       index: this._currentIndex,

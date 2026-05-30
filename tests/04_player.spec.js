@@ -4,6 +4,7 @@ import {
   events,
   clearEvents,
   expectEvent,
+  expectNoEvent,
   expectPlayerPlaying,
 } from "./helpers.js"
 
@@ -104,4 +105,87 @@ test("a failed track errors and skips to the next", async ({ page }) => {
   await start(page)
   await expectEvent(page, "player:error")
   await expectPlayerPlaying(page, { id: 2 }) // skipped past the broken track
+})
+
+test("consecutive failed tracks skip through to a playable one", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    window.TRACKS = [
+      { id: 97, url: "/mp3/missing-a.mp3" },
+      { id: 98, url: "/mp3/missing-b.mp3" },
+      { id: 3, url: "/mp3/short-continuous-3.mp3" },
+    ]
+  })
+  await start(page)
+  await expectPlayerPlaying(page, { id: 3 })
+})
+
+test("a failing last track ends the queue", async ({ page }) => {
+  await page.evaluate(() => {
+    window.TRACKS = [{ id: 96, url: "/mp3/missing-only.mp3" }]
+  })
+  await start(page)
+  await expectEvent(page, "player:error")
+  await expectEvent(page, "player:queueended")
+})
+
+test("autoAdvance:false stops at the end of a track without advancing", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    window.player.autoAdvance = false
+    window.OPTS = { startIndex: 0, autoplay: true }
+  })
+  await start(page)
+  await expectEvent(page, "player:ended")
+  await clearEvents(page)
+  // give auto-advance a chance to (wrongly) fire, then assert it didn't
+  await page.waitForTimeout(500)
+  await expectNoEvent(page, "player:trackchanged")
+  expect(await page.evaluate(() => window.player.isPlaying)).toBe(false)
+})
+
+test("toggle pauses then resumes the current track", async ({ page }) => {
+  await start(page)
+  await expectPlayerPlaying(page)
+  await page.evaluate(() => window.player.toggle())
+  await expectEvent(page, "player:paused")
+  await clearEvents(page)
+  await page.evaluate(() => window.player.toggle())
+  await expectPlayerPlaying(page)
+})
+
+test("clear stops playback and empties the queue", async ({ page }) => {
+  await start(page)
+  await expectPlayerPlaying(page)
+  await page.evaluate(() => window.player.clear())
+  const state = await page.evaluate(() => ({
+    queue: window.player.queue,
+    index: window.player.currentIndex,
+    current: window.player.currentTrack,
+  }))
+  expect(state.queue).toEqual([])
+  expect(state.index).toBe(-1)
+  expect(state.current).toBeNull()
+})
+
+test("jumpTo out of bounds is a no-op", async ({ page }) => {
+  await start(page)
+  await expectPlayerPlaying(page, { id: 1 })
+  await page.evaluate(() => {
+    window.player.jumpTo(99)
+    window.player.jumpTo(-5)
+  })
+  expect(await page.evaluate(() => window.player.currentIndex)).toBe(0)
+})
+
+test("seek before playback does not throw", async ({ page }) => {
+  await page.evaluate(() => {
+    window.OPTS = { startIndex: 0, autoplay: false }
+  })
+  await start(page)
+  // no audio node yet; seek must be a safe no-op rather than crash
+  await page.evaluate(() => window.player.seek(0.5))
+  expect(await page.evaluate(() => window.player.currentIndex)).toBe(0)
 })
