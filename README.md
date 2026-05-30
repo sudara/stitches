@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/sudara/stitches/tree/main.svg?style=svg)](https://circleci.com/gh/sudara/stitches/tree/main)
+[![Tests](https://github.com/sudara/stitches/actions/workflows/test.yml/badge.svg)](https://github.com/sudara/stitches/actions/workflows/test.yml)
 
 ![stitches](logo.svg)
 
@@ -10,62 +10,110 @@ To distill and codify 13+ years experience of building dozens of web music playe
 
 ## Features
 
-* Is written in ES6+
-* Deals with "unlocking" audio elements from their auto-play restrictions to enable playlist playback
-* Completely ignores the Web Audio API (which doesn't allow buffering, therefore useless for music playback)
-* Only handles the MP3 format (pragmatically, the only format that matters)
-* Lets you decide if you want to babel things or just include in a `<script type=module>`
-* Is defensive, but doesn't test for browsers or feature detect
-* Aims to perform well by doing the minimum amount of work necessary
+- Is written in ES6+
+- Deals with "unlocking" audio elements from their auto-play restrictions to enable playlist playback
+- Completely ignores the Web Audio API (which doesn't allow buffering, therefore useless for music playback)
+- Only handles the MP3 format (pragmatically, the only format that matters)
+- Lets you decide if you want to babel things or just include in a `<script type=module>`
+- Is defensive, but doesn't test for browsers or feature detect
+- Aims to perform well by doing the minimum amount of work necessary
 
 ## Assumptions
 
 This is what stitches assumes your default case is:
 
-
-* You have at least one playlist (you can have more than one on a page)
-* You might want to preload one of the tracks
-* You'd love to have continuous playback within a playlist (preload upcoming tracks)
-* You care as much about mobile as you do desktop
-* You might have a SPA or a Rails turbolinks app and don't want to create and destroy `<audio>` tags willy nilly but instead reuse them.
-
+- You have at least one playlist (you can have more than one on a page)
+- You might want to preload one of the tracks
+- You'd love to have continuous playback within a playlist (preload upcoming tracks)
+- You care as much about mobile as you do desktop
+- You might have a SPA or a Rails turbolinks app and don't want to create and destroy `<audio>` tags willy nilly but instead reuse them.
 
 ## Things stitches doesn't do (yet?)
 
-* Provide support for a global player
-* Deal with volume
-* Spport any other format than mp3 (might work, might not, who knows)
+- Provide support for a global player
+- Deal with volume
+- Spport any other format than mp3 (might work, might not, who knows)
 
 ## We worked hard so you don't have to
 
 Unfortunately the state of HTML5 Audio support on browsers has not evolved much in the last decade, leaving the API incomplete and unreliable across platforms. Stitches has your back by:
 
-* Unlocking multiple audio nodes on an interaction so you can play through multiple tracks
+- Unlocking multiple audio nodes on an interaction so you can play through multiple tracks
 
-* Abstracts out and normalizes HTML5 audio events so that they actually work cross-browser (For example, [onended in iOS was broken for years](https://bugs.webkit.org/show_bug.cgi?id=173332)).
+- Abstracts out and normalizes HTML5 audio events so that they actually work cross-browser (For example, [onended in iOS was broken for years](https://bugs.webkit.org/show_bug.cgi?id=173332)).
 
-* Comes with defaults that enable gapless playback, with an ability to tune.
+- Comes with defaults that enable gapless playback, with an ability to tune.
 
 ## Installation
 
-`yarn add  @alonetone/stitches`
+`npm install @alonetone/stitches`
 
-## Usage
+## Two APIs
 
-With a bundler like Webpack you can:
+Stitches exposes two top-level classes, both built on the same playback engine:
 
-`
-import Playlist from 'stitches'
-`
+- **`Player`** (recommended) — a queue-driven, imperative, app-wide player. You
+  build a queue of track descriptors in JS and drive it with method calls; it
+  emits `player:*` events. Ideal for a single persistent player (e.g. a bar
+  fixed to the viewport that survives SPA/Turbo navigations).
+- **`Playlist`** (legacy) — scans the DOM for tracks via selectors and wires up
+  click/seek handlers for you. Good for static pages with embedded tracklists.
 
-With raw html, you can:
-
+```js
+import { Player, Playlist } from "@alonetone/stitches"
 ```
-<script type='module'>
-  import Playlist from './src/playlist.js'
-  const playlist = Playlist.newFromSelector('a')
-</script>
+
+Both also work without a bundler, straight from `<script type="module">`.
+
+## Player (queue-driven)
+
+```js
+import { Player } from "@alonetone/stitches"
+
+const player = new Player({ autoAdvance: true, preloadNext: true })
+
+// build the queue from JS and start it inside a click handler (see iOS note)
+playButton.addEventListener("click", () => {
+  player.setQueue(
+    [
+      { id: 1, url: "/songs/one.mp3", title: "One" },
+      { id: 2, url: "/songs/two.mp3", title: "Two" },
+    ],
+    { startIndex: 0, autoplay: true },
+  )
+})
+
+document.addEventListener("player:timeupdate", (e) => {
+  seekBar.value = e.detail.percent
+})
 ```
+
+Tracks are plain objects; only `id` and `url` are required. Everything else is
+opaque and echoed back untouched in `event.detail.track` so your UI can render
+without re-reading the DOM.
+
+### Methods
+
+`setQueue(tracks, { startIndex = 0, autoplay = true })`, `play()`, `pause()`,
+`toggle()`, `next()`, `previous()`, `jumpTo(index)`, `seek(0..1)`, `clear()`,
+`unlock()`. Getters: `currentTrack`, `currentIndex`, `isPlaying`, `queue`.
+
+### iOS / autoplay unlock
+
+The **first** `setQueue({ autoplay: true })` / `play()` after page load must be
+called **synchronously inside a click/tap handler** — build the queue array
+synchronously, then call. Stitches rides that gesture to unlock the audio nodes;
+after that, `next()` / `previous()` / `jumpTo()` and auto-advance all work with
+no further gesture. If your queue comes from an async source, call
+`player.unlock()` in the handler first, then `setQueue` once data arrives.
+
+### Events
+
+CustomEvents dispatched on `eventTarget` (default `document`), namespaced
+`player:*`: `queued`, `trackchanged`, `loading`, `playing`, `timeupdate`,
+`paused`, `ended`, `queueended`, `registerlisten`, `seeked`, `error`. Each
+detail carries `{ track, index, duration, currentTime, currentTimeFormatted,
+percent }` (plus `{ error: { name, message } }` on `player:error`).
 
 ## How does it work?
 
@@ -79,7 +127,7 @@ To mitigate the fact that browsers sabotage this ability, we create a `NodePool`
 
 For continuous/gapless playback we really only need two `<audio>` elements: One to handle a currently playing track and another to preload the next audio track in. When a file is done playing, the node is released back to the pool.
 
-## Options
+## Playlist options (legacy selector-based API)
 
 The following options can be passed to `new Playlist`
 
@@ -103,20 +151,17 @@ Optional. Defaults to the first `<a>` child of `tracksSelector`.
 
 Which child element of `tracksSelector` should be considered the playButton?
 
-### `progressSelector = "progress"`
+### `loadingProgressSelector = "progress"` and `playProgressSelector = "progress"`
 
-Optional. Defaults to the first `progress` child of `tracksSelector` and fails silently if not present.
+Optional. Default to the first `progress` child of `tracksSelector` and fail silently if not present. `loadingProgressSelector` reflects buffering progress; `playProgressSelector` reflects playback position.
 
-if the element is a progress element, this will update the attribute called `value` during the `whilePlaying` callback.
-
-For other elements, it will set the element's `style.width` to be the appropriate percentage.
+If the element is a `<progress>`, this updates its `value`. For other elements, it sets `style.width` to the appropriate percentage.
 
 ### `seekSelector = "progress"`
 
 Optional. Defaults to the first `progress` child of `tracksSelector` and fails silently if not present.
 
 This will register a click handler on the element so it can be used to seek the track.
-
 
 ### `timeSelector = "time"`
 
@@ -126,7 +171,7 @@ Optional. Defaults to the first `<time>` child of `tracksSelector` and fails sil
 
 Optional. No default. Expects a function.
 
-The provided function is called *repeatedly* during a track's playback.
+The provided function is called _repeatedly_ during a track's playback.
 
 ### `onError`
 
@@ -144,7 +189,7 @@ Optional. Defaults to false, keeping the console nice and clear.
 
 This is also exposed a static setter `Log.logToConsole` in case there's a need for a lil runtime funtime.
 
-## Events Fired 
+## Events Fired
 
 Stitches emits a number of events to deliver what an app typically expects from a player. Underneath the hook, many of these are built upon [the dumpster fire that is HTML5 audio events](https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events), but with additional sanity checks and detail.
 
@@ -158,6 +203,7 @@ The follow event detail are included in all `track` events.
 `timeFromEnd`: The number in seconds before the end of the mp3
 `percentPlayed`: A float number between 0 and 1.0 specifying the current playback position
 `currentTime`: A formatted String representing the elapsed time, such as "0:00" or "1:23"
+
 ```
 
 Please be aware that for the earlier events like `track:create` or `track:loading`, most of these values will be 0 or `NaN`, as their values are not yet known.
@@ -165,7 +211,7 @@ Please be aware that for the earlier events like `track:create` or `track:loadin
 
 ### Custom event detail
 
-Custom event detail can also be emitted on each of these events when it's specifyed in the html via data attributes. Simply prefix the data attribute with "stitches" and make sure the attribute is on each element of `.tracksSelector`. 
+Custom event detail can also be emitted on each of these events when it's specifyed in the html via data attributes. Simply prefix the data attribute with "stitches" and make sure the attribute is on each element of `.tracksSelector`.
 
 For example, if your tracks are each an `<li>` and have a database track ID you'd like to send with all events, you could specify `<li data-stitches-track-id="5">` and `event.detail` in js will contain a property `trackId` with the value `"5"`.
 
@@ -177,54 +223,56 @@ Fires from the javascript's constructor when a track is found in the DOM.
 `track:grabNodeAndSetSrc`
 Fired right before the track becomes associated with an audio node, either on preload or right before play.
 
-`track:preload`  
+`track:preload`
 Fires on *attempt* to preload a track in a playlist on page load, if and only if `preloadIndex` is set.
 
-`track:play`  
+`track:play`
 Fires as soon as `play()` has been called on a track.
 Note: This does not mean the track is actively playing yet, only that play has been called.
 
 `track:pause`
 Fires when `pause()` is called.
 
-`track:loading`  
+`track:loading`
 An `AudioNode` was assigned for the track and it has been told to play the appropriate url via the src attribute being set.
 
-`track:notPlaying`  
+`track:notPlaying`
 Fired if the attempt to grab an `AudioNode` fails.
 
-`track:playing`  
+`track:playing`
 This is fired as soon as we know for sure the track is actually producing audio and happily playing.
 It fires on every transition from a stopped or paused state to a playing one.
 Note: it does not fire after seeking if seeking occurred while track was already playing.
 
-`track:whilePlaying`  
+`track:whilePlaying`
 This is *repeatedly* called, a few times a second, while a track is actively producing audio.
 
-`track:ended`  
+`track:ended`
 This is called when a track is finished. It does not rely on the somewhat sketchy nature of `<audio>` tag events fired from the browser, it will fire approximately 200ms near the end of the track.
 
-`track:seeked`  
+`track:seeked`
 This is called after a track has successfully seeked and is playing again. Note that `track:playing` will not fire.
 
-`track:registerListen`  
+`track:registerListen`
 After 15% of the track has been played, this fires. This is a good place to hook into for play stats.
 
 ## Events Listened To
 
 There are only a few listeners that stiches sets up by default.
 
-`click` is listened to on `playButtonSelector`  
+`click` is listened to on `playButtonSelector`
 This allows play buttons to be clicked.
 
-`click` is listened to on `seekElement`  
+`click` is listened to on `seekElement`
 Seeks the track, deriving the track position from the mouse click position within `seekElement`.
 
-`track:seek`  
+`track:seek`
 Seeks the track to the `position` property in the event `detail`.
 
 ```
+
 new CustomEvent('track:seek', { 'detail': { 'position': 23.0 }, 'bubbles': true })
+
 ```
 
 
@@ -245,6 +293,7 @@ However, as time wore on, I found myself constantly having to keep up with the c
 Each `Playlist` has `Tracks` that communicate to a `NodePool` containing `AudioNode`s.
 
 ```
+
                    ┌-----------┐
                    | Playlist  |
                    └-----------┘
@@ -266,7 +315,8 @@ Each `Playlist` has `Tracks` that communicate to a `NodePool` containing `AudioN
           └------┘    └------┘   └------┘
               |           |          |
            <audio>      <audio>   <audio>
-```
+
+````
 
 These `AudioNode`s map 1-1 with HTML5 audio elements which are "unlocked" on any user interaction. The `NodePool` manages these unlocked `AudioNode`s, supplying them as needed.
 
@@ -278,48 +328,31 @@ Each `NodePool` (there's one per playlist) has exactly 3 `AudioNode`s, which all
 
 ## Running tests
 
-Given the somewhat sketchy state of audio playback in browsers (especially Safari), it's absolutely critical to run tests against as many current browsers as possible.
-
-Selenium tests are currently written in [Nightwatch](http://nightwatchjs.org)
-
-The full testing stack is by its nature VERY.... brittle.
-
-There are lots of places things can go wrong: The tests themselves, the testing framework, the webdriver for each browser, selenium, all sorts of infrastructure related things on browserstack's end... the most difficult part of this project is definitely maintaining this testing harness.
-
-### Locally Against Chrome
-
-You can run tests locally with:
-
-`yarn test`
-
-This will run tests against headless chrome as configured in `nightwatch-local.conf.json`.
-
-### Run a single test
+Given the sketchy state of audio playback in browsers (especially Safari), it's critical to test against real engines. Tests run on [Playwright](https://playwright.dev) and assert against the library's real `CustomEvent`s.
 
 ```sh
-yarn start
-yarn test:single --test tests/suites/03_playlist.js
+npm test            # all engines: chromium (Chrome channel), firefox, webkit
+npm run test:ui     # interactive UI mode
+npx playwright test tests/04_player.spec.js   # a single suite
+````
+
+A few things worth knowing:
+
+- **MP3 codecs.** Playwright's bundled Chromium ships without MP3, so the `chromium` project drives the real Chrome channel (`channel: "chrome"`). Run `npx playwright install chrome` once.
+- **WebKit/Safari.** WebKit only decodes MP3 on macOS (system codecs), so the `webkit` project must run on a Mac. CI runs it on a macOS runner.
+- **No web server dance.** `playwright.config.js` starts/stops `http-server` automatically.
+
+CI runs on GitHub Actions (`.github/workflows/test.yml`): Chromium + Firefox on Linux, WebKit on macOS.
+
+### BrowserStack (real devices, opt-in)
+
+Local Playwright already covers the Chromium, Firefox and WebKit engines, so BrowserStack exists only for **real iOS/Android devices**. It uses the BrowserStack Playwright SDK (`browserstack.yml` + `playwright.browserstack.config.js`):
+
+```sh
+BROWSERSTACK_USERNAME=… BROWSERSTACK_ACCESS_KEY=… npm run browserstack
 ```
 
-
-### Browserstack
-
-![Sessions Overview - BrowserStack Automate 2020-02-27 00-57-41](https://user-images.githubusercontent.com/472/75399491-9ef3c480-58fc-11ea-802a-301012d23aff.jpg)
-
-We are using Browserstack to run tests against multiple browsers. This is configured in `nightwatch-browserstack.conf.js` and uses a runner defined in `browserstack.runner.js`. Travis is setup to run Browserstack.
-
-Test failures are manually reported via `afterEach` callbacks via Browserstack's API which manually send a request per test case to Browserstack, renaming the name of the test as well as reporting it as `passed` or `failed`.
-
-### Locally against Browserstack
-
-You can also run Browserstack locally (assuming you have the `BROWSERSTACK_USERNAME` and `BROWSERSTACK_ACCESS_KEY` credentials set as ENV variables)
-
-`yarn browserstack`
-
-This is useful for figuring out why something might be failing on one particular browser. For this use case, I recommend reducing the number of browsers that are being run in package.json, isolating the one browser that is causing problems.
-
-PROTIP: You won't see any "live" output from nightwatch when more than one browser is being run, as in this case tests are being run in parallel and the log output wouldn't be very coherent. If you want to see nightwatch output as it happens, just use one browser.
-
+It's also a manual (`workflow_dispatch`) GitHub Actions lane, not part of the per-push run.
 
 ## Releasing
 
@@ -330,10 +363,9 @@ npm version x.y.z
 npm publish
 ```
 
-
 ## Acknowledgements
 
-* Thanks to [@smoofles](https://twitter.com/smoofles) for the name and logo!
-* Thanks to [@scottschiller](https://github.com/scottshiller) for creating [soundmanager](http://www.schillmania.com/projects/soundmanager2/), which had alonetone's back for many many years
-* Thanks to [@blackslate](https://github.com/blackslate) for [an example of, and detailed instructions to render](https://gist.github.com/wittnl/8a1a0168b94f3b6abfaa) a small base64 encoded mp3.
-* Thanks to [@scottanderson42](https://github.com/scottanderson42) for [the idea of creating a pool of unlocked nodes.](https://github.com/goldfire/howler.js/pull/1008)
+- Thanks to [@smoofles](https://twitter.com/smoofles) for the name and logo!
+- Thanks to [@scottschiller](https://github.com/scottshiller) for creating [soundmanager](http://www.schillmania.com/projects/soundmanager2/), which had alonetone's back for many many years
+- Thanks to [@blackslate](https://github.com/blackslate) for [an example of, and detailed instructions to render](https://gist.github.com/wittnl/8a1a0168b94f3b6abfaa) a small base64 encoded mp3.
+- Thanks to [@scottanderson42](https://github.com/scottanderson42) for [the idea of creating a pool of unlocked nodes.](https://github.com/goldfire/howler.js/pull/1008)
