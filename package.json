@@ -4,7 +4,7 @@
   "description": "Stitching Together MP3 Playback in HTML5 Audio with ES6",
   "type": "module",
   "exports": {
-    ".": "./src/playlist.js"
+    ".": "./src/index.js"
   },
   "scripts": {
     "test": "playwright test",

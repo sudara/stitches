@@ -3,7 +3,7 @@ import { expect } from "@playwright/test"
 // Every stitches event goes through Log.trigger as a bubbling CustomEvent.
 // We wrap dispatchEvent so tests assert against real events instead of
 // scraping text out of the #debug element (the old Nightwatch approach).
-export async function openPlayer(page) {
+export async function openPlayer(page, path = "/tests/fixtures/player.html") {
   await page.addInitScript(() => {
     window.__stitchesEvents = []
     const origDispatch = EventTarget.prototype.dispatchEvent
@@ -14,7 +14,7 @@ export async function openPlayer(page) {
       return origDispatch.call(this, event)
     }
   })
-  await page.goto("/tests/fixtures/player.html")
+  await page.goto(path)
 }
 
 export function events(page) {
@@ -63,6 +63,34 @@ export async function expectPlaying(
       {
         timeout: 15_000,
         message: `expected playback past ${past}s${fileName ? ` of ${fileName}` : ""}`,
+      },
+    )
+    .toBe(true)
+}
+
+// Player equivalent of expectPlaying: asserts a player:playing/timeupdate event
+// whose track advanced past `past` seconds (optionally for a specific track id).
+export async function expectPlayerPlaying(
+  page,
+  { past = 0.3, id = null } = {},
+) {
+  await expect
+    .poll(
+      async () => {
+        const evts = await events(page)
+        return evts.some((e) => {
+          if (e.type !== "player:playing" && e.type !== "player:timeupdate")
+            return false
+          if (id != null && e.detail?.track?.id !== id) return false
+          return (
+            typeof e.detail?.currentTime === "number" &&
+            e.detail.currentTime > past
+          )
+        })
+      },
+      {
+        timeout: 15_000,
+        message: `expected player past ${past}s${id != null ? ` of track ${id}` : ""}`,
       },
     )
     .toBe(true)

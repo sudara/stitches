@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+  <head>
+    <title>StitchES Player fixture</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script type="module">
+      import { Player } from "/src/index.js"
+
+      window.player = new Player()
+
+      // Tests override window.TRACKS / window.OPTS via evaluate, then click
+      // #play so the actual setQueue rides a real user gesture (autoplay/iOS).
+      window.TRACKS = [
+        { id: 1, url: "/mp3/short-continuous-1.mp3", title: "One" },
+        { id: 2, url: "/mp3/short-continuous-2.mp3", title: "Two" },
+        { id: 3, url: "/mp3/short-continuous-3.mp3", title: "Three" },
+      ]
+
+      document.querySelector("#play").addEventListener("click", () => {
+        window.player.setQueue(
+          window.TRACKS,
+          window.OPTS || { startIndex: 0, autoplay: true },
+        )
+      })
+    </script>
+  </head>
+  <body>
+    <button id="play">play queue</button>
+  </body>
+</html>
