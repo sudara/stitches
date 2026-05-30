@@ -56,9 +56,14 @@ export default class AudioNode {
 
   // position is a percentage
   async seek(position) {
+    // metadata (duration) may not have loaded yet; wait briefly for it rather
+    // than spin forever if the track never loads
+    let attempts = 0
     while (isNaN(this.audio.duration)) {
-      Log.trigger("waiting for audio.duration")
-
+      if (attempts++ > 100) {
+        Log.trigger("audioNode:seekTimedOut", { fileName: this.fileName })
+        return
+      }
       await new Promise((resolve) => setTimeout(resolve, 20))
     }
     this.seeked = true
