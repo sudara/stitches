@@ -13,7 +13,7 @@ export default class Track {
     timeSelector,
     whileLoading,
     whilePlaying,
-    onError
+    onError,
   }) {
     this.id = uniqueId()
     this.pool = pool
@@ -36,12 +36,16 @@ export default class Track {
     this.whileLoadingCallback = whileLoading
     this.whilePlayingCallback = whilePlaying
     this.onErrorCallback = onError
-    this.playButtonElement.addEventListener("click", this.togglePlay.bind(this), true)
+    this.playButtonElement.addEventListener(
+      "click",
+      this.togglePlay.bind(this),
+      true,
+    )
     this.addSeekListener()
     this.reset()
     this.log("track:create", this.payload())
-		this.customEventDetail = {}
-		this.extractCustomEventDetail()
+    this.customEventDetail = {}
+    this.extractCustomEventDetail()
   }
 
   reset() {
@@ -49,7 +53,6 @@ export default class Track {
     this.preloadNextTrackDispatched = false
     this.playingEventDispatched = false
     this.registerListenEventDispatched = false
-		
   }
 
   async preload() {
@@ -73,7 +76,7 @@ export default class Track {
       this.log("track:grabNodeAndSetSrc", this.payload())
 
       this.audioNode = await this.pool.nextAvailableNode(
-        this.cleanupAudioNode.bind(this)
+        this.cleanupAudioNode.bind(this),
       )
 
       // Both of these events can happen before play is passed
@@ -105,8 +108,11 @@ export default class Track {
       // Normally we'd want a "await" here, but it broke continuous playback on ios
       // This means that errors from playback won't bubble up here
       // And instead need to be caught inside AudioNode
-      this.audioNode.play(this.whilePlaying.bind(this), this.onSeek.bind(this),
-        this.wasClicked)
+      this.audioNode.play(
+        this.whilePlaying.bind(this),
+        this.onSeek.bind(this),
+        this.wasClicked,
+      )
 
       await this.pool.unlockAllAudioNodes()
 
@@ -162,8 +168,8 @@ export default class Track {
     this.timeFromEnd = data.duration - this.time
 
     // Achtung, the order of these are important for tests!
-    const payload = this.payload(data)		
-        
+    const payload = this.payload(data)
+
     // ensures track:playing always fires before whilePlaying
     if (!this.playingEventDispatched) {
       // manually fire one last whileLoading
@@ -176,7 +182,7 @@ export default class Track {
       this.log("track:whilePlaying", payload)
     }
 
-    if (!this.registerListenEventDispatched && (this.position > 0.15)) {
+    if (!this.registerListenEventDispatched && this.position > 0.15) {
       this.log("track:registerListen", payload)
       this.registerListenEventDispatched = true
     }
@@ -210,20 +216,20 @@ export default class Track {
   }
 
   async updatePosition(event) {
-
     this.wasClicked = true // This lets us shortcut unlockAll for this particular track
 
     let newPosition
 
     // if we weren't playing before, now is the time
     this.playlistSetCurrentTrack(this)
-    if(this.paused) await this.play()
+    if (this.paused) await this.play()
 
     // this is a custom event, we are getting the position
     if (event.detail.position) {
       newPosition = event.detail.position
-    } else if(this.seekElement) {
-      const offset = event.clientX - this.seekElement.getBoundingClientRect().left
+    } else if (this.seekElement) {
+      const offset =
+        event.clientX - this.seekElement.getBoundingClientRect().left
       newPosition = offset / this.seekElement.offsetWidth
     }
     this.updatePlayProgressElement(newPosition)
@@ -292,17 +298,15 @@ export default class Track {
     if (this.loadingProgressElement) {
       if (this.loadingProgressElement.nodeName === "PROGRESS")
         this.loadingProgressElement.value = position
-      else
-        this.loadingProgressElement.style.width = `${position * 100}%`
+      else this.loadingProgressElement.style.width = `${position * 100}%`
     }
   }
 
-  updatePlayProgressElement(position=this.position) {
+  updatePlayProgressElement(position = this.position) {
     if (this.playProgressElement && !Number.isNaN(position)) {
       if (this.playProgressElement.nodeName === "PROGRESS")
         this.playProgressElement.value = position
-      else
-        this.playProgressElement.style.width = `${position * 100}%`
+      else this.playProgressElement.style.width = `${position * 100}%`
     }
   }
 
@@ -310,21 +314,21 @@ export default class Track {
     const time = Math.floor(this.time)
     const min = Math.floor(time / 60)
     const sec = time % 60
-    return min + ':' + (sec >= 10 ? sec : '0' + sec)
+    return min + ":" + (sec >= 10 ? sec : "0" + sec)
   }
-	
-	extractCustomEventDetail() {
-		for (const dataAttribute in this.element.dataset)
-		{
-			if (dataAttribute.startsWith("stitches"))
-			{
-				// stitchesTrackName becomes trackName
-				const newAttributeName = dataAttribute[8].toLowerCase() + dataAttribute.substring(9)
-				this.customEventDetail[newAttributeName] = this.element.dataset[dataAttribute]
-			}
-		}
-	}
-  
+
+  extractCustomEventDetail() {
+    for (const dataAttribute in this.element.dataset) {
+      if (dataAttribute.startsWith("stitches")) {
+        // stitchesTrackName becomes trackName
+        const newAttributeName =
+          dataAttribute[8].toLowerCase() + dataAttribute.substring(9)
+        this.customEventDetail[newAttributeName] =
+          this.element.dataset[dataAttribute]
+      }
+    }
+  }
+
   // Achtung, the browser tests rely on this.time being logged first!
   payload(data) {
     return {

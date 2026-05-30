@@ -40,7 +40,7 @@ export default class AudioNode {
     this.reset()
     this.audio.src = url
     this.fileName = url.startsWith("data:audio") ? "data" : url.split("/").pop()
-    Log.trigger("audioNode:srcchanged", { fileName: this.fileName } )
+    Log.trigger("audioNode:srcchanged", { fileName: this.fileName })
   }
 
   get src() {
@@ -57,14 +57,14 @@ export default class AudioNode {
   // position is a percentage
   async seek(position) {
     while (isNaN(this.audio.duration)) {
-      Log.trigger('waiting for audio.duration')
+      Log.trigger("waiting for audio.duration")
 
-      await new Promise(resolve => setTimeout(resolve, 20))
+      await new Promise((resolve) => setTimeout(resolve, 20))
     }
     this.seeked = true
     Log.trigger("audioNode:seeked", {
       position,
-      fileName: this.fileName
+      fileName: this.fileName,
     })
     this.audio.currentTime = this.audio.duration * position
   }
@@ -75,15 +75,15 @@ export default class AudioNode {
 
   // this can *only* be called via an interaction event like a click/touch
   async unlock() {
-     // https://developers.google.com/web/updates/2016/03/play-returns-promise
+    // https://developers.google.com/web/updates/2016/03/play-returns-promise
     try {
       // This will be reached only if preloaded track *wasn't* clicked on
-      if (this.unlockedDirectlyViaUserInteraction){
+      if (this.unlockedDirectlyViaUserInteraction) {
         Log.trigger("audioNode:alreadyUnlockedDirectly")
       } else if (!this.blank && !this.unlocked) {
         await this.unlockPreloaded()
         Log.trigger("audioNode:unlockedPreloaded")
-      } else if(!this.unlocked) {
+      } else if (!this.unlocked) {
         await this.audio.play()
         Log.trigger("audioNode:unlocked")
       } else {
@@ -93,7 +93,7 @@ export default class AudioNode {
     } catch (err) {
       Log.trigger("audioNode:unlockfailed", {
         name: err.name,
-        message: err.message
+        message: err.message,
       })
     }
   }
@@ -123,7 +123,7 @@ export default class AudioNode {
       // https://developer.mozilla.org/en-US/docs/Web/Guide/Audio_and_video_delivery/buffering_seeking_time_ranges#Seekable
       secondsLoaded = this.audio.seekable.end(this.audio.seekable.length - 1)
     } catch {
-      Log.trigger('audioNode:indexSizeError')
+      Log.trigger("audioNode:indexSizeError")
     }
 
     // we don't want to fire on pointless / duplicate events
@@ -132,9 +132,9 @@ export default class AudioNode {
     const payload = {
       secondsLoaded,
       duration: this.duration,
-      fileName: this.fileName
+      fileName: this.fileName,
     }
-    Log.trigger('audioNode:whileLoading', payload)
+    Log.trigger("audioNode:whileLoading", payload)
 
     // this is Track's whileLoading
     // We don't want it to fire on blank mp3, etc
@@ -160,9 +160,9 @@ export default class AudioNode {
     // In these cases, we don't want to fire whilePlaying, as we aren't playing.
     // Warning: In some browsers, the event that fires on seek can have a different
     // decimal precision to the next event, despite no time passing.
-    if (this.seeked)  {
-      if ((this.lastSeeked > 0) && (this.lastSeeked !== currentTime.toFixed(3))) {
-      this.seeked = false
+    if (this.seeked) {
+      if (this.lastSeeked > 0 && this.lastSeeked !== currentTime.toFixed(3)) {
+        this.seeked = false
         this.lastSeeked = 0.0
         if (this.onSeekCallback) this.onSeekCallback()
       } else {
@@ -175,20 +175,26 @@ export default class AudioNode {
       this.whilePlayingCallback({
         currentTime,
         duration: this.duration,
-        fileName: this.fileName
+        fileName: this.fileName,
       })
     }
   }
 
   // https://dev.w3.org/html5/spec-author-view/spec.html#mediaerror
   onError(e) {
-    if(e.target ) { e = e.target.error } // when e is an event
-    const codes = ['MEDIA_ERR_ABORTED', 'MEDIA_ERR_NETWORK',
-      'MEDIA_ERR_DECODE', 'MEDIA_ERR_SRC_NOT_SUPPORTED']
+    if (e.target) {
+      e = e.target.error
+    } // when e is an event
+    const codes = [
+      "MEDIA_ERR_ABORTED",
+      "MEDIA_ERR_NETWORK",
+      "MEDIA_ERR_DECODE",
+      "MEDIA_ERR_SRC_NOT_SUPPORTED",
+    ]
     const payload = {
       fileName: this.fileName,
       code: `${e.code}: ${codes[parseInt(e.code, 10) - 1]}`,
-      message: e.message
+      message: e.message,
     }
 
     // useful internally to make sure our error handling works
@@ -198,7 +204,11 @@ export default class AudioNode {
     this.onErrorCallback(payload)
   }
 
-  async play(whilePlayingCallback, onSeekCallback, firedFromUserInteraction=false) {
+  async play(
+    whilePlayingCallback,
+    onSeekCallback,
+    firedFromUserInteraction = false,
+  ) {
     Log.trigger("audioNode:play")
     this.unlockedDirectlyViaUserInteraction = firedFromUserInteraction
 
@@ -210,7 +220,9 @@ export default class AudioNode {
     // In the case of an error, the onError handler will handle it
     try {
       await this.audio.play()
-    } catch { /* no-op */ }
+    } catch {
+      /* no-op */
+    }
   }
 
   pause() {
@@ -233,7 +245,7 @@ export default class AudioNode {
     if (!this.blank) {
       this.whileLoading()
       Log.trigger("audioNode:loaded", {
-        fileName: this.fileName
+        fileName: this.fileName,
       })
     }
   }

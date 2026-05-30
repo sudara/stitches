@@ -1,10 +1,9 @@
 export default class Log {
-
   static enableConsoleLogging(newValue) {
     this.logToConsole = newValue
   }
 
-  static trigger(scope, detail, dispatcher=document) {
+  static trigger(scope, detail, dispatcher = document) {
     const message = `${performance.now().toFixed(1)} ms: ${scope}`
 
     if (this.logToConsole) {
@@ -24,8 +23,8 @@ export default class Log {
 
     if (el) {
       const detailString = Object.values(detail || []).join(" ")
-      if (detailString.length > 0){
-        message += ` - ${ detailString }`
+      if (detailString.length > 0) {
+        message += ` - ${detailString}`
       }
       el.insertAdjacentHTML("afterbegin", `${message}<br/>`)
     }

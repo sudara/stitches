@@ -14,7 +14,6 @@ export default class NodePool {
 
   // has Last in Last out behaviour e.g. [a, b, c] -> [b, c, a]
   async nextAvailableNode(cleanupCallback) {
-
     // grab the first track in line
     const audioNode = this.audioNodes.shift()
 

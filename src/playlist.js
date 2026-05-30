@@ -10,7 +10,6 @@ import NodePool from "./node_pool.js"
 const pool = new NodePool(3)
 
 export default class Playlist {
-
   constructor(options) {
     this.listenersAreSetup = false
 
@@ -37,10 +36,12 @@ export default class Playlist {
     this.reset()
     const elements = document.querySelectorAll(tracksSelector)
     if (!elements.length) {
-      Log.trigger("Stiches tracksSelector' not specified or contains no elements")
+      Log.trigger(
+        "Stiches tracksSelector' not specified or contains no elements",
+      )
     }
     this.tracks = [...elements].map(
-      el =>
+      (el) =>
         new Track({
           element: el,
           pool,
@@ -51,12 +52,12 @@ export default class Playlist {
           seekSelector,
           timeSelector,
           whilePlaying,
-          onError
-        })
+          onError,
+        }),
     )
     if (preloadIndex >= 0) this.tracks[preloadIndex].preload()
-    if(!this.listenersAreSetup) this.setupListeners()
-    Log.enableConsoleLogging(enableConsoleLogging);
+    if (!this.listenersAreSetup) this.setupListeners()
+    Log.enableConsoleLogging(enableConsoleLogging)
   }
 
   reset() {
@@ -68,7 +69,7 @@ export default class Playlist {
 
   nextTrack() {
     const currentTrackIndex = this.tracks.findIndex(
-      track => this.currentTrack && track.id === this.currentTrack.id
+      (track) => this.currentTrack && track.id === this.currentTrack.id,
     )
     return this.tracks[currentTrackIndex + 1]
       ? this.tracks[currentTrackIndex + 1]
@@ -76,14 +77,14 @@ export default class Playlist {
   }
 
   async setCurrentTrack(track) {
-    if (this.currentTrack && (this.currentTrack !== track)) {
+    if (this.currentTrack && this.currentTrack !== track) {
       this.currentTrack.pause()
     }
     this.currentTrack = track
   }
 
   trackIsPartOfPlaylist(evt) {
-    return this.tracks.some(track => track.id === evt.detail.id)
+    return this.tracks.some((track) => track.id === evt.detail.id)
   }
 
   async playNextTrack(evt) {
@@ -107,7 +108,7 @@ export default class Playlist {
     document.addEventListener("track:ended", this.playNextTrack.bind(this))
     document.addEventListener(
       "track:preloadNextTrack",
-      this.preloadNextTrack.bind(this)
+      this.preloadNextTrack.bind(this),
     )
     this.listenersAreSetup = true
   }
