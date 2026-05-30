@@ -1,6 +1,10 @@
 import Log from "./log.js"
-import uniqueId from "./unique_id.js"
+import PlaybackController from "./playback_controller.js"
 
+// DOM adapter over PlaybackController: binds a playlist element to the engine,
+// wires the play/seek listeners, updates the progress/time/class DOM, and
+// re-broadcasts the engine's lifecycle as the legacy bubbling `track:*`
+// CustomEvents (with this element's `data-stitches-*` detail merged in).
 export default class Track {
   constructor({
     element,
@@ -15,8 +19,6 @@ export default class Track {
     whilePlaying,
     onError,
   }) {
-    this.id = uniqueId()
-    this.pool = pool
     this.element = element
     this.playButtonElement = element.querySelector(playButtonSelector)
     this.url = this.playButtonElement.href
@@ -25,204 +27,112 @@ export default class Track {
     this.seekElement = element.querySelector(seekSelector)
     this.timeElement = element.querySelector(timeSelector)
     this.playlistSetCurrentTrack = setCurrentTrack
-    this.audioNode = null
-    this.duration = 0
-    this.time = 0
-    this.position = 0
-    this.timeFromEnd = NaN
-    this.wasClicked = false
-    this.paused = true
-    this.displayingPauseButton = false
     this.whileLoadingCallback = whileLoading
     this.whilePlayingCallback = whilePlaying
     this.onErrorCallback = onError
+    this.displayingPauseButton = false
+    this.customEventDetail = {}
+    this.extractCustomEventDetail()
+
+    this.controller = new PlaybackController({
+      url: this.url,
+      pool,
+      emit: this.handle.bind(this),
+    })
+    this.id = this.controller.id
+
     this.playButtonElement.addEventListener(
       "click",
       this.togglePlay.bind(this),
       true,
     )
     this.addSeekListener()
-    this.reset()
-    this.log("track:create", this.payload())
-    this.customEventDetail = {}
-    this.extractCustomEventDetail()
+    this.log("track:create", this.controller.state())
   }
 
-  reset() {
-    this.hasEnded = false
-    this.preloadNextTrackDispatched = false
-    this.playingEventDispatched = false
-    this.registerListenEventDispatched = false
+  get paused() {
+    return this.controller.paused
   }
 
-  async preload() {
-    // grab node from list
-    this.log("track:preload", this.payload())
-    await this.load()
+  get audioNode() {
+    return this.controller.audioNode
   }
 
-  // grabbing a new node automatically results in position 0 for it and no seek(0) is needed
-  // TODO: set the old position if it was partially played https://github.com/sudara/stitchES/issues/34
-  async grabNode() {
-    if (this.audioNode !== null) {
-      // No need to check for unlocked audio nodes,
-      // since hasEnded means the audio node have been unlocked before
-      if (this.hasEnded) {
-        this.seek(0)
-      }
-    } else {
-      // grabbing a new node automatically results in position 0 for it and no seek(0) is needed
-      // TODO: set the old position if it was partially played https://github.com/sudara/stitchES/issues/34
-      this.log("track:grabNodeAndSetSrc", this.payload())
-
-      this.audioNode = await this.pool.nextAvailableNode(
-        this.cleanupAudioNode.bind(this),
-      )
-
-      // Both of these events can happen before play is passed
-      // So we need to be sure the set these callbacks ASAP
-      this.audioNode.whileLoadingCallback = this.whileLoading.bind(this)
-      this.audioNode.onErrorCallback = this.onError.bind(this)
-
-      this.audioNode.src = this.url
-      this.log("track:loading", this.payload())
-    }
-  }
-
-  cleanupAudioNode() {
-    this.audioNode = null
-  }
-
-  // https://developers.google.com/web/updates/2016/03/play-returns-promise
-  async play() {
-    this.log("track:play", this.payload())
-
-    // this helps us fire the track:playing event
-    // the first time that whileLoading is called
-    this.playingEventDispatched = false
-
-    try {
-      await this.grabNode()
-
-      // we are binding Track's methods to audioNode's callbacks
-      // Normally we'd want a "await" here, but it broke continuous playback on ios
-      // This means that errors from playback won't bubble up here
-      // And instead need to be caught inside AudioNode
-      this.audioNode.play(
-        this.whilePlaying.bind(this),
-        this.onSeek.bind(this),
-        this.wasClicked,
-      )
-
-      await this.pool.unlockAllAudioNodes()
-
-      // TODO: this needs to happen via callbacks
-      if (this.audioNode.isLoaded) {
-        this.element.classList.add("stitches-playing")
-        this.element.classList.remove("stitches-paused")
-      } else {
-        this.element.classList.add("stitches-loading")
-        this.element.classList.remove("stitches-playing")
-        this.element.classList.remove("stitches-paused")
-      }
-
-      if (this.timeElement) {
-        this.timeElement.innerText = this.formattedTime()
-      }
-      this.hasEnded = false
-      this.paused = false
-    } catch (err) {
-      this.onError(err)
-    }
-  }
-
-  // called from an audioNode
-  onError(data) {
-    // call the user supplied callback
-    if (this.onErrorCallback) {
-      this.onErrorCallback(data)
-    }
-    this.log("track:notPlaying", this.payload())
-  }
-
-  // called from an audioNode
-  onSeek() {
-    this.log("track:seeked", this.payload())
-  }
-
-  // called from an audioNode
-  whileLoading(data) {
-    this.duration = data.duration
-    const position = data.secondsLoaded / data.duration
-    this.updateLoadingProgressElement(position)
-    if (typeof this.whileLoadingCallback === "function") {
-      this.whileLoadingCallback(data)
-    }
-    this.log("track:whileLoading", this.payload(data))
-  }
-
-  // called from an audioNode
-  whilePlaying(data) {
-    this.time = data.currentTime
-    this.position = data.currentTime / data.duration
-    this.timeFromEnd = data.duration - this.time
-
-    // Achtung, the order of these are important for tests!
-    const payload = this.payload(data)
-
-    // ensures track:playing always fires before whilePlaying
-    if (!this.playingEventDispatched) {
-      // manually fire one last whileLoading
-      // as browsers are a bit inconsistent about this
-      // and we'd like to always see the full loading progress
-      this.audioNode.whileLoading()
-      this.log("track:playing", payload)
-      this.playingEventDispatched = true
-    } else {
-      this.log("track:whilePlaying", payload)
+  // Turns each engine event into the DOM updates + the bubbling track:* event
+  // the old Track emitted. playStarted is internal (no legacy event).
+  handle(event, detail) {
+    switch (event) {
+      case "playStarted":
+        if (detail.isLoaded) {
+          this.element.classList.add("stitches-playing")
+          this.element.classList.remove("stitches-paused")
+        } else {
+          this.element.classList.add("stitches-loading")
+          this.element.classList.remove("stitches-playing")
+          this.element.classList.remove("stitches-paused")
+        }
+        if (this.timeElement) this.timeElement.innerText = detail.currentTime
+        return
+      case "whileLoading":
+        this.updateLoadingProgressElement(detail.loadingPosition)
+        if (typeof this.whileLoadingCallback === "function")
+          this.whileLoadingCallback(detail)
+        break
+      case "playing":
+      case "whilePlaying":
+        if (this.timeElement) this.timeElement.innerText = detail.currentTime
+        this.updatePlayProgressElement(detail.percentPlayed)
+        if (!this.displayingPauseButton) {
+          this.element.classList.remove("stitches-loading")
+          this.element.classList.add("stitches-playing")
+          this.displayingPauseButton = true
+        }
+        break
+      case "pause":
+        this.displayingPauseButton = false
+        break
+      case "notPlaying":
+        if (this.onErrorCallback) this.onErrorCallback(detail.error)
+        break
+      default:
+        break
     }
 
-    if (!this.registerListenEventDispatched && this.position > 0.15) {
-      this.log("track:registerListen", payload)
-      this.registerListenEventDispatched = true
-    }
+    const payload = { ...detail, ...this.customEventDetail }
+    this.log("track:" + event, payload)
 
-    if (this.timeElement) {
-      this.timeElement.innerText = this.formattedTime()
-    }
-
-    if (!this.hasEnded && this.timeFromEnd < 0.2) {
-      this.hasEnded = true
-      this.paused = true
-      this.log("track:ended", payload)
-    }
-
-    if (!this.preloadNextTrackDispatched && this.timeFromEnd < 10) {
-      this.preloadNextTrackDispatched = true
-      this.log("track:preloadNextTrack", payload)
-    }
-
-    this.updatePlayProgressElement()
-
-    if (!this.displayingPauseButton) {
-      this.element.classList.remove("stitches-loading")
-      this.element.classList.add("stitches-playing")
-      this.displayingPauseButton = true
-    }
-
-    if (typeof this.whilePlayingCallback === "function") {
+    if (
+      (event === "playing" || event === "whilePlaying") &&
+      typeof this.whilePlayingCallback === "function"
+    ) {
       this.whilePlayingCallback(payload)
     }
   }
 
+  preload() {
+    return this.controller.preload()
+  }
+
+  play() {
+    return this.controller.play()
+  }
+
+  pause() {
+    this.controller.pause()
+  }
+
+  load() {
+    return this.controller.load()
+  }
+
   async updatePosition(event) {
-    this.wasClicked = true // This lets us shortcut unlockAll for this particular track
+    this.controller.wasClicked = true // This lets us shortcut unlockAll for this particular track
 
     let newPosition
 
     // if we weren't playing before, now is the time
     this.playlistSetCurrentTrack(this)
-    if (this.paused) await this.play()
+    if (this.controller.paused) await this.play()
 
     // this is a custom event, we are getting the position
     if (event.detail.position) {
@@ -233,45 +143,21 @@ export default class Track {
       newPosition = offset / this.seekElement.offsetWidth
     }
     this.updatePlayProgressElement(newPosition)
-    this.seek(newPosition)
-  }
-
-  seek(position) {
-    if (this.hasEnded) {
-      this.reset()
-    }
-    this.audioNode.seek(position)
-  }
-
-  async load() {
-    if (!this.audioNode) {
-      await this.grabNode()
-      this.audioNode.src = this.url
-      await this.audioNode.load()
-    } else if (this.audioNode && !this.audioNode.isLoading) {
-      await this.audioNode.load()
-    }
-  }
-
-  pause() {
-    this.audioNode.pause()
-    this.paused = true
-    this.displayingPauseButton = false
-    this.log("track:pause")
+    this.controller.seek(newPosition)
   }
 
   // This is called by the click handler
   // And the event we are "riding" to unlock everything
   togglePlay(evt) {
-    this.wasClicked = true // This lets us shortcut unlockAll for this particular track
+    this.controller.wasClicked = true // This lets us shortcut unlockAll for this particular track
     evt.preventDefault() // This will still bubble up to fire unlockAll from body
-    if (this.audioNode && !this.paused) {
+    if (this.controller.audioNode && !this.controller.paused) {
       this.pause()
       this.element.classList.remove("stitches-loading")
       this.element.classList.remove("stitches-playing")
       this.element.classList.add("stitches-paused")
     } else {
-      // all exceptions are handled and caught in this.play()
+      // all exceptions are handled and caught in play()
       // hence we don't need to await / try / catch
       this.playlistSetCurrentTrack(this)
       this.play()
@@ -291,7 +177,11 @@ export default class Track {
 
   // just keeps the logging a bit cleaner in the rest of the class
   log(event, options = {}) {
-    Log.trigger(event, Object.assign(options, { id: this.id }), this.element)
+    Log.trigger(
+      event,
+      Object.assign({}, options, { id: this.id }),
+      this.element,
+    )
   }
 
   updateLoadingProgressElement(position) {
@@ -302,19 +192,12 @@ export default class Track {
     }
   }
 
-  updatePlayProgressElement(position = this.position) {
+  updatePlayProgressElement(position) {
     if (this.playProgressElement && !Number.isNaN(position)) {
       if (this.playProgressElement.nodeName === "PROGRESS")
         this.playProgressElement.value = position
       else this.playProgressElement.style.width = `${position * 100}%`
     }
-  }
-
-  formattedTime() {
-    const time = Math.floor(this.time)
-    const min = Math.floor(time / 60)
-    const sec = time % 60
-    return min + ":" + (sec >= 10 ? sec : "0" + sec)
   }
 
   extractCustomEventDetail() {
@@ -326,19 +209,6 @@ export default class Track {
         this.customEventDetail[newAttributeName] =
           this.element.dataset[dataAttribute]
       }
-    }
-  }
-
-  // Achtung, the browser tests rely on this.time being logged first!
-  payload(data) {
-    return {
-      time: this.time,
-      duration: this.duration,
-      fileName: data === undefined ? "" : data.fileName,
-      timeFromEnd: this.timeFromEnd,
-      percentPlayed: this.position,
-      currentTime: this.formattedTime(),
-      ...this.customEventDetail,
     }
   }
 }
