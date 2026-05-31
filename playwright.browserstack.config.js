@@ -10,10 +10,9 @@ export default defineConfig({
   // tunnels the host's server under bs-local.com, so point the tests there.
   use: { ...base.use, baseURL: "http://bs-local.com:8080" },
   // Real devices over the tunnel are slow, and the full desktop-tuned suite is
-  // the wrong shape for them. Run just the smoke canary — "does MP3 actually
-  // decode and play on this real device" — with no retries so failures surface
-  // fast rather than 3x into the job timeout.
-  grep: /@smoke/,
+  // the wrong shape for them. Run only the smoke suite (unlock/play/next) with
+  // no retries so failures surface fast rather than 3x into the job timeout.
+  testMatch: /smoke\.spec\.js/,
   retries: 0,
   projects: [{ name: "browserstack" }],
 })

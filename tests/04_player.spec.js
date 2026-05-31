@@ -15,9 +15,7 @@ test.beforeEach(async ({ page }) => {
 // The first setQueue rides this click so autoplay/iOS unlock is satisfied.
 const start = (page) => page.locator("#play").click()
 
-test("setQueue queues, announces the track, and plays it @smoke", async ({
-  page,
-}) => {
+test("setQueue queues, announces the track, and plays it", async ({ page }) => {
   await start(page)
 
   await expect
