@@ -7,7 +7,13 @@ import NodePool from "./node_pool.js"
 // 1 playing, 1 preloading and the last one played in memory
 // Browsers will usually HTTP cache the asset anyway
 // so there's no need to hang on to too many <audio> nodes
-const pool = new NodePool(3)
+// Created lazily so merely importing Playlist (e.g. via the barrel) doesn't
+// spin up audio nodes; still a singleton shared across Playlist instances.
+let pool
+function sharedPool() {
+  if (!pool) pool = new NodePool(3)
+  return pool
+}
 
 export default class Playlist {
   constructor(options) {
@@ -44,7 +50,7 @@ export default class Playlist {
       (el) =>
         new Track({
           element: el,
-          pool,
+          pool: sharedPool(),
           setCurrentTrack: this.setCurrentTrack.bind(this),
           playButtonSelector,
           loadingProgressSelector,
