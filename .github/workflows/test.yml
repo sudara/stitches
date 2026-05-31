@@ -48,4 +48,14 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps firefox
+      # Headless Linux has no audio device, so cubeb can't build a sink and
+      # every play errors with OnMediaSinkAudioError. A userspace null sink
+      # gives Firefox a real sink (no hardware) so playback advances.
+      - name: Start a dummy PulseAudio sink
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pulseaudio
+          pulseaudio --start --exit-idle-time=-1
+          pactl load-module module-null-sink sink_name=dummy
+          pactl set-default-sink dummy
       - run: npx playwright test --project=firefox

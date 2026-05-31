@@ -36,10 +36,6 @@ export default defineConfig({
           firefoxUserPrefs: {
             "media.autoplay.default": 0,
             "media.autoplay.blocking_policy": 0,
-            // headless Linux CI has no audio device, so cubeb fails to build a
-            // sink (OnMediaSinkAudioError) when the pool plays its 3 nodes at
-            // once; the null backend serves every node and still ticks the clock
-            "media.cubeb.force_null_context": true,
           },
         },
       },
