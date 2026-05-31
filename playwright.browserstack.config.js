@@ -15,7 +15,7 @@ export default defineConfig({
   // Real devices over the tunnel are slow, and the full desktop-tuned suite is
   // the wrong shape for them. Run only the smoke suite (unlock/play/next) with
   // no retries so failures surface fast rather than 3x into the job timeout.
-  testMatch: /smoke\.spec\.js/,
+  testMatch: /bs-debug\.spec\.js/,
   retries: 0,
   projects: [{ name: "browserstack" }],
 })
