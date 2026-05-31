@@ -17,6 +17,11 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # browserstack-node-sdk (1.55.4, latest) hardcodes a Playwright internal
+      # path (playwright/lib/common/configLoader.js) that 1.60 bundled away, so
+      # the SDK only works with Playwright <=1.55. Pin a compatible version for
+      # this opt-in job only; the main lanes stay on the repo's 1.60.
+      - run: npm install --no-save @playwright/test@1.55.0 playwright@1.55.0
       # the SDK runs the test files on BrowserStack's devices; the local
       # http-server (started by Playwright's webServer) is reached via the
       # BrowserStack Local tunnel that the SDK manages
