@@ -20,6 +20,13 @@ const HUB = "https://hub-cloud.browserstack.com/wd/hub"
 // host's server under bs-local.com.
 const BASE = "http://bs-local.com:8080"
 const FIXTURE = `${BASE}/tests/fixtures/player-queue.html`
+// Pause/resume and seek need a track long enough to have headroom mid-playback
+// (must be ≥ ~16s: seek 0.6 + the +3s assertion); the fixture's short-continuous
+// clips are ~5s. Re-queued without a new tap, which also proves the unlock
+// persists across queues. Distinct ids per check so events can't bleed across.
+const LONG = { url: "/mp3/continuous-play-1.mp3", title: "continuous-play-1" }
+const PAUSE_TRACK = { id: 91, ...LONG }
+const SEEK_TRACK = { id: 92, ...LONG }
 
 // BrowserStack device/version strings drift over time — adjust against the
 // current BrowserStack capability builder if a session fails to start.
@@ -61,27 +68,42 @@ function installRecorder() {
   }
 }
 
-function playedPast(id) {
+// Pure, args-only so they serialize cleanly to the device via executeScript.
+function playedPast(id, t) {
   return (window.__events || []).some(
     (e) =>
       (e.type === "player:playing" || e.type === "player:timeupdate") &&
       e.id === id &&
       typeof e.ct === "number" &&
-      e.ct > 0.3,
+      e.ct > t,
   )
 }
 
-async function waitForPlaying(driver, id) {
-  await driver.wait(
-    () => driver.executeScript(playedPast, id),
-    45_000,
-    `track ${id} never played past 0.3s`,
-    1_000,
+function sawEvent(type, id) {
+  return (window.__events || []).some((e) => e.type === type && (id == null || e.id === id))
+}
+
+function maxTime(id) {
+  return (window.__events || []).reduce(
+    (m, e) => (e.id === id && typeof e.ct === "number" && e.ct > m ? e.ct : m),
+    0,
   )
 }
 
-async function runSmoke(device) {
-  const driver = await new Builder()
+function poll(driver, fn, message, timeout, ...args) {
+  return driver.wait(() => driver.executeScript(fn, ...args), timeout, message, 1_000)
+}
+
+const setQueue = (driver, track) =>
+  driver.executeScript((t) => window.player.setQueue([t], { autoplay: true }), track)
+const playerCall = (driver, method) => driver.executeScript((m) => window.player[m](), method)
+const clearEvents = (driver) =>
+  driver.executeScript(() => {
+    window.__events = []
+  })
+
+function buildDriver(device) {
+  return new Builder()
     .usingServer(HUB)
     .withCapabilities({
       ...device.caps,
@@ -96,28 +118,66 @@ async function runSmoke(device) {
       },
     })
     .build()
+}
+
+async function runSmoke(device) {
+  const driver = await buildDriver(device)
 
   try {
+    // unlock + play: a real gesture unlocks the pool and track 1 decodes + plays
     await driver.get(FIXTURE)
-    await driver.wait(
-      () =>
-        driver.executeScript(
-          () => typeof window.player !== "undefined" && !!document.querySelector("#play"),
-        ),
-      30_000,
+    await poll(
+      driver,
+      () => typeof window.player !== "undefined" && !!document.querySelector("#play"),
       "player module never initialized",
+      30_000,
     )
     await driver.executeScript(installRecorder)
-
     // nativeWebTap turns this into a real OS tap on iOS = trusted gesture.
     await driver.findElement(By.id("play")).click()
-    await waitForPlaying(driver, 1)
+    await poll(driver, playedPast, "track 1 never played past 0.3s", 45_000, 1, 0.3)
 
-    await driver.executeScript(() => window.player.next())
-    await waitForPlaying(driver, 2)
+    // gapless advance: track 1 reaches its natural end and the preloaded next
+    // track auto-advances and plays with NO new gesture (the core promise)
+    await poll(driver, sawEvent, "track 1 never ended", 45_000, "player:ended", 1)
+    await poll(driver, playedPast, "track 2 never auto-advanced past 0.3s", 30_000, 2, 0.3)
+
+    // pause + resume mid-track without a new gesture
+    await clearEvents(driver)
+    await setQueue(driver, PAUSE_TRACK)
+    await poll(driver, playedPast, "long track never played past 0.8s", 45_000, PAUSE_TRACK.id, 0.8)
+    await playerCall(driver, "pause")
+    await poll(driver, sawEvent, "pause never took effect", 15_000, "player:paused", null)
+    // snapshot after pause confirmed so any residual timeupdate is in the baseline
+    const beforePause = await driver.executeScript(maxTime, PAUSE_TRACK.id)
+    await playerCall(driver, "play")
+    await poll(
+      driver,
+      playedPast,
+      "playback did not resume after pause",
+      20_000,
+      PAUSE_TRACK.id,
+      beforePause + 0.5,
+    )
+
+    // seek-then-play: a forward seek lands and playback continues from there
+    await clearEvents(driver)
+    await setQueue(driver, SEEK_TRACK)
+    await poll(driver, playedPast, "long track never played before seek", 45_000, SEEK_TRACK.id, 0.3)
+    const beforeSeek = await driver.executeScript(maxTime, SEEK_TRACK.id)
+    await driver.executeScript((p) => window.player.seek(p), 0.6)
+    await poll(driver, sawEvent, "seek never fired", 15_000, "player:seeked", SEEK_TRACK.id)
+    await poll(
+      driver,
+      playedPast,
+      "playback did not continue past the seek point",
+      20_000,
+      SEEK_TRACK.id,
+      beforeSeek + 3,
+    )
 
     await driver.executeScript(
-      'browserstack_executor: {"action":"setSessionStatus","arguments":{"status":"passed","reason":"unlock + play + next"}}',
+      'browserstack_executor: {"action":"setSessionStatus","arguments":{"status":"passed","reason":"unlock, gapless advance, pause/resume, seek"}}',
     )
   } finally {
     await driver.quit()
