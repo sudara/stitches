@@ -40,10 +40,12 @@ export default class Player {
     return this._isPlaying
   }
 
-  // Primary entry point. Rides the user gesture: unlocks the pool synchronously
-  // (before any await) so iOS allows later gestureless auto-advance/next.
+  // Primary entry point. Call it inside the user gesture: the first play rides
+  // the gesture and (via PlaybackController) unlocks the rest of the pool right
+  // after, so later gestureless next/auto-advance can play. We intentionally do
+  // NOT pre-unlock here — playing a node's blank clip and then swapping its src
+  // stalls playback in Firefox.
   setQueue(tracks, { startIndex = 0, autoplay = true } = {}) {
-    this.unlock()
     this._stopCurrent()
 
     this._queue = tracks.slice()
@@ -70,10 +72,14 @@ export default class Player {
   }
 
   play() {
-    this.unlock()
     // committing to (re)play the current track re-arms the advance latch
     this._advanced = false
-    this._controllers[this._currentIndex]?.play()
+    const controller = this._controllers[this._currentIndex]
+    if (!controller) return
+    // flag this play as user-initiated so the post-play pool unlock doesn't
+    // pause the track we're starting (same role wasClicked plays for Track)
+    controller.wasClicked = true
+    controller.play()
   }
 
   pause() {
