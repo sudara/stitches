@@ -207,8 +207,6 @@ The follow event detail are included in all `track` events.
 `percentPlayed`: A float number between 0 and 1.0 specifying the current playback position
 `currentTime`: A formatted String representing the elapsed time, such as "0:00" or "1:23"
 
-```
-
 Please be aware that for the earlier events like `track:create` or `track:loading`, most of these values will be 0 or `NaN`, as their values are not yet known.
 
 
