@@ -15,10 +15,13 @@ browserstackLocal: true
 parallelsPerPlatform: 1
 
 platforms:
-  # TEMP: single-device probe to validate auth/tunnel/caps and surface logs
-  # before scaling back to the full 6-platform matrix (iOS 26/18/17 +
-  # Android 16/15/14). See git history for the full list.
+  # TEMP: raw-audio probe on one iOS + one Android to isolate the platform
+  # variable (does an automated tap grant media user-activation?).
   - deviceName: iPhone 17
     osVersion: "26"
     browserName: playwright-webkit
+    realMobile: "true"
+  - deviceName: Google Pixel 10
+    osVersion: "16.0"
+    browserName: playwright-chromium
     realMobile: "true"
