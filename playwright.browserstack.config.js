@@ -6,5 +6,11 @@ import base from "./playwright.config.js"
 // platforms fan it out across real devices. Run via: npm run browserstack
 export default defineConfig({
   ...base,
+  // Real devices over the tunnel are slow, and the full desktop-tuned suite is
+  // the wrong shape for them. Run just the smoke canary — "does MP3 actually
+  // decode and play on this real device" — with no retries so failures surface
+  // fast rather than 3x into the job timeout.
+  grep: /@smoke/,
+  retries: 0,
   projects: [{ name: "browserstack" }],
 })
