@@ -12,6 +12,29 @@ test.beforeEach(async ({ page }) => {
   await openPlayer(page, "/tests/fixtures/player-queue.html")
 })
 
+// TEMP diagnostic for the real-iOS playback failure: dump the playback events
+// (projected to primitives so the result transfers over Selenium).
+test.afterEach(async ({ page }, testInfo) => {
+  if (testInfo.status === testInfo.expectedStatus) return
+  const dump = await page.evaluate(() =>
+    (window.__stitchesEvents || [])
+      .filter((e) =>
+        /nodepool:|audioNode:onError|player:(error|playing|timeupdate|loading|trackchanged|queued)/.test(
+          e.type,
+        ),
+      )
+      .map((e) => ({
+        t: e.type,
+        file: e.detail && e.detail.fileName,
+        code: e.detail && e.detail.code,
+        msg: e.detail && (e.detail.message || (e.detail.error && e.detail.error.message)),
+        id: e.detail && e.detail.track && e.detail.track.id,
+        ct: e.detail && e.detail.currentTime,
+      })),
+  )
+  console.log(`[DIAG ${testInfo.title}] ${JSON.stringify(dump)}`)
+})
+
 const start = (page) => page.locator("#play").click()
 
 test("unlock + play: the first track plays after the gesture", async ({
