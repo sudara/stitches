@@ -6,10 +6,33 @@ import { expect } from "@playwright/test"
 export async function openPlayer(page, path = "/tests/fixtures/player.html") {
   await page.addInitScript(() => {
     window.__stitchesEvents = []
+    // BrowserStack drives real devices over Selenium, whose JSON transport
+    // rejects circular/DOM-bearing values ("Recursive object cannot be
+    // transferred"). Snapshot a plain, acyclic copy of detail at capture time
+    // so events() always returns something transferable.
+    const safe = (val, seen = new WeakSet()) => {
+      if (val === null || typeof val === "undefined") return val
+      const type = typeof val
+      if (type === "function") return undefined
+      if (type !== "object") return val
+      if (typeof Node !== "undefined" && val instanceof Node) return undefined
+      if (seen.has(val)) return undefined
+      seen.add(val)
+      if (Array.isArray(val)) return val.map((item) => safe(item, seen))
+      const out = {}
+      for (const key of Object.keys(val)) {
+        const cloned = safe(val[key], seen)
+        if (typeof cloned !== "undefined") out[key] = cloned
+      }
+      return out
+    }
     const origDispatch = EventTarget.prototype.dispatchEvent
     EventTarget.prototype.dispatchEvent = function (event) {
       if (event instanceof CustomEvent) {
-        window.__stitchesEvents.push({ type: event.type, detail: event.detail })
+        window.__stitchesEvents.push({
+          type: event.type,
+          detail: safe(event.detail),
+        })
       }
       return origDispatch.call(this, event)
     }
