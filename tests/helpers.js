@@ -6,10 +6,22 @@ import { expect } from "@playwright/test"
 export async function openPlayer(page, path = "/tests/fixtures/player.html") {
   await page.addInitScript(() => {
     window.__stitchesEvents = []
-    // BrowserStack drives real devices over Selenium, whose JSON transport
-    // rejects circular/DOM-bearing values ("Recursive object cannot be
-    // transferred"). Snapshot a plain, acyclic copy of detail at capture time
-    // so events() always returns something transferable.
+    const origDispatch = EventTarget.prototype.dispatchEvent
+    EventTarget.prototype.dispatchEvent = function (event) {
+      if (event instanceof CustomEvent) {
+        window.__stitchesEvents.push({ type: event.type, detail: event.detail })
+      }
+      return origDispatch.call(this, event)
+    }
+  })
+  await page.goto(path)
+}
+
+// BrowserStack drives real devices over Selenium, whose JSON transport rejects
+// circular/DOM-bearing values ("Recursive object cannot be transferred"). Clone
+// each detail into a plain, acyclic shape at read time so the array transfers.
+export function events(page) {
+  return page.evaluate(() => {
     const safe = (val, seen = new WeakSet()) => {
       if (val === null || typeof val === "undefined") return val
       const type = typeof val
@@ -26,22 +38,11 @@ export async function openPlayer(page, path = "/tests/fixtures/player.html") {
       }
       return out
     }
-    const origDispatch = EventTarget.prototype.dispatchEvent
-    EventTarget.prototype.dispatchEvent = function (event) {
-      if (event instanceof CustomEvent) {
-        window.__stitchesEvents.push({
-          type: event.type,
-          detail: safe(event.detail),
-        })
-      }
-      return origDispatch.call(this, event)
-    }
+    return (window.__stitchesEvents || []).map((e) => ({
+      type: e.type,
+      detail: safe(e.detail),
+    }))
   })
-  await page.goto(path)
-}
-
-export function events(page) {
-  return page.evaluate(() => window.__stitchesEvents)
 }
 
 export function callbacks(page) {
