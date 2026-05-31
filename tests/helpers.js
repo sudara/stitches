@@ -4,6 +4,10 @@ import { expect } from "@playwright/test"
 // We wrap dispatchEvent so tests assert against real events instead of
 // scraping text out of the #debug element (the old Nightwatch approach).
 export async function openPlayer(page, path = "/tests/fixtures/player.html") {
+  page.on("pageerror", (err) => console.log(`[pageerror] ${err.message}`))
+  page.on("console", (msg) => {
+    if (msg.type() === "error") console.log(`[console.error] ${msg.text()}`)
+  })
   await page.addInitScript(() => {
     window.__stitchesEvents = []
     const origDispatch = EventTarget.prototype.dispatchEvent
