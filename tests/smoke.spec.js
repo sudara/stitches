@@ -43,12 +43,12 @@ test("unlock + play: the first track plays after the gesture", async ({
   await expectEvent(page, "nodepool:create") // the library loaded and Player built
   await start(page)
   await expectEvent(page, "nodepool:unlockAll") // the gesture unlocked the pool
-  await expectPlayerPlaying(page, { id: 1 }) // real MP3 decoded and played
+  await expectPlayerPlaying(page, { id: 1, timeout: 45_000 }) // real MP3 decoded and played
 })
 
 test("next: gestureless advance plays the second track", async ({ page }) => {
   await start(page)
-  await expectPlayerPlaying(page, { id: 1 })
+  await expectPlayerPlaying(page, { id: 1, timeout: 45_000 })
   await page.evaluate(() => window.player.next())
-  await expectPlayerPlaying(page, { id: 2 })
+  await expectPlayerPlaying(page, { id: 2, timeout: 45_000 })
 })

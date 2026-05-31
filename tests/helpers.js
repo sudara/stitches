@@ -96,7 +96,7 @@ export async function expectPlaying(
 // whose track advanced past `past` seconds (optionally for a specific track id).
 export async function expectPlayerPlaying(
   page,
-  { past = 0.3, id = null } = {},
+  { past = 0.3, id = null, timeout = 15_000 } = {},
 ) {
   await expect
     .poll(
@@ -113,7 +113,7 @@ export async function expectPlayerPlaying(
         })
       },
       {
-        timeout: 15_000,
+        timeout,
         message: `expected player past ${past}s${id != null ? ` of track ${id}` : ""}`,
       },
     )

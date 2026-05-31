@@ -9,6 +9,9 @@ export default defineConfig({
   // On a real device "localhost" is the device itself; BrowserStack Local
   // tunnels the host's server under bs-local.com, so point the tests there.
   use: { ...base.use, baseURL: "http://bs-local.com:8080" },
+  // real devices fetch MP3s over the tunnel, so allow longer than the desktop
+  // per-test budget for the smoke playback assertions (which wait up to 45s)
+  timeout: 120_000,
   // Real devices over the tunnel are slow, and the full desktop-tuned suite is
   // the wrong shape for them. Run only the smoke suite (unlock/play/next) with
   // no retries so failures surface fast rather than 3x into the job timeout.
