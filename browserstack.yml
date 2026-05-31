@@ -15,29 +15,10 @@ browserstackLocal: true
 parallelsPerPlatform: 1
 
 platforms:
-  # the unique value over local Playwright: real mobile devices.
-  # Last 3 iOS releases (Safari/WebKit) and last 3 Android releases (Chrome).
+  # TEMP: single-device probe to validate auth/tunnel/caps and surface logs
+  # before scaling back to the full 6-platform matrix (iOS 26/18/17 +
+  # Android 16/15/14). See git history for the full list.
   - deviceName: iPhone 17
     osVersion: "26"
     browserName: playwright-webkit
-    realMobile: "true"
-  - deviceName: iPhone 16
-    osVersion: "18"
-    browserName: playwright-webkit
-    realMobile: "true"
-  - deviceName: iPhone 15
-    osVersion: "17"
-    browserName: playwright-webkit
-    realMobile: "true"
-  - deviceName: Google Pixel 10
-    osVersion: "16.0"
-    browserName: playwright-chromium
-    realMobile: "true"
-  - deviceName: Google Pixel 9
-    osVersion: "15.0"
-    browserName: playwright-chromium
-    realMobile: "true"
-  - deviceName: Samsung Galaxy S24
-    osVersion: "14.0"
-    browserName: playwright-chromium
     realMobile: "true"
