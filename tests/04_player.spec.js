@@ -12,28 +12,6 @@ test.beforeEach(async ({ page }) => {
   await openPlayer(page, "/tests/fixtures/player-queue.html")
 })
 
-// TEMP diagnostic for the Firefox failures: dump error/playback events on fail
-test.afterEach(async ({ page }, testInfo) => {
-  if (testInfo.status === testInfo.expectedStatus) return
-  const dump = await page.evaluate(() =>
-    (window.__stitchesEvents || [])
-      .filter((e) =>
-        /audioNode:onError|player:(error|playing|timeupdate|trackchanged)/.test(
-          e.type,
-        ),
-      )
-      .map((e) => ({
-        t: e.type,
-        file: e.detail?.fileName,
-        code: e.detail?.code,
-        msg: e.detail?.message || e.detail?.error?.message,
-        id: e.detail?.track?.id,
-        ct: e.detail?.currentTime,
-      })),
-  )
-  console.log(`[DIAG ${testInfo.title}] ${JSON.stringify(dump)}`)
-})
-
 // The first setQueue rides this click so autoplay/iOS unlock is satisfied.
 const start = (page) => page.locator("#play").click()
 

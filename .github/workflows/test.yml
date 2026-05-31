@@ -33,13 +33,9 @@ jobs:
       - run: npx playwright install webkit
       - run: npx playwright test --project=webkit
 
-  # Non-blocking: the Player path has a known Firefox-on-Linux issue (the silent
-  # unlock clip + 3-node pool contention cause spurious errors), tracked in
-  # issue #159. Runs for visibility but does not gate the build.
   firefox:
-    name: Playwright (firefox, informational)
+    name: Playwright (firefox)
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
