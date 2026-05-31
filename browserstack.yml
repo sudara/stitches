@@ -15,12 +15,29 @@ browserstackLocal: true
 parallelsPerPlatform: 1
 
 platforms:
-  # the unique value over local Playwright: real mobile devices
+  # the unique value over local Playwright: real mobile devices.
+  # Last 3 iOS releases (Safari/WebKit) and last 3 Android releases (Chrome).
+  - deviceName: iPhone 17
+    osVersion: "26"
+    browserName: playwright-webkit
+    realMobile: "true"
+  - deviceName: iPhone 16
+    osVersion: "18"
+    browserName: playwright-webkit
+    realMobile: "true"
   - deviceName: iPhone 15
     osVersion: "17"
     browserName: playwright-webkit
     realMobile: "true"
-  - deviceName: Samsung Galaxy S23
-    osVersion: "13.0"
+  - deviceName: Google Pixel 10
+    osVersion: "16.0"
+    browserName: playwright-chromium
+    realMobile: "true"
+  - deviceName: Google Pixel 9
+    osVersion: "15.0"
+    browserName: playwright-chromium
+    realMobile: "true"
+  - deviceName: Samsung Galaxy S24
+    osVersion: "14.0"
     browserName: playwright-chromium
     realMobile: "true"
