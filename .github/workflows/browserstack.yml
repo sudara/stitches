@@ -2,7 +2,8 @@ name: BrowserStack
 
 # Opt-in real-device lane. Local Playwright already covers the Chromium,
 # Firefox and WebKit (Safari) engines; this exists only for real iOS/Android
-# devices. Triggered manually to keep it off the per-push path.
+# devices, driven by Selenium + Appium (nativeWebTap) so iOS Safari grants the
+# media user-activation Playwright can't. Triggered manually.
 on: workflow_dispatch
 
 jobs:
@@ -17,15 +18,19 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      # browserstack-node-sdk (1.55.4, latest) hardcodes a Playwright internal
-      # path (playwright/lib/common/configLoader.js) that 1.60 bundled away, so
-      # the SDK only works with Playwright <=1.55. Pin a compatible version for
-      # this opt-in job only; the main lanes stay on the repo's 1.60.
-      - run: npm install --no-save @playwright/test@1.55.0 playwright@1.55.0
-      # the SDK runs the test files on BrowserStack's devices; the local
-      # http-server (started by Playwright's webServer) is reached via the
-      # BrowserStack Local tunnel that the SDK manages
+      # the real devices fetch the fixtures + MP3s over the BrowserStack Local
+      # tunnel (opened by the runner) from this server
+      - name: Serve the site
+        run: npx http-server -p 8080 -s &
+      - name: Wait for the server
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:8080/tests/fixtures/player-queue.html && exit 0
+            sleep 1
+          done
+          echo "http-server never came up on :8080" && exit 1
       - run: npm run browserstack
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+          BUILD_NAME: stitches ${{ github.ref_name }} ${{ github.run_number }}

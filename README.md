@@ -349,9 +349,11 @@ CI runs on GitHub Actions (`.github/workflows/test.yml`): Chromium + Firefox on 
 
 ### BrowserStack (real devices, opt-in)
 
-Local Playwright already covers the Chromium, Firefox and WebKit engines, so BrowserStack exists only for **real iOS/Android devices**. It uses the BrowserStack Playwright SDK (`browserstack.yml` + `playwright.browserstack.config.js`):
+Local Playwright already covers the Chromium, Firefox and WebKit engines, so BrowserStack exists only for **real iOS/Android devices**. It runs `tests/browserstack/realdevice-smoke.js` on Selenium + Appium rather than Playwright: Playwright drives WebKit over the remote inspector protocol, and its synthesized click never grants real iOS Safari the media user-activation a gesture needs, so `play()` throws `NotAllowedError`. Appium's `nativeWebTap` performs a real OS-level tap, which iOS accepts.
 
 ```sh
+# needs a local server on :8080
+npx http-server -p 8080 -s &
 BROWSERSTACK_USERNAME=… BROWSERSTACK_ACCESS_KEY=… npm run browserstack
 ```
 
