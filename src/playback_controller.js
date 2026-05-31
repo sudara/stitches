@@ -195,6 +195,7 @@ export default class PlaybackController {
   }
 
   pause() {
+    if (!this.audioNode) return
     this.audioNode.pause()
     this.paused = true
     this.emit("pause", this.state())

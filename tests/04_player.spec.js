@@ -189,3 +189,53 @@ test("seek before playback does not throw", async ({ page }) => {
   await page.evaluate(() => window.player.seek(0.5))
   expect(await page.evaluate(() => window.player.currentIndex)).toBe(0)
 })
+
+test("pause before playback does not throw", async ({ page }) => {
+  const threw = await page.evaluate(() => {
+    window.player.setQueue(window.TRACKS, { startIndex: 0, autoplay: false })
+    // load() is async, so no node is leased yet; pause must be a safe no-op
+    try {
+      window.player.pause()
+      return false
+    } catch {
+      return true
+    }
+  })
+  expect(threw).toBe(false)
+})
+
+test("a stale controller from a replaced queue cannot mutate the new queue", async ({
+  page,
+}) => {
+  const fired = await page.evaluate(() => {
+    window.player.setQueue(window.TRACKS, { startIndex: 0, autoplay: false })
+    const stale = window.player._controllers[0]
+    window.player.setQueue([{ id: 99, url: "/mp3/short-continuous-1.mp3" }], {
+      autoplay: false,
+    })
+    window.__stitchesEvents = []
+    // an error from the outgoing controller lands on the new queue's index 0
+    stale.onError({ code: "3: MEDIA_ERR_DECODE", message: "boom" })
+    return window.__stitchesEvents.map((e) => e.type)
+  })
+  expect(fired).not.toContain("player:error")
+  expect(fired).not.toContain("player:queueended")
+  expect(await page.evaluate(() => window.player.currentTrack?.id)).toBe(99)
+})
+
+test("player:error carries the media error code and fileName", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    window.TRACKS = [{ id: 1, url: "/mp3/nope-does-not-exist.mp3", title: "x" }]
+  })
+  await start(page)
+  await expectEvent(page, "player:error")
+  const error = await page.evaluate(
+    () =>
+      window.__stitchesEvents.find((e) => e.type === "player:error")?.detail
+        ?.error,
+  )
+  expect(error.code).toBeTruthy()
+  expect(error.fileName).toContain("nope-does-not-exist")
+})

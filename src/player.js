@@ -22,6 +22,7 @@ export default class Player {
     this._currentIndex = -1
     this._isPlaying = false
     this._advanced = false
+    this._generation = 0
   }
 
   get queue() {
@@ -47,6 +48,10 @@ export default class Player {
   // stalls playback in Firefox.
   setQueue(tracks, { startIndex = 0, autoplay = true } = {}) {
     this._stopCurrent()
+    // a controller from the outgoing queue may still emit (error/ended) after
+    // replacement; tag emits with the generation so stale ones are ignored
+    this._generation += 1
+    const generation = this._generation
 
     this._queue = tracks.slice()
     this._controllers = this._queue.map(
@@ -54,7 +59,8 @@ export default class Player {
         new PlaybackController({
           url: track.url,
           pool: this.pool,
-          emit: (event, detail) => this._onEngineEvent(i, event, detail),
+          emit: (event, detail) =>
+            this._onEngineEvent(generation, i, event, detail),
         }),
     )
     this._currentIndex = startIndex
@@ -121,6 +127,7 @@ export default class Player {
 
   clear() {
     this._stopCurrent()
+    this._generation += 1
     this._queue = []
     this._controllers = []
     this._currentIndex = -1
@@ -136,7 +143,9 @@ export default class Player {
     this._isPlaying = false
   }
 
-  _onEngineEvent(index, event, detail) {
+  _onEngineEvent(generation, index, event, detail) {
+    // an event from a queue we've since replaced must not touch current state
+    if (generation !== this._generation) return
     // events from a backgrounded controller (e.g. the next track preloading)
     // are not surfaced as player state
     if (index !== this._currentIndex) return
@@ -211,7 +220,12 @@ export default class Player {
       percent,
     }
     if (core.error) {
-      detail.error = { name: core.error.name, message: core.error.message }
+      detail.error = {
+        name: core.error.name,
+        code: core.error.code,
+        message: core.error.message,
+        fileName: core.error.fileName,
+      }
     }
     if (this.enableConsoleLogging) {
       console.log(`player:${type}`, detail)

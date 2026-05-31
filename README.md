@@ -112,7 +112,11 @@ CustomEvents dispatched on `eventTarget` (default `document`), namespaced
 `player:*`: `queued`, `trackchanged`, `loading`, `playing`, `timeupdate`,
 `paused`, `ended`, `queueended`, `registerlisten`, `seeked`, `error`. Each
 detail carries `{ track, index, duration, currentTime, currentTimeFormatted,
-percent }` (plus `{ error: { name, message } }` on `player:error`).
+percent }` (plus `{ error: { name, code, message, fileName } }` on
+`player:error`). For media-element failures (decode/network/unsupported) `code`
+is the `MediaError` code like `"3: MEDIA_ERR_DECODE"` and `fileName` is set; for
+a `play()` rejection (e.g. blocked autoplay) `name` holds the DOMException name
+and `code`/`fileName` are undefined.
 
 ## How does it work?
 

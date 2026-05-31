@@ -3,6 +3,7 @@
   "version": "3.0.0",
   "description": "Stitching Together MP3 Playback in HTML5 Audio with ES6",
   "type": "module",
+  "main": "./src/index.js",
   "exports": {
     ".": "./src/index.js"
   },
