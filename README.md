@@ -293,37 +293,38 @@ However, as time wore on, I found myself constantly having to keep up with the c
 
 ## Visualizing the object relationships
 
-Each `Playlist` has `Tracks` that communicate to a `NodePool` containing `AudioNode`s.
+`Player` (queue-driven) and `Playlist` (DOM selectors) are two front-ends over the same engine. Each builds one controller per track that asks a `NodePool` for an unlocked `AudioNode`:
 
 ```
 
-                   ┌-----------┐
-                   | Playlist  |
-                   └-----------┘
-                    /    |    \
-                   /     |     \
-          ┌-------┐  ┌-------┐  ┌-------┐
-          | Track |  | Track |  | Track |
-          └-------┘  └-------┘  └-------┘
-                         ↓
-          hi, can i have an unlocked node plz?
-                         ↓
-                   ┌----------┐
-                   | NodePool |
-                   └----------┘
-                  /      |     \
-                 /       |      \
-          ┌------┐    ┌------┐   ┌------┐
-         AudioNode   AudioNode  AudioNode
-          └------┘    └------┘   └------┘
-              |           |          |
-           <audio>      <audio>   <audio>
+        ┌------------------┐      ┌------------------┐
+        |      Player      |      |     Playlist     |
+        |  (queue-driven)  |      |  (DOM selectors) |
+        └------------------┘      └------------------┘
+                 |                         |
+       one PlaybackController       one Track per element
+          per queued track         (wraps a PlaybackController)
+                  \                       /
+                   \                     /
+                    ↓                   ↓
+                hi, can i have an unlocked node plz?
+                            ↓
+                      ┌----------┐
+                      | NodePool |
+                      └----------┘
+                     /      |     \
+                    /       |      \
+             ┌------┐    ┌------┐   ┌------┐
+            AudioNode   AudioNode  AudioNode
+             └------┘    └------┘   └------┘
+                 |           |          |
+              <audio>      <audio>   <audio>
 
-````
+```
 
 These `AudioNode`s map 1-1 with HTML5 audio elements which are "unlocked" on any user interaction. The `NodePool` manages these unlocked `AudioNode`s, supplying them as needed.
 
-Each `NodePool` (there's one per playlist) has exactly 3 `AudioNode`s, which allows for seamless preloading and playback with minimum amount of 🤹🏻‍♂️. For example they might all be in use in this situation:
+A `Player` owns its own `NodePool`; all `Playlist`s share a single module-level one. Either way a pool has exactly 3 `AudioNode`s, which allows for seamless preloading and playback with minimum amount of 🤹🏻‍♂️. For example they might all be in use in this situation:
 
 1. The last track that just played
 2. The current track that's playing now
