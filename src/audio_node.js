@@ -207,8 +207,9 @@ export default class AudioNode {
     // useful internally to make sure our error handling works
     Log.trigger("audioNode:onError", payload)
 
-    // bubble this up to the Track in charge
-    this.onErrorCallback(payload)
+    // a pooled node can error before it's been leased to a track (e.g. the
+    // silent unlock clip failing to decode), so it may have no callback yet
+    if (this.onErrorCallback) this.onErrorCallback(payload)
   }
 
   async play(

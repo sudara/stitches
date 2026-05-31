@@ -12,17 +12,6 @@ test.beforeEach(async ({ page }) => {
   await openPlayer(page, "/tests/fixtures/player-queue.html")
 })
 
-// TEMP diagnostic: on failure, dump what actually happened in the page
-test.afterEach(async ({ page }, testInfo) => {
-  if (testInfo.status !== testInfo.expectedStatus) {
-    const info = await page.evaluate(() => ({
-      player: typeof window.player,
-      events: (window.__stitchesEvents || []).map((e) => e.type),
-    }))
-    console.log(`[DIAG ${testInfo.title}] ${JSON.stringify(info)}`)
-  }
-})
-
 // The first setQueue rides this click so autoplay/iOS unlock is satisfied.
 const start = (page) => page.locator("#play").click()
 
