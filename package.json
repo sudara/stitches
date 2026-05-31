@@ -1,6 +1,6 @@
 {
   "name": "@alonetone/stitches",
-  "version": "2.1.2",
+  "version": "3.0.0",
   "description": "Stitching Together MP3 Playback in HTML5 Audio with ES6",
   "type": "module",
   "exports": {
