@@ -27,7 +27,18 @@ export default defineConfig({
     },
     {
       name: "firefox",
-      use: { ...devices["Desktop Firefox"] },
+      use: {
+        ...devices["Desktop Firefox"],
+        // headless Firefox on Linux CI blocks the gestureless programmatic
+        // plays the Player relies on (next/jumpTo/auto-advance); allow autoplay
+        // so we test our playback logic, not Firefox's autoplay policy
+        launchOptions: {
+          firefoxUserPrefs: {
+            "media.autoplay.default": 0,
+            "media.autoplay.blocking_policy": 0,
+          },
+        },
+      },
     },
     // WebKit only decodes MP3 on macOS (system codecs); CI runs this project
     // on a macOS runner. On Linux it will fail to play and should be skipped.
