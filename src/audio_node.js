@@ -15,7 +15,8 @@ export default class AudioNode {
     this.audio = new Audio()
     this.audio.autoplay = false
     // https://developer.mozilla.org/en-US/docs/Web/Apps/Fundamentals/Audio_and_video_delivery/Cross-browser_audio_basics
-    this.audio.onprogress = this.whileLoading.bind(this)
+    // arrow, not bind: the native ProgressEvent must not land in `force`
+    this.audio.onprogress = () => this.whileLoading()
     this.audio.ontimeupdate = this.whilePlaying.bind(this)
     this.audio.oncanplaythrough = this.loaded.bind(this)
     this.audio.onloadeddata = this.onloading.bind(this)
@@ -116,7 +117,7 @@ export default class AudioNode {
   }
 
   // https://developer.mozilla.org/en-US/docs/Web/Guide/Audio_and_video_delivery/buffering_seeking_time_ranges
-  whileLoading() {
+  whileLoading(force = false) {
     // we can't do much until we have metadata like duration
     if (!this.duration) return
 
@@ -131,8 +132,10 @@ export default class AudioNode {
       Log.trigger("audioNode:indexSizeError")
     }
 
-    // we don't want to fire on pointless / duplicate events
-    if (secondsLoaded <= this.lastSecondsLoaded) return
+    // we don't want to fire on pointless / duplicate events — unless forced, so
+    // a preloaded track (already buffered to full while backgrounded) still
+    // reports its progress when it becomes current on auto-advance
+    if (!force && secondsLoaded <= this.lastSecondsLoaded) return
 
     const payload = {
       secondsLoaded,

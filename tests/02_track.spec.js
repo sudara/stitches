@@ -70,17 +70,15 @@ test("seeking works and doesn't reload the track", async ({ page }) => {
   await expectEvent(page, "track:playing")
   await expectPlaying(page, { past: 2.0 }) // only reachable via the seek
 
-  // The current track's audio is never reloaded; the only src/loading churn is
-  // the *next* track preloading (timeFromEnd < 10 always holds on these ~4.4s
-  // mp3s), so we assert by fileName rather than by event absence.
-  const loadFiles = (await events(page))
-    .filter(
-      (e) =>
-        e.type === "audioNode:srcchanged" ||
-        e.type === "audioNode:whileLoading",
-    )
+  // The current track's audio is never reloaded; the only src churn is the
+  // *next* track preloading (timeFromEnd < 10 always holds on these ~4.4s mp3s),
+  // so we assert by fileName rather than by event absence. A whileLoading for
+  // the current file is expected here (resuming re-reports its full progress),
+  // so a reload is signalled solely by a fresh srcchanged.
+  const reloadedFiles = (await events(page))
+    .filter((e) => e.type === "audioNode:srcchanged")
     .map((e) => e.detail?.fileName)
-  expect(loadFiles).not.toContain("short-continuous-1.mp3")
+  expect(reloadedFiles).not.toContain("short-continuous-1.mp3")
 })
 
 test("seeking during playback doesn't trigger play callbacks", async ({

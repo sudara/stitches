@@ -94,6 +94,27 @@ test("a finished track auto-advances to the next", async ({ page }) => {
   await expectPlayerPlaying(page, { id: 2 }) // advanced without a gesture
 })
 
+test("an auto-advanced (preloaded) track still reports player:whileloading", async ({
+  page,
+}) => {
+  await start(page)
+  await expectPlayerPlaying(page, { id: 1 })
+  await clearEvents(page)
+  await expectPlayerPlaying(page, { id: 2 }) // auto-advanced into the preload
+  // the preloaded track buffered to full while backgrounded, so the forced
+  // nudge must report (near) complete progress, not a stale fraction
+  await expect
+    .poll(async () =>
+      (await events(page)).find(
+        (e) =>
+          e.type === "player:whileloading" &&
+          e.detail.index === 1 &&
+          e.detail.loadingPosition > 0.9,
+      ),
+    )
+    .toMatchObject({ detail: { secondsLoaded: expect.any(Number) } })
+})
+
 test("the last track finishing emits player:queueended", async ({ page }) => {
   await page.evaluate(() => {
     window.OPTS = { startIndex: 2, autoplay: true }

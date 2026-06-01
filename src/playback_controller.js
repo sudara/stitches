@@ -145,7 +145,7 @@ export default class PlaybackController {
     if (!this.playingDispatched) {
       // manually fire one last whileLoading as browsers are a bit inconsistent
       // about this and we'd like to always see the full loading progress
-      this.audioNode.whileLoading()
+      this.audioNode.whileLoading(true)
       this.emit("playing", detail)
       this.playingDispatched = true
     } else {
