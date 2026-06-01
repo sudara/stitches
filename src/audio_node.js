@@ -15,7 +15,8 @@ export default class AudioNode {
     this.audio = new Audio()
     this.audio.autoplay = false
     // https://developer.mozilla.org/en-US/docs/Web/Apps/Fundamentals/Audio_and_video_delivery/Cross-browser_audio_basics
-    this.audio.onprogress = this.whileLoading.bind(this)
+    // arrow, not bind: the native ProgressEvent must not land in `force`
+    this.audio.onprogress = () => this.whileLoading()
     this.audio.ontimeupdate = this.whilePlaying.bind(this)
     this.audio.oncanplaythrough = this.loaded.bind(this)
     this.audio.onloadeddata = this.onloading.bind(this)
@@ -40,7 +41,7 @@ export default class AudioNode {
     this.reset()
     this.audio.src = url
     this.fileName = url.startsWith("data:audio") ? "data" : url.split("/").pop()
-    Log.trigger("audioNode:srcchanged", { fileName: this.fileName } )
+    Log.trigger("audioNode:srcchanged", { fileName: this.fileName })
   }
 
   get src() {
@@ -56,16 +57,20 @@ export default class AudioNode {
 
   // position is a percentage
   async seek(position) {
+    // metadata (duration) may not have loaded yet; wait briefly for it rather
+    // than spin forever if the track never loads
+    let attempts = 0
     while (isNaN(this.audio.duration)) {
-      Log.trigger('waiting for audio.duration')
-
-      // eslint-disable-next-line no-await-in-loop
-      await new Promise(resolve => setTimeout(resolve, 20))
+      if (attempts++ > 100) {
+        Log.trigger("audioNode:seekTimedOut", { fileName: this.fileName })
+        return
+      }
+      await new Promise((resolve) => setTimeout(resolve, 20))
     }
     this.seeked = true
     Log.trigger("audioNode:seeked", {
       position,
-      fileName: this.fileName
+      fileName: this.fileName,
     })
     this.audio.currentTime = this.audio.duration * position
   }
@@ -76,15 +81,15 @@ export default class AudioNode {
 
   // this can *only* be called via an interaction event like a click/touch
   async unlock() {
-     // https://developers.google.com/web/updates/2016/03/play-returns-promise
+    // https://developers.google.com/web/updates/2016/03/play-returns-promise
     try {
       // This will be reached only if preloaded track *wasn't* clicked on
-      if (this.unlockedDirectlyViaUserInteraction){
+      if (this.unlockedDirectlyViaUserInteraction) {
         Log.trigger("audioNode:alreadyUnlockedDirectly")
       } else if (!this.blank && !this.unlocked) {
         await this.unlockPreloaded()
         Log.trigger("audioNode:unlockedPreloaded")
-      } else if(!this.unlocked) {
+      } else if (!this.unlocked) {
         await this.audio.play()
         Log.trigger("audioNode:unlocked")
       } else {
@@ -94,7 +99,7 @@ export default class AudioNode {
     } catch (err) {
       Log.trigger("audioNode:unlockfailed", {
         name: err.name,
-        message: err.message
+        message: err.message,
       })
     }
   }
@@ -112,7 +117,7 @@ export default class AudioNode {
   }
 
   // https://developer.mozilla.org/en-US/docs/Web/Guide/Audio_and_video_delivery/buffering_seeking_time_ranges
-  whileLoading() {
+  whileLoading(force = false) {
     // we can't do much until we have metadata like duration
     if (!this.duration) return
 
@@ -124,27 +129,31 @@ export default class AudioNode {
       // https://developer.mozilla.org/en-US/docs/Web/Guide/Audio_and_video_delivery/buffering_seeking_time_ranges#Seekable
       secondsLoaded = this.audio.seekable.end(this.audio.seekable.length - 1)
     } catch {
-      Log.trigger('audioNode:indexSizeError')
+      Log.trigger("audioNode:indexSizeError")
     }
 
-    // we don't want to fire on pointless / duplicate events
-    if (secondsLoaded <= this.lastSecondsLoaded) return
+    // we don't want to fire on pointless / duplicate events — unless forced, so
+    // a preloaded track (already buffered to full while backgrounded) still
+    // reports its progress when it becomes current on auto-advance
+    if (!force && secondsLoaded <= this.lastSecondsLoaded) return
 
     const payload = {
       secondsLoaded,
       duration: this.duration,
-      fileName: this.fileName
+      fileName: this.fileName,
     }
-    Log.trigger('audioNode:whileLoading', payload)
+    Log.trigger("audioNode:whileLoading", payload)
 
     // this is Track's whileLoading
     // We don't want it to fire on blank mp3, etc
     if (this.whileLoadingCallback) this.whileLoadingCallback(payload)
 
     // some browsers (FF 81) don't fire a last whileLoading
-    // lets give them a helping hand
-    if (secondsLoaded !== this.duration)
-      setTimeout(() => this.whileLoading, 1500)
+    // lets give them a helping hand (debounced so we schedule just one nudge)
+    if (secondsLoaded !== this.duration) {
+      clearTimeout(this.loadingNudge)
+      this.loadingNudge = setTimeout(() => this.whileLoading(), 1500)
+    }
 
     this.lastSecondsLoaded = secondsLoaded
   }
@@ -161,9 +170,9 @@ export default class AudioNode {
     // In these cases, we don't want to fire whilePlaying, as we aren't playing.
     // Warning: In some browsers, the event that fires on seek can have a different
     // decimal precision to the next event, despite no time passing.
-    if (this.seeked)  {
-      if ((this.lastSeeked > 0) && (this.lastSeeked !== currentTime.toFixed(3))) {
-      this.seeked = false
+    if (this.seeked) {
+      if (this.lastSeeked > 0 && this.lastSeeked !== currentTime.toFixed(3)) {
+        this.seeked = false
         this.lastSeeked = 0.0
         if (this.onSeekCallback) this.onSeekCallback()
       } else {
@@ -176,30 +185,41 @@ export default class AudioNode {
       this.whilePlayingCallback({
         currentTime,
         duration: this.duration,
-        fileName: this.fileName
+        fileName: this.fileName,
       })
     }
   }
 
   // https://dev.w3.org/html5/spec-author-view/spec.html#mediaerror
   onError(e) {
-    if(e.target ) { e = e.target.error } // when e is an event
-    const codes = ['MEDIA_ERR_ABORTED', 'MEDIA_ERR_NETWORK',
-      'MEDIA_ERR_DECODE', 'MEDIA_ERR_SRC_NOT_SUPPORTED']
+    if (e.target) {
+      e = e.target.error
+    } // when e is an event
+    const codes = [
+      "MEDIA_ERR_ABORTED",
+      "MEDIA_ERR_NETWORK",
+      "MEDIA_ERR_DECODE",
+      "MEDIA_ERR_SRC_NOT_SUPPORTED",
+    ]
     const payload = {
       fileName: this.fileName,
       code: `${e.code}: ${codes[parseInt(e.code, 10) - 1]}`,
-      message: e.message
+      message: e.message,
     }
 
     // useful internally to make sure our error handling works
     Log.trigger("audioNode:onError", payload)
 
-    // bubble this up to the Track in charge
-    this.onErrorCallback(payload)
+    // a pooled node can error before it's been leased to a track (e.g. the
+    // silent unlock clip failing to decode), so it may have no callback yet
+    if (this.onErrorCallback) this.onErrorCallback(payload)
   }
 
-  async play(whilePlayingCallback, onSeekCallback, firedFromUserInteraction=false) {
+  async play(
+    whilePlayingCallback,
+    onSeekCallback,
+    firedFromUserInteraction = false,
+  ) {
     Log.trigger("audioNode:play")
     this.unlockedDirectlyViaUserInteraction = firedFromUserInteraction
 
@@ -211,7 +231,9 @@ export default class AudioNode {
     // In the case of an error, the onError handler will handle it
     try {
       await this.audio.play()
-    } catch(e) { /* no-op */ }
+    } catch {
+      /* no-op */
+    }
   }
 
   pause() {
@@ -234,7 +256,7 @@ export default class AudioNode {
     if (!this.blank) {
       this.whileLoading()
       Log.trigger("audioNode:loaded", {
-        fileName: this.fileName
+        fileName: this.fileName,
       })
     }
   }

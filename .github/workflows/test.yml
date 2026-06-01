@@ -1,0 +1,57 @@
+name: Tests
+
+on: [push, pull_request]
+
+jobs:
+  # chromium uses the real Chrome channel for MP3 codecs. Required gate.
+  chromium:
+    name: Playwright (chromium) & lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npx playwright install --with-deps chrome
+      - run: npx playwright test --project=chromium
+
+  # WebKit only decodes MP3 on macOS (system codecs), so the Safari-engine lane
+  # needs a macOS runner. Required gate.
+  webkit:
+    name: Playwright (webkit, macOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install webkit
+      - run: npx playwright test --project=webkit
+
+  firefox:
+    name: Playwright (firefox)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps firefox
+      # Headless Linux has no audio device, so cubeb can't build a sink and
+      # every play errors with OnMediaSinkAudioError. A userspace null sink
+      # gives Firefox a real sink (no hardware) so playback advances.
+      - name: Start a dummy PulseAudio sink
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pulseaudio
+          pulseaudio --start --exit-idle-time=-1
+          pactl load-module module-null-sink sink_name=dummy
+          pactl set-default-sink dummy
+      - run: npx playwright test --project=firefox

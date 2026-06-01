@@ -7,10 +7,15 @@ import NodePool from "./node_pool.js"
 // 1 playing, 1 preloading and the last one played in memory
 // Browsers will usually HTTP cache the asset anyway
 // so there's no need to hang on to too many <audio> nodes
-const pool = new NodePool(3)
+// Created lazily so merely importing Playlist (e.g. via the barrel) doesn't
+// spin up audio nodes; still a singleton shared across Playlist instances.
+let pool
+function sharedPool() {
+  if (!pool) pool = new NodePool(3)
+  return pool
+}
 
 export default class Playlist {
-
   constructor(options) {
     this.listenersAreSetup = false
 
@@ -24,7 +29,7 @@ export default class Playlist {
   setup(options) {
     const {
       tracksSelector,
-      preloadIndex = 0,
+      preloadIndex = -1,
       playButtonSelector = "a",
       loadingProgressSelector = "progress",
       playProgressSelector = "progress",
@@ -37,13 +42,15 @@ export default class Playlist {
     this.reset()
     const elements = document.querySelectorAll(tracksSelector)
     if (!elements.length) {
-      Log.trigger("Stiches tracksSelector' not specified or contains no elements")
+      Log.trigger(
+        "Stitches: tracksSelector not specified or contains no elements",
+      )
     }
     this.tracks = [...elements].map(
-      el =>
+      (el) =>
         new Track({
           element: el,
-          pool,
+          pool: sharedPool(),
           setCurrentTrack: this.setCurrentTrack.bind(this),
           playButtonSelector,
           loadingProgressSelector,
@@ -51,12 +58,12 @@ export default class Playlist {
           seekSelector,
           timeSelector,
           whilePlaying,
-          onError
-        })
+          onError,
+        }),
     )
     if (preloadIndex >= 0) this.tracks[preloadIndex].preload()
-    if(!this.listenersAreSetup) this.setupListeners()
-    Log.enableConsoleLogging(enableConsoleLogging);
+    if (!this.listenersAreSetup) this.setupListeners()
+    Log.enableConsoleLogging(enableConsoleLogging)
   }
 
   reset() {
@@ -68,7 +75,7 @@ export default class Playlist {
 
   nextTrack() {
     const currentTrackIndex = this.tracks.findIndex(
-      track => this.currentTrack && track.id === this.currentTrack.id
+      (track) => this.currentTrack && track.id === this.currentTrack.id,
     )
     return this.tracks[currentTrackIndex + 1]
       ? this.tracks[currentTrackIndex + 1]
@@ -76,14 +83,14 @@ export default class Playlist {
   }
 
   async setCurrentTrack(track) {
-    if (this.currentTrack && (this.currentTrack !== track)) {
+    if (this.currentTrack && this.currentTrack !== track) {
       this.currentTrack.pause()
     }
     this.currentTrack = track
   }
 
   trackIsPartOfPlaylist(evt) {
-    return this.tracks.some(track => track.id === evt.detail.id)
+    return this.tracks.some((track) => track.id === evt.detail.id)
   }
 
   async playNextTrack(evt) {
@@ -107,7 +114,7 @@ export default class Playlist {
     document.addEventListener("track:ended", this.playNextTrack.bind(this))
     document.addEventListener(
       "track:preloadNextTrack",
-      this.preloadNextTrack.bind(this)
+      this.preloadNextTrack.bind(this),
     )
     this.listenersAreSetup = true
   }

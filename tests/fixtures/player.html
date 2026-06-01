@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+  <head>
+    <title>StitchES test fixture</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script type="module">
+      import Playlist from "/src/playlist.js"
+
+      // Tests observe consumer callbacks here instead of scraping #debug.
+      window.__callbacks = { whilePlaying: [], onError: [] }
+
+      window.playlist = new Playlist({
+        tracksSelector: "#playlist li",
+        preloadIndex: 0,
+      })
+
+      window.playlist2 = new Playlist({
+        tracksSelector: "#playlist2 li",
+        loadingProgressSelector: ".progress",
+        playProgressSelector: ".progress",
+        seekSelector: ".seek",
+        whilePlaying: (detail) => window.__callbacks.whilePlaying.push(detail),
+        onError: (detail) => window.__callbacks.onError.push(detail),
+      })
+    </script>
+  </head>
+  <body>
+    <h2>3 different tracks</h2>
+    <ul id="playlist">
+      <li>
+        <a href="/mp3/short-continuous-1.mp3" id="track1" class="track">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+            <use xlink:href="#playButton" width="50" height="50" />
+          </svg>
+        </a>
+        <div class="title">Track 1 (preloaded)</div>
+        <time id="track1time">1:23</time>
+        <progress id="track1progress" value="0"></progress>
+      </li>
+
+      <li>
+        <a href="/mp3/short-continuous-2.mp3" id="track2" class="track">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+            <use xlink:href="#playButton" width="50" height="50" />
+          </svg>
+        </a>
+        <div class="title">Track 2 (no time element)</div>
+        <progress id="track2progress" value="0"></progress>
+      </li>
+
+      <li>
+        <a href="/mp3/short-continuous-3.mp3" id="track3" class="track">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+            <use xlink:href="#playButton" width="50" height="50" />
+          </svg>
+        </a>
+        <div class="title">Track 3 (no progress element)</div>
+        <time>1:23</time>
+      </li>
+    </ul>
+
+    <h2>2 duplicate tracks, 2 broken tracks. With callbacks</h2>
+    <ul id="playlist2">
+      <li data-stitches-track-id="456">
+        <a
+          href="/mp3/short-continuous-1.mp3"
+          id="playlist2-track1"
+          class="track"
+        >
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+            <use xlink:href="#playButton" width="50" height="50" />
+          </svg>
+        </a>
+        <div class="title">Track 1 (custom seek/progress)</div>
+        <time>1:23</time>
+        <div class="seek"><div id="customProgress" class="progress"></div></div>
+      </li>
+
+      <li>
+        <a href="/mp3/short-continuous-1.mp3" class="track">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+            <use xlink:href="#playButton" width="50" height="50" />
+          </svg>
+        </a>
+        <div class="title">Play Track 1 again</div>
+        <time>1:23</time>
+        <div class="seek"><div class="progress"></div></div>
+      </li>
+
+      <li>
+        <a href="/mp3/short-continuous-666.mp3" id="track404" class="track">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+            <use xlink:href="#playButton" width="50" height="50" />
+          </svg>
+        </a>
+        <div class="title">404 track</div>
+        <time>1:23</time>
+        <progress value="0" class="progress"></progress>
+      </li>
+
+      <li>
+        <a href="http://alonetone.com/error" id="track500" class="track">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+            <use xlink:href="#playButton" width="50" height="50" />
+          </svg>
+        </a>
+        <div class="title">500 track</div>
+        <time>1:23</time>
+        <progress value="0" class="progress"></progress>
+      </li>
+    </ul>
+
+    <div id="debug"></div>
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      display="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g id="playButton">
+        <circle opacity="0.33" cx="12" cy="12" r="10" stroke="black" />
+        <path d="M17 12L9 7V17L17 12Z" fill="black" />
+      </g>
+    </svg>
+  </body>
+</html>

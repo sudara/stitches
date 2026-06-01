@@ -12,9 +12,9 @@ export default class NodePool {
     this.audioNodes = Array.from({ length: size }, () => new AudioNode())
   }
 
-  // has Last in Last out behaviour e.g. [a, b, c] -> [b, c, a]
-  async nextAvailableNode(cleanupCallback, preload=false) {
-
+  // round-robin: take the oldest node from the front, return it to the back
+  // e.g. [a, b, c] -> [b, c, a]
+  async nextAvailableNode(cleanupCallback) {
     // grab the first track in line
     const audioNode = this.audioNodes.shift()
 
