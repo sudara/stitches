@@ -109,11 +109,16 @@ no further gesture. If your queue comes from an async source, call
 ### Events
 
 CustomEvents dispatched on `eventTarget` (default `document`), namespaced
-`player:*`: `queued`, `trackchanged`, `loading`, `playing`, `timeupdate`,
-`paused`, `ended`, `queueended`, `registerlisten`, `seeked`, `error`. Each
-detail carries `{ track, index, duration, currentTime, currentTimeFormatted,
-percent }` (plus `{ error: { name, code, message, fileName } }` on
-`player:error`). For media-element failures (decode/network/unsupported) `code`
+`player:*`: `queued`, `trackchanged`, `loading`, `whileloading`, `playing`,
+`timeupdate`, `paused`, `ended`, `queueended`, `registerlisten`, `seeked`,
+`error`. Each detail carries `{ track, index, duration, currentTime,
+currentTimeFormatted, percent }` (plus `{ error: { name, code, message,
+fileName } }` on `player:error`). `player:whileloading` additionally carries
+`secondsLoaded` (seconds of the file buffered so far) and `loadingPosition` (a
+float 0..1, `secondsLoaded / duration`). Prefer `secondsLoaded` when driving a
+loading-progress UI against your own authoritative duration: `loadingPosition`
+divides by the media element's `duration`, which can be unreliable during the
+loading window. For media-element failures (decode/network/unsupported) `code`
 is the `MediaError` code like `"3: MEDIA_ERR_DECODE"` and `fileName` is set; for
 a `play()` rejection (e.g. blocked autoplay) `name` holds the DOMException name
 and `code`/`fileName` are undefined.

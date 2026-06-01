@@ -154,6 +154,9 @@ export default class Player {
       case "loading":
         this._dispatch("loading", detail)
         break
+      case "whileLoading":
+        this._dispatch("whileloading", detail)
+        break
       case "playing":
         this._isPlaying = true
         this._dispatch("playing", detail)
@@ -218,6 +221,12 @@ export default class Player {
       currentTime: core.time || 0,
       currentTimeFormatted: core.currentTime || "0:00",
       percent,
+    }
+    if (Number.isFinite(core.secondsLoaded)) {
+      detail.secondsLoaded = core.secondsLoaded
+    }
+    if (Number.isFinite(core.loadingPosition)) {
+      detail.loadingPosition = Math.min(1, Math.max(0, core.loadingPosition))
     }
     if (core.error) {
       detail.error = {

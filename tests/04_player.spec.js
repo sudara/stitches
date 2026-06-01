@@ -38,6 +38,26 @@ test("player:timeupdate fires repeatedly while playing", async ({ page }) => {
     .toBeGreaterThan(2)
 })
 
+test("player:whileloading carries a 0..1 loadingPosition", async ({ page }) => {
+  await start(page)
+  await expect
+    .poll(async () =>
+      (await events(page)).find((e) => e.type === "player:whileloading"),
+    )
+    .toMatchObject({ detail: { loadingPosition: expect.any(Number) } })
+
+  const loading = (await events(page)).find(
+    (e) => e.type === "player:whileloading",
+  )
+  expect(loading.detail.loadingPosition).toBeGreaterThanOrEqual(0)
+  expect(loading.detail.loadingPosition).toBeLessThanOrEqual(1)
+  expect(loading.detail.secondsLoaded).toBeGreaterThanOrEqual(0)
+
+  await expectPlayerPlaying(page)
+  const playing = (await events(page)).find((e) => e.type === "player:playing")
+  expect(playing.detail).not.toHaveProperty("loadingPosition")
+})
+
 test("pause emits player:paused and stops reporting playing", async ({
   page,
 }) => {
